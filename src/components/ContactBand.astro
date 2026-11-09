@@ -17,10 +17,10 @@ interface Props {
 const {
   id,
   title = 'Let’s talk.',
-  text = 'Hiring for a role in AI, software or technology? Email is the best way to reach me. I’m happy to walk you through any role or project here.',
+  text = 'Recruiting for a Management Trainee programme or a role in AI and technology? Email is the best way to reach me.',
 } = Astro.props;
 const headingId = id ? `${id}-title` : 'contact-band-title';
-const ticker = ['Say hello', ...(profile.availability ? [profile.availability.short] : []), 'Industry roles', 'Collaboration'];
+const ticker = ['Say hello', ...(profile.availability ? [profile.availability.short] : []), 'AI & technology', 'Leadership'];
 ---
 
 <section class="contact-band" id={id} aria-labelledby={headingId}>

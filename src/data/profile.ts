@@ -52,12 +52,12 @@ export const profile: Profile = {
   name: 'Syeda Maliha Tabassum',
   shortName: 'Maliha Tabassum',
   monogram: 'SMT',
-  headline: 'Computer Science Graduate · AI, Software & Infrastructure',
-  focus: 'AI, software and infrastructure that solve practical problems',
+  headline: 'AI & Technology Graduate · Aspiring Business Leader',
+  focus: 'AI and technology, applied with people and leadership',
   intro:
-    'I turn technical skills into working solutions for real organisations — from automating power-infrastructure monitoring at Grameenphone to building a full-stack healthcare platform and machine-learning pipelines for health data.',
+    'I bring AI and technology together with people to deliver results. From automating power-infrastructure monitoring at Grameenphone to a live digital-health platform and machine-learning models for health data, I apply technology where it solves practical problems.',
   description:
-    'Syeda Maliha Tabassum — computer science graduate (BRAC University, Highest Distinction, CGPA 3.93) with industry experience at Grameenphone, building AI, software and infrastructure solutions. Open to industry roles.',
+    'Syeda Maliha Tabassum — computer science graduate (BRAC University, Highest Distinction, CGPA 3.93) and former Grameenphone NEXTERN, working across AI and technology. Open to Management Trainee programmes.',
   location: 'Dhaka, Bangladesh',
   email: 'syeda.maliha.tabassum1@g.bracu.ac.bd',
   // Profiles shown on the site: LinkedIn only (owner's choice).
@@ -70,8 +70,8 @@ export const profile: Profile = {
     },
   ],
   availability: {
-    label: 'Open to industry roles in AI, software and technology',
-    short: 'Open to industry roles',
+    label: 'Open to Management Trainee programmes — technology and techno-commercial tracks',
+    short: 'Open to Management Trainee roles',
   },
   // No CV download until an industry résumé is supplied. See CONTENT_TODO.md.
   cv: null,
@@ -84,11 +84,11 @@ export const profile: Profile = {
   },
   interests: [
     'Artificial Intelligence',
-    'Machine Learning',
-    'Software Development',
-    'Network Infrastructure',
+    'Data Analytics',
+    'Digital Transformation',
+    'Telecom Infrastructure',
     'Automation',
-    'Embedded Systems',
+    'Leadership',
     'Health Technology',
   ],
 };

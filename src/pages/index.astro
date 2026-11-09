@@ -1,6 +1,6 @@
 ---
 // The whole portfolio is this one scrolling page, ordered for recruiters.
-// Sections (in order): #home, #about (+ #skills), #experience, #projects,
+// Sections (in order): #home, #about (+ #skills), #leadership, #experience, #projects,
 // #education (+ #recognition), #research (publications), #contact. Research entries and projects open inline (#research-<id>,
 // #project-<id>).
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -9,6 +9,7 @@ import Contact from '@/components/sections/Contact.astro';
 import Education from '@/components/sections/Education.astro';
 import Experience from '@/components/sections/Experience.astro';
 import Hero from '@/components/sections/Hero.astro';
+import Leadership from '@/components/sections/Leadership.astro';
 import Projects from '@/components/sections/Projects.astro';
 import Research from '@/components/sections/Research.astro';
 import { profile } from '@/data/profile';
@@ -30,6 +31,7 @@ const jsonLd = {
 <BaseLayout type="profile" jsonLd={jsonLd}>
   <Hero />
   <About />
+  <Leadership />
   <Experience />
   <Projects />
   <Education />

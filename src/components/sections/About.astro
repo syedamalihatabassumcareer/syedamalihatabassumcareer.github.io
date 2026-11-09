@@ -40,7 +40,7 @@ const icons: Record<string, IconName> = {
   'agentic-systems': 'globe',
   'embedded-robotics': 'cpu',
   programming: 'terminal',
-  tools: 'briefcase',
+  tools: 'users',
 };
 ---
 
@@ -49,7 +49,7 @@ const icons: Record<string, IconName> = {
     <SectionHeading
       id="about-title"
       title="About me"
-      sub="Computer science graduate with industry experience at Grameenphone, building AI, software and infrastructure solutions that work for the people who use them."
+      sub="Computer science graduate and former Grameenphone NEXTERN, combining AI and technology with the people skills to lead."
     />
 
     <div class="about-grid">
@@ -82,7 +82,7 @@ const icons: Record<string, IconName> = {
       <div class="story" data-reveal style="--reveal-step:1">
         <p class="eyebrow eyebrow--accent">Profile</p>
         <p class="statement">
-          I turn technical skills into <span class="accent">working solutions</span> for real organisations.
+          I bring <span class="accent">AI and technology</span> together with people to deliver results.
         </p>
         <p>
           As a NEXTERN at Grameenphone, in Technology Infrastructure Management, I automated deployment and connectivity
@@ -90,23 +90,23 @@ const icons: Record<string, IconName> = {
           upgrades with the Umbrella team and prepared the requirements for an AI-assisted site power design tool.
         </p>
         <p>
-          My projects range from WeHeal, a full-stack healthcare platform that is live today, to machine-learning pipelines
-          for health data, a network design linking six healthcare units, and autonomous robots built on embedded hardware.
+          My projects apply technology to real problems: WeHeal, a digital-health platform that is live today,
+          machine-learning models for health data, a network design linking six healthcare units, and autonomous robots.
         </p>
         <p>
-          I work well with people: I mentored more than 250 students as a Data Structures teaching assistant, and I was a
+          I do my best work with people. I mentored more than 250 students as a Data Structures teaching assistant, was a
           core member of BRAC University’s Mars rover team, which ranked 8th of 102 teams worldwide at the University Rover
-          Challenge 2025.
+          Challenge 2025, and was a Top 6 finalist in the EXCELERATE National Excel Competition.
         </p>
         <blockquote class="thread">
           <p>
-            What I bring: solid technical foundations, clear communication, and a focus on whether a solution actually works
-            for the people using it.
+            What I bring: a strong foundation in AI and technology, a habit of working across teams, and the drive to keep
+            learning — ready for a fast-track leadership programme.
           </p>
         </blockquote>
         <div class="story-actions">
-          <a class="btn btn--primary" href={withBase('#experience')}>
-            See my experience <Icon name="arrow-right" />
+          <a class="btn btn--primary" href={withBase('#leadership')}>
+            See how I lead <Icon name="arrow-right" />
           </a>
           <a class="btn" href={withBase('#contact')}>
             Let’s talk <Icon name="arrow-up-right" />
@@ -270,6 +270,7 @@ const icons: Record<string, IconName> = {
         {
           groups.map((group, i) => (
             <li class="skill glass-card float" data-reveal data-spotlight style={`--reveal-step:${i % 3};--float-i:${i}`}>
+              <span class="skill-bar" aria-hidden="true" />
               <div class="skill-top">
                 <span class="skill-pill">
                   {String(i + 1).padStart(2, '0')} · {group.items.length} skills
@@ -622,9 +623,30 @@ const icons: Record<string, IconName> = {
 
   /* Summary cards: label · number · heading + line · footer pinned to the bottom */
   .g-stat {
+    --tone: var(--accent-text);
+    --tone-glow: rgb(25 170 248 / 0.14);
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
+    border-top: 4px solid var(--tone);
+    background:
+      radial-gradient(90% 70% at 100% 0%, light-dark(var(--tone-glow), transparent), transparent 70%),
+      linear-gradient(160deg, light-dark(rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.045)) 0%, transparent 42%),
+      var(--glass-tint);
+  }
+
+  .g-stat:nth-of-type(3n) {
+    --tone: var(--purple);
+    --tone-glow: rgb(124 92 255 / 0.14);
+  }
+
+  .g-stat:nth-of-type(3n + 1) {
+    --tone: var(--green);
+    --tone-glow: rgb(26 190 81 / 0.14);
+  }
+
+  .g-stat .g-label {
+    color: var(--tone);
   }
 
   .g-text {
@@ -818,14 +840,39 @@ const icons: Record<string, IconName> = {
     color: var(--muted);
   }
 
+  /* Tones rotate blue → purple → green across the cards. */
+  .skill {
+    --tone-a: #19aaf8;
+    --tone-b: #0078cf;
+    overflow: hidden;
+  }
+
+  .skill:nth-child(3n + 2) {
+    --tone-a: #a993ff;
+    --tone-b: #6a3fd1;
+  }
+
+  .skill:nth-child(3n + 3) {
+    --tone-a: #4cd47a;
+    --tone-b: #13873b;
+  }
+
+  .skill-bar {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg, var(--tone-a), var(--tone-b));
+  }
+
   .skill-icon {
     display: grid;
     place-items: center;
-    width: 2.4rem;
-    height: 2.4rem;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    color: var(--accent-text);
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
+    color: #fff;
+    box-shadow: 0 10px 22px -8px var(--tone-b);
   }
 
 

@@ -26,6 +26,9 @@ The owner's CV and information she gives directly are the **only** factual sourc
 
 - **Never invent** metrics, results, impact, deployment claims, users, publication outcomes,
   acceptances, leadership roles, awards, endorsements or team sizes.
+- **Leadership is shown through behaviours.** The owner held no formal leadership title;
+  `src/data/leadership.ts` only cites documented facts. Never write "led", "managed" or
+  "headed" unless she supplies such a role.
 - **Impact framing is purpose, not outcome.** The project `impact` lines say what the work was
   built to do and who it serves; they never claim measured results, adoption or savings unless
   the owner supplies them. SDG tags are a relevance mapping, not a claim of impact.
@@ -53,15 +56,15 @@ The owner's CV and information she gives directly are the **only** factual sourc
 - **Base path:** every internal link and `/public` asset goes through `withBase()` from
   `src/lib/url.ts`. Never hard-code `/…` hrefs. Page links end with `/`
   (`trailingSlash: 'always'`). Site URL/base live only in `site.config.mjs`.
-- **Strictly one page**, ordered for recruiters: `#home #about (#skills) #experience
-  #projects #education (#recognition) #research #contact` (ids must match
+- **Strictly one page**, aimed at Management Trainee programmes: `#home #about (#skills)
+  #leadership #experience #projects #education (#recognition) #research #contact` (ids must match
   `src/data/navigation.ts`). Extra detail goes in inline expanders: research rows
   (`#research-<id>`) and project panels (`#project-<id>`).
 - **Expanders:** `button[data-expander-toggle][aria-controls]` + `.expander[data-expander] >
   .expander-inner`. Panels render open (readable without JS); `src/scripts/site.ts` collapses
   them.
-- **Visual language:** light-first, Grameenphone blues (`#19AAF8`, `#0078CF`), green `#1ABE51`
-  as the second accent, ink `#1A1A1A` on white / pale blue-grey; dark theme only via the
+- **Visual language:** light-first, Grameenphone blues (`#19AAF8`, `#0078CF`), purple
+  (`--purple`) and green (`--green`) accents, layered tinted shadows and coloured card tops, ink `#1A1A1A` on white / pale blue-grey; dark theme only via the
   toggle. Accent fills carry `--on-accent` text; accent *text* uses `--accent-text`. Lato +
   JetBrains Mono. Reuse tokens in `src/styles/global.css` instead of one-off colours, and check
   WCAG AA contrast in both themes.

@@ -32,13 +32,13 @@ const stats = [
   globalRank?.data.badge && teams && { value: globalRank.data.badge, label: `of ${teams} teams worldwide · URC`, icon: 'trophy', href: '#recognition' },
 ].filter(Boolean) as { value: string; label: string; icon: IconName; href: string }[];
 
-const role = 'CSE Graduate';
-const roleRest = 'AI · Software · Infrastructure';
+const role = 'AI & Technology';
+const roleRest = 'CSE Graduate · aspiring business leader';
 const [first, ...rest] = profile.name.split(' ');
 // First sentence of the intro, as a short pitch beside the portrait.
 const pitch = profile.intro.split(/(?<=\.)\s/)[0];
 // Rotating focus line (static first word without motion). From the profile, projects and experience.
-const focusWords = ['AI & machine learning', 'Full-stack web platforms', 'Infrastructure automation', 'Embedded & IoT systems'];
+const focusWords = ['Data-driven decisions', 'Digital transformation', 'Telecom infrastructure', 'Leading with people'];
 const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].filter(Boolean);
 ---
 
@@ -130,8 +130,8 @@ const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].
     <div class="bottom-right enter" style="--enter-step:6">
       <p class="pitch">{pitch}</p>
       <div class="actions">
-        <a class="btn btn--primary" href={withBase('#experience')}>
-          See my experience <Icon name="arrow-right" />
+        <a class="btn btn--primary" href={withBase('#leadership')}>
+          See how I lead <Icon name="arrow-right" />
         </a>
         {
           profile.cv ? (
@@ -180,7 +180,7 @@ const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].
     padding-bottom: var(--s-6);
   }
 
-  /* Orange glow behind the portrait (the reference used purple; this is the site's orange). */
+  /* Blue glow behind the portrait, with purple and green light at the edges. */
   .glow {
     position: absolute;
     z-index: -2;
@@ -190,12 +190,15 @@ const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].
     aspect-ratio: 1;
     translate: -50% -50%;
     border-radius: 50%;
-    background: radial-gradient(
-      closest-side,
-      light-dark(rgb(25 170 248 / 0.32), rgb(25 170 248 / 0.42)),
-      light-dark(rgb(25 170 248 / 0.1), rgb(25 170 248 / 0.12)) 55%,
-      transparent 100%
-    );
+    background:
+      radial-gradient(closest-side at 30% 35%, light-dark(rgb(124 92 255 / 0.28), rgb(124 92 255 / 0.22)), transparent 70%),
+      radial-gradient(closest-side at 72% 70%, light-dark(rgb(26 190 81 / 0.22), rgb(26 190 81 / 0.14)), transparent 70%),
+      radial-gradient(
+        closest-side,
+        light-dark(rgb(25 170 248 / 0.55), rgb(25 170 248 / 0.45)),
+        light-dark(rgb(25 170 248 / 0.18), rgb(25 170 248 / 0.12)) 55%,
+        transparent 100%
+      );
     filter: blur(10px);
   }
 
@@ -307,7 +310,8 @@ const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].
 
   .role-main {
     display: block;
-    font-size: clamp(2.2rem, 0.9rem + 3vw, 3.6rem);
+    white-space: nowrap;
+    font-size: clamp(1.9rem, 0.7rem + 2.2vw, 2.7rem);
     background: var(--accent-gradient);
     -webkit-background-clip: text;
     background-clip: text;
@@ -317,8 +321,8 @@ const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].
 
   .role-rest {
     display: block;
-    margin-top: 0.2em;
-    font-size: clamp(1.2rem, 0.8rem + 1vw, 1.65rem);
+    margin-top: 0.3em;
+    font-size: clamp(1rem, 0.85rem + 0.45vw, 1.25rem);
     line-height: 1.15;
     color: var(--text);
   }

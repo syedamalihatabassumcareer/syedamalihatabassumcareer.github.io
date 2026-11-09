@@ -11,15 +11,23 @@ anything that isn't confirmed.
       phone number, home address or referee details, put it in `public/cv/` and set `cv` back
       to its path. Every "Download CV" button then reappears.
 
-### Positioning — please confirm or reword
-- [ ] **Hero role:** "CSE Graduate" with "AI · Software · Infrastructure" underneath, and
-      "Computer Science Graduate · AI, Software & Infrastructure" in page titles. Is there a
-      specific role title you're applying for (e.g. a graduate programme or trainee title)?
-- [ ] **Availability:** "Open to industry roles in AI, software and technology" (hero badge,
-      About, Contact). Change or narrow it via `availability` in `src/data/profile.ts`.
-- [ ] **Profile statement (About):** "I turn technical skills into working solutions for real
-      organisations" and the closing line "What I bring: solid technical foundations, clear
-      communication, and a focus on whether a solution actually works for the people using it."
+### Positioning — Management Trainee (please confirm or reword)
+The site is aimed at Management Trainee programmes such as Grameenphone's Next Business Leader
+(NBL), which recruits fresh STEM graduates (0–2 years' experience) into Commercial, Technology and
+Techno-Commercial tracks and looks for analytical, problem-solving and communication skills, a
+growth mindset and leadership potential. The site doesn't name NBL, so it also works for other
+programmes.
+- [ ] **Hero:** "AI & Technology" with "CSE Graduate · aspiring business leader" underneath;
+      page title "AI & Technology Graduate · Aspiring Business Leader".
+- [ ] **Availability:** "Open to Management Trainee programmes — technology and
+      techno-commercial tracks" (hero badge, About, Contact). Change via `availability` in
+      `src/data/profile.ts`.
+- [ ] **Profile statement (About):** "I bring AI and technology together with people to deliver
+      results", ending "…ready for a fast-track leadership programme."
+- [ ] **Leadership in action** (`src/data/leadership.ts`): six qualities, each backed only by
+      CV facts. You held no formal leadership title, so the section shows behaviours, not
+      positions. Did you lead anything (a sub-team on the rover, a club, an event, a team
+      project)? Real leadership roles would make this section much stronger.
 
 ### Impact — numbers only you can supply
 Project and experience text describes what the work was built to do, not measured results.

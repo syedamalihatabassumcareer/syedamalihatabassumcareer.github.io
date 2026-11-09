@@ -1,0 +1,219 @@
+---
+// Leadership in action: six qualities a fast-track leadership / management
+// trainee programme looks for, each with documented evidence linking to the
+// role, project or award on this page (data in src/data/leadership.ts).
+import Icon from '@/components/Icon.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { leadership } from '@/data/leadership';
+import { withBase } from '@/lib/url';
+---
+
+<section class="section leadership" id="leadership" aria-labelledby="leadership-title">
+  <div class="wrap">
+    <SectionHeading
+      id="leadership-title"
+      title="Leadership in action"
+      sub="The qualities a leadership programme looks for — each one backed by something I have actually done."
+    />
+
+    <ul class="grid glass-scene">
+      {
+        leadership.map((q, i) => (
+          <li
+            class={`quality glass-card float tone-${q.tone}`}
+            id={`lead-${q.id}`}
+            data-reveal
+            data-spotlight
+            style={`--reveal-step:${i % 3};--float-i:${i}`}
+          >
+            <span class="q-bar" aria-hidden="true" />
+            <div class="q-top">
+              <span class="q-icon" aria-hidden="true">
+                <Icon name={q.icon} />
+              </span>
+              {q.stat && (
+                <p class="q-stat">
+                  <span class="q-num">{q.stat.value}</span>
+                  <span class="q-unit">{q.stat.label}</span>
+                </p>
+              )}
+            </div>
+            <h3 class="q-title">{q.title}</h3>
+            <p class="q-sum">{q.summary}</p>
+            <ul class="q-evidence">
+              {q.evidence.map((e) => (
+                <li>
+                  <span>{e.text}</span>
+                  <a href={withBase(e.href)}>
+                    {e.label} <Icon name="arrow-right" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .leadership {
+    background:
+      radial-gradient(45% 55% at 0% 0%, light-dark(rgb(124 92 255 / 0.1), rgb(124 92 255 / 0.08)), transparent 70%),
+      radial-gradient(40% 50% at 100% 100%, light-dark(rgb(26 190 81 / 0.1), rgb(26 190 81 / 0.06)), transparent 70%),
+      var(--bg);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: var(--s-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .tone-blue {
+    --tone: var(--accent);
+    --tone-text: var(--accent-text);
+    --tone-soft: var(--accent-soft);
+    --tone-a: #19aaf8;
+    --tone-b: #0078cf;
+  }
+
+  .tone-purple {
+    --tone: var(--purple);
+    --tone-text: var(--purple);
+    --tone-soft: var(--purple-soft);
+    --tone-a: #a993ff;
+    --tone-b: #6a3fd1;
+  }
+
+  .tone-green {
+    --tone: var(--green);
+    --tone-text: var(--green);
+    --tone-soft: var(--green-soft);
+    --tone-a: #4cd47a;
+    --tone-b: #13873b;
+  }
+
+  .quality {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    padding: var(--s-3);
+    overflow: hidden;
+  }
+
+  /* Coloured highlight along the top edge. */
+  .q-bar {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg, var(--tone-a), var(--tone-b));
+  }
+
+  .q-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--s-2);
+    margin-bottom: var(--s-1);
+  }
+
+  .q-icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
+    color: #fff;
+    box-shadow: 0 10px 22px -8px var(--tone-b);
+  }
+
+  .q-icon :global(svg) {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .q-stat {
+    display: grid;
+    justify-items: end;
+    text-align: right;
+  }
+
+  .q-num {
+    color: var(--tone-text);
+    font-size: var(--step-3);
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .q-unit {
+    color: var(--muted);
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+  }
+
+  .q-title {
+    font-size: var(--step-1);
+    font-weight: 800;
+  }
+
+  .q-sum {
+    color: var(--text-2);
+    font-size: var(--step--1);
+  }
+
+  .q-evidence {
+    display: grid;
+    gap: var(--s-1);
+    margin-top: var(--s-1);
+    padding: 0;
+    list-style: none;
+  }
+
+  .q-evidence li {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius);
+    background: var(--tone-soft);
+    border-left: 3px solid var(--tone);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  .q-evidence a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    width: fit-content;
+    min-height: 1.75rem;
+    color: var(--tone-text);
+    font-size: var(--step--2);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .q-evidence a:hover {
+    text-decoration: underline;
+  }
+
+  .q-evidence a :global(svg) {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .q-icon {
+      transition: transform 400ms var(--ease);
+    }
+
+    .quality:hover .q-icon {
+      transform: rotate(-6deg) scale(1.08);
+    }
+  }
+</style>

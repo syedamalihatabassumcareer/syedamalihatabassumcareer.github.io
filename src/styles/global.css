@@ -11,8 +11,8 @@
 
   /* Palette taken from Grameenphone's brand colours: blue #19AAF8, deep blue
      #0078CF, green #1ABE51, ink #1A1A1A on white and pale blue-grey. */
-  --bg: light-dark(#ffffff, #0b1220);
-  --bg-alt: light-dark(#f1f6fa, #0f182a);
+  --bg: light-dark(#f3f7fc, #0b1220);
+  --bg-alt: light-dark(#e9f1fa, #0f182a);
   --surface: light-dark(#ffffff, #142033);
   --surface-2: light-dark(#f4f8fb, #1a2840);
   --border: light-dark(#dde6ee, #263650);
@@ -27,8 +27,10 @@
   --on-accent: light-dark(#ffffff, #06121f);
   --green: light-dark(#13873b, #1abe51);
   --green-soft: light-dark(rgb(26 190 81 / 0.1), rgb(26 190 81 / 0.14));
-  --accent-gradient: linear-gradient(90deg, light-dark(#0068b4, #0a8ad8) 0%, light-dark(#0078cf, #19aaf8) 55%, light-dark(#0f8f6a, #1abe51) 100%);
-  --brand-gradient: linear-gradient(90deg, #19aaf8, #1abe51);
+  --purple: light-dark(#6a3fd1, #a993ff);
+  --purple-soft: light-dark(rgb(106 63 209 / 0.09), rgb(169 147 255 / 0.14));
+  --accent-gradient: linear-gradient(90deg, light-dark(#0068b4, #19aaf8) 0%, light-dark(#4b4fd8, #7c8cff) 55%, light-dark(#6a3fd1, #a993ff) 100%);
+  --brand-gradient: linear-gradient(90deg, #19aaf8, #7c5cff 55%, #1abe51);
 
   --status-published: light-dark(#13873b, #5fd38d);
   --status-accepted: light-dark(#13873b, #5fd38d);
@@ -41,7 +43,7 @@
   --tone-assistive: light-dark(#6a3fc2, #b49bff);
   --tone-interaction: light-dark(#13873b, #5fd38d);
 
-  --shadow: 0 1px 0 rgb(15 40 70 / 0.04), 0 18px 40px -24px rgb(15 40 70 / 0.35);
+  --shadow: 0 1px 2px light-dark(rgb(16 42 84 / 0.08), rgb(0 0 0 / 0.3)), 0 18px 40px -22px light-dark(rgb(0 70 150 / 0.35), rgb(0 0 0 / 0.6));
 
   /* Type: Lato for everything, JetBrains Mono for small metadata. */
   --font-sans-stack: var(--font-sans, 'Lato', system-ui, 'Segoe UI', sans-serif);
@@ -297,7 +299,11 @@ a:hover {
 }
 
 .section--alt {
-  background: var(--bg-alt);
+  background:
+    radial-gradient(40% 50% at 8% 12%, light-dark(rgb(25 170 248 / 0.12), rgb(25 170 248 / 0.06)), transparent 70%),
+    radial-gradient(35% 45% at 95% 40%, light-dark(rgb(124 92 255 / 0.1), rgb(124 92 255 / 0.06)), transparent 70%),
+    radial-gradient(35% 45% at 30% 98%, light-dark(rgb(26 190 81 / 0.08), rgb(26 190 81 / 0.04)), transparent 70%),
+    var(--bg-alt);
 }
 
 /* Centred heading + grey subtitle, as in the reference. */
@@ -322,10 +328,11 @@ a:hover {
 }
 
 .section-heading .rule {
-  width: 3rem;
-  height: 3px;
+  width: 4rem;
+  height: 4px;
   border-radius: 2px;
-  background: var(--accent);
+  background: var(--brand-gradient);
+  box-shadow: 0 4px 14px -4px light-dark(rgb(124 92 255 / 0.5), rgb(25 170 248 / 0.5));
 }
 
 /* ── Buttons ────────────────────────────────────────────────────────────── */
@@ -443,27 +450,30 @@ a:hover {
    --surface, so contrast is unchanged. */
 .card,
 .glass-card {
-  --glass-tint: light-dark(rgb(255 255 255 / 0.72), rgb(30 30 30 / 0.62));
+  --glass-tint: light-dark(rgb(255 255 255 / 0.9), rgb(20 32 51 / 0.66));
   --glass-rim: linear-gradient(
     145deg,
-    light-dark(rgb(255 255 255 / 1), rgb(255 255 255 / 0.22)) 0%,
-    light-dark(rgb(25 170 248 / 0.28), rgb(25 170 248 / 0.3)) 22%,
-    transparent 48%,
-    transparent 70%,
-    light-dark(rgb(25 170 248 / 0.18), rgb(255 255 255 / 0.1)) 100%
+    light-dark(rgb(0 120 207 / 0.55), rgb(255 255 255 / 0.22)) 0%,
+    light-dark(rgb(25 170 248 / 0.35), rgb(25 170 248 / 0.32)) 20%,
+    transparent 45%,
+    transparent 62%,
+    light-dark(rgb(124 92 255 / 0.3), rgb(124 92 255 / 0.22)) 85%,
+    light-dark(rgb(26 190 81 / 0.35), rgb(26 190 81 / 0.2)) 100%
   );
   --float-shadow:
-    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.07)),
-    0 1px 2px light-dark(rgb(60 30 10 / 0.06), rgb(0 0 0 / 0.3)),
-    0 22px 44px -26px light-dark(rgb(90 45 10 / 0.3), rgb(0 0 0 / 0.85));
+    inset 0 1px 0 light-dark(rgb(255 255 255 / 1), rgb(255 255 255 / 0.07)),
+    0 1px 2px light-dark(rgb(16 42 84 / 0.08), rgb(0 0 0 / 0.3)),
+    0 10px 24px -14px light-dark(rgb(0 84 160 / 0.22), rgb(0 0 0 / 0.5)),
+    0 28px 56px -30px light-dark(rgb(76 52 190 / 0.32), rgb(0 0 0 / 0.85));
   --float-shadow-hover:
-    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.1)),
-    0 2px 4px light-dark(rgb(60 30 10 / 0.06), rgb(0 0 0 / 0.3)),
-    0 40px 70px -34px light-dark(rgb(90 45 10 / 0.38), rgb(0 0 0 / 0.9)),
-    0 18px 50px -30px rgb(25 170 248 / 0.45);
+    inset 0 1px 0 light-dark(rgb(255 255 255 / 1), rgb(255 255 255 / 0.1)),
+    0 2px 4px light-dark(rgb(16 42 84 / 0.08), rgb(0 0 0 / 0.3)),
+    0 40px 70px -34px light-dark(rgb(0 84 160 / 0.45), rgb(0 0 0 / 0.9)),
+    0 18px 50px -24px light-dark(rgb(124 92 255 / 0.4), rgb(25 170 248 / 0.45)),
+    0 0 0 1px light-dark(rgb(0 120 207 / 0.18), rgb(25 170 248 / 0.25));
   position: relative;
   isolation: isolate;
-  border: 1px solid light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.06));
+  border: 1px solid light-dark(rgb(0 70 150 / 0.08), rgb(255 255 255 / 0.06));
   border-radius: var(--radius-l);
   background:
     linear-gradient(160deg, light-dark(rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.045)) 0%, transparent 42%),
@@ -521,9 +531,9 @@ a:hover {
   z-index: -1;
   inset: 4% 2%;
   background:
-    radial-gradient(32% 42% at 18% 30%, light-dark(rgb(25 170 248 / 0.16), rgb(25 170 248 / 0.17)), transparent 70%),
-    radial-gradient(28% 38% at 82% 68%, light-dark(rgb(26 190 81 / 0.12), rgb(26 190 81 / 0.1)), transparent 70%),
-    radial-gradient(24% 30% at 55% 12%, light-dark(rgb(160 220 255 / 0.35), rgb(255 255 255 / 0.05)), transparent 70%);
+    radial-gradient(32% 42% at 18% 30%, light-dark(rgb(25 170 248 / 0.3), rgb(25 170 248 / 0.18)), transparent 70%),
+    radial-gradient(28% 38% at 82% 68%, light-dark(rgb(124 92 255 / 0.24), rgb(124 92 255 / 0.16)), transparent 70%),
+    radial-gradient(24% 30% at 55% 12%, light-dark(rgb(26 190 81 / 0.18), rgb(26 190 81 / 0.1)), transparent 70%);
   filter: blur(30px);
   pointer-events: none;
 }
@@ -801,7 +811,7 @@ a:hover {
     }
   }
 
-  /* Section headings: the orange rule draws in after the title appears. */
+  /* Section headings: the accent rule draws in after the title appears. */
   .section-heading.reveal-pending .rule {
     transform: scaleX(0);
   }
