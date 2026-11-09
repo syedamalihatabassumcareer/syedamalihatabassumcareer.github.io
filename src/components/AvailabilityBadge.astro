@@ -1,0 +1,70 @@
+---
+// "Open to …" badge, driven by `profile.availability`. Renders nothing when
+// availability is null.
+import { profile } from '@/data/profile';
+
+interface Props {
+  class?: string;
+  style?: string;
+}
+const { class: className, style } = Astro.props;
+const availability = profile.availability;
+---
+
+{
+  availability && (
+    <p class:list={['availability', className]} style={style}>
+      <span class="dot" aria-hidden="true" />
+      {availability.short}
+    </p>
+  )
+}
+
+<style>
+  .availability {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: fit-content;
+    padding: 0.35rem 0.9rem 0.35rem 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .dot {
+    position: relative;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
+    flex: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .dot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: currentColor;
+      animation: ping 2.4s var(--ease) infinite;
+    }
+
+    @keyframes ping {
+      0% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+      70%,
+      100% {
+        transform: scale(2.8);
+        opacity: 0;
+      }
+    }
+  }
+</style>

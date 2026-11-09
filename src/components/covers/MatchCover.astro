@@ -1,0 +1,427 @@
+---
+// Animated cover for Matrimonial Hub (decorative): two profile cards face each
+// other, a match request travels between them (Pending → Accepted) and a
+// chat opens between the two.
+// Profiles are abstract — no names, photos or numbers.
+---
+
+<div class="cover-scene match" aria-hidden="true">
+  <div class="rig">
+
+    <!-- Two profiles -->
+    <div class="profile profile--a">
+      <span class="avatar"></span>
+      <span class="bar bar--name"></span>
+      <span class="bar" style="--w:0.8"></span>
+      <span class="bar" style="--w:0.6"></span>
+      <span class="act">Request</span>
+    </div>
+    <div class="profile profile--b">
+      <span class="avatar avatar--b"></span>
+      <span class="bar bar--name"></span>
+      <span class="bar" style="--w:0.7"></span>
+      <span class="bar" style="--w:0.85"></span>
+      <span class="act act--b">Accept</span>
+    </div>
+
+    <span class="heart">♥</span>
+    <p class="status">
+      <span class="s-pending">PENDING</span>
+      <span class="s-accepted">ACCEPTED ✓</span>
+    </p>
+
+    <!-- Messaging, once the match is accepted -->
+    <div class="chat">
+      <span class="bubble bubble--a"></span>
+      <span class="bubble bubble--b"></span>
+      <span class="typing"><i></i><i></i><i></i></span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cover-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+    background:
+      radial-gradient(50% 60% at 50% 58%, rgb(236 72 153 / 0.18), transparent 70%),
+      radial-gradient(120% 90% at 50% 0%, #1f1119, #0a0709 70%);
+  }
+
+  .rig {
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    width: 600px;
+    height: 320px;
+    margin: -160px 0 0 -300px;
+    perspective: 900px;
+    font-family: var(--font-mono-stack);
+  }
+
+  /* ── Query ── */
+
+
+
+
+
+  /* ── Profiles ── */
+  .profile {
+    position: absolute;
+    top: 74px;
+    display: grid;
+    gap: 8px;
+    width: 160px;
+    padding: 16px;
+    border-radius: 14px;
+    background: #fff7fa;
+    box-shadow: 0 30px 50px -22px rgb(0 0 0 / 0.95);
+  }
+
+  .profile--a {
+    left: 44px;
+    transform: rotateY(24deg);
+  }
+
+  .profile--b {
+    left: 364px;
+    transform: rotateY(-24deg);
+  }
+
+  .avatar {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 4px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 38%, #f6d2b8 0 26%, transparent 27%),
+      radial-gradient(ellipse at 50% 100%, #c2185b 0 48%, transparent 49%),
+      #f9d6e4;
+    border: 2px solid #ff8fc0;
+  }
+
+  .avatar--b {
+    background:
+      radial-gradient(circle at 50% 38%, #e8bfa0 0 26%, transparent 27%),
+      radial-gradient(ellipse at 50% 100%, #6d28d9 0 48%, transparent 49%),
+      #efe2fb;
+  }
+
+  .bar {
+    display: block;
+    height: 8px;
+    border-radius: 3px;
+    background: #ecd7e0;
+    transform: scaleX(var(--w, 1));
+    transform-origin: left;
+  }
+
+  .bar--name {
+    height: 11px;
+    background: #3a1a2c;
+    --w: 0.75;
+  }
+
+  .act {
+    margin-top: 4px;
+    width: fit-content;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: #e3417f;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .act--b {
+    background: #16a34a;
+  }
+
+  .heart {
+    position: absolute;
+    left: 286px;
+    top: 140px;
+    color: #ff3d7f;
+    font-size: 34px;
+    line-height: 1;
+    text-shadow: 0 0 14px rgb(255 61 127 / 0.9);
+    opacity: 0;
+  }
+
+  .status {
+    position: absolute;
+    left: 300px;
+    top: 28px;
+    width: 124px;
+    height: 24px;
+    translate: -50% 0;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .status span {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+  }
+
+  .s-pending {
+    background: #f59e0b;
+    color: #1b1204;
+  }
+
+  .s-accepted {
+    background: #16a34a;
+    color: #fff;
+    opacity: 0;
+  }
+
+
+
+
+
+
+
+
+  .chat {
+    position: absolute;
+    left: 300px;
+    top: 112px;
+    display: grid;
+    gap: 7px;
+    width: 104px;
+    translate: -50% 0;
+  }
+
+  .bubble {
+    display: block;
+    height: 20px;
+    border-radius: 12px;
+  }
+
+  .bubble--a {
+    width: 78px;
+    background: #f1e4ea;
+    border-bottom-left-radius: 3px;
+  }
+
+  .bubble--b {
+    justify-self: end;
+    width: 64px;
+    background: #e3417f;
+    border-bottom-right-radius: 3px;
+  }
+
+  .typing {
+    display: flex;
+    gap: 4px;
+    width: fit-content;
+    padding: 7px 9px;
+    border-radius: 12px;
+    background: #f1e4ea;
+  }
+
+  .typing i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #9b6b80;
+  }
+
+  @container (max-width: 620px) {
+    .rig {
+      scale: 0.9;
+    }
+  }
+
+  @container (max-width: 460px) {
+    .rig {
+      scale: 0.6;
+      top: 52%;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* One 8-second story: request → accepted → messages. */
+    .bubble--a {
+      animation: mc-msg-a 8s var(--ease) infinite;
+    }
+
+    .bubble--b {
+      animation: mc-msg-b 8s var(--ease) infinite;
+    }
+
+    .typing {
+      animation: mc-msg-c 8s var(--ease) infinite;
+    }
+
+    @keyframes mc-msg-a {
+      0%,
+      58% {
+        opacity: 0;
+        transform: translateY(6px) scale(0.85);
+      }
+
+      63%,
+      94% {
+        opacity: 1;
+        transform: none;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes mc-msg-b {
+      0%,
+      67% {
+        opacity: 0;
+        transform: translateY(6px) scale(0.85);
+      }
+
+      72%,
+      94% {
+        opacity: 1;
+        transform: none;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes mc-msg-c {
+      0%,
+      76% {
+        opacity: 0;
+        transform: translateY(6px) scale(0.85);
+      }
+
+      81%,
+      94% {
+        opacity: 1;
+        transform: none;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .typing i {
+      animation: mc-dot 0.9s ease-in-out infinite;
+    }
+
+    .typing i:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .typing i:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes mc-dot {
+      50% {
+        transform: translateY(-3px);
+      }
+    }
+
+    /* The request heart arcs from profile A to profile B. */
+    .heart {
+      animation: mc-heart 8s ease-in-out infinite;
+    }
+
+    @keyframes mc-heart {
+      0%,
+      20% {
+        opacity: 0;
+        transform: translate(-80px, 30px) scale(0.6);
+      }
+
+      26% {
+        opacity: 1;
+        transform: translate(-66px, 20px) scale(1);
+      }
+
+      38% {
+        transform: translate(0, -30px) scale(1.15);
+      }
+
+      50% {
+        opacity: 1;
+        transform: translate(66px, 20px) scale(1);
+      }
+
+      56%,
+      100% {
+        opacity: 0;
+        transform: translate(80px, 30px) scale(0.6);
+      }
+    }
+
+    .s-accepted {
+      animation: mc-accept 8s ease infinite;
+    }
+
+    @keyframes mc-accept {
+      0%,
+      52% {
+        opacity: 0;
+      }
+
+      56%,
+      94% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .act--b {
+      animation: mc-press 8s ease infinite;
+    }
+
+    @keyframes mc-press {
+      0%,
+      50%,
+      58%,
+      100% {
+        transform: none;
+      }
+
+      54% {
+        transform: scale(0.88);
+      }
+    }
+
+
+    .profile--a {
+      animation: mc-sway-a 7s ease-in-out infinite alternate;
+    }
+
+    .profile--b {
+      animation: mc-sway-b 7s ease-in-out infinite alternate;
+    }
+
+    @keyframes mc-sway-a {
+      to {
+        transform: rotateY(16deg) translateY(-6px);
+      }
+    }
+
+    @keyframes mc-sway-b {
+      to {
+        transform: rotateY(-16deg) translateY(-6px);
+      }
+    }
+  }
+</style>

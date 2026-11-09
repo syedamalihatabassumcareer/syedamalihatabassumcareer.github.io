@@ -1,0 +1,579 @@
+---
+// A small animated, decorative illustration for a research topic. Drawn on a
+// fixed 120×80 canvas and scaled to the requested size; colour comes from the
+// topic's tone token (--tone-<topic> in global.css). No data is shown — the
+// shapes only evoke the theme (calibration bars, a 3D box, an ultrasound fan,
+// an agent loop, a gesture keyboard).
+import type { ResearchTopic } from '@/data/taxonomy';
+
+interface Props {
+  topic: ResearchTopic;
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const { topic, size = 'md', class: className } = Astro.props;
+const keys = [10, 9, 7];
+---
+
+<span class:list={['glyph', `glyph--${size}`, `glyph--${topic}`, className]} style={`--tone: var(--tone-${topic})`} aria-hidden="true">
+  <span class="art">
+    {
+      topic === 'reliable-ai' && (
+        <>
+          <span class="diag" />
+          {[0, 1, 2, 3, 4].map((i) => (
+            <span class="cal-bar" style={`--i:${i}`} />
+          ))}
+          <span class="thresh" />
+          <span class="abstain">?</span>
+        </>
+      )
+    }
+    {
+      topic === 'perception' && (
+        <>
+          <span class="cam" />
+          <span class="ray" />
+          <span class="cube">
+            <i class="f1" />
+            <i class="f2" />
+            <i class="f3" />
+            <i class="f4" />
+            <i class="f5" />
+            <i class="f6" />
+          </span>
+        </>
+      )
+    }
+    {
+      topic === 'health' && (
+        <>
+          <span class="fan" />
+          <span class="sweep" />
+          <span class="fol" style="--x:46px;--y:38px;--r:12px;--i:0" />
+          <span class="fol" style="--x:70px;--y:46px;--r:9px;--i:1" />
+          <span class="fol" style="--x:58px;--y:58px;--r:7px;--i:2" />
+        </>
+      )
+    }
+    {
+      topic === 'assistive' && (
+        <>
+          <span class="orbit" />
+          <span class="core" />
+          <span class="sats">
+            <i style="--a:0deg" />
+            <i style="--a:120deg" />
+            <i style="--a:240deg" />
+          </span>
+          <span class="edge" />
+          <span class="cloud" />
+        </>
+      )
+    }
+    {
+      topic === 'interaction' && (
+        <>
+          <span class="kb">
+            {keys.map((n, r) => (
+              <span class="kb-row" style={`--r:${r}`}>
+                {Array.from({ length: n }, () => (
+                  <i />
+                ))}
+              </span>
+            ))}
+            <span class="kb-hit" />
+          </span>
+          <span class="hand">
+            <i class="tip" />
+            <i class="bone b1" />
+            <i class="bone b2" />
+            <i class="bone b3" />
+          </span>
+          {size === 'lg' && (
+            <span class="suggest">
+              <b>EN</b>
+              <i />
+              <i />
+              <b>বাং</b>
+              <i />
+            </span>
+          )}
+        </>
+      )
+    }
+  </span>
+</span>
+
+<style>
+  .glyph {
+    --k: 1;
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background:
+      radial-gradient(70% 90% at 50% 60%, color-mix(in srgb, var(--tone) 22%, transparent), transparent 75%),
+      color-mix(in srgb, var(--tone) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tone) 28%, transparent);
+  }
+
+  .glyph--md {
+    --k: 1.2;
+    height: 6.5rem;
+  }
+
+  .glyph--sm {
+    --k: 0.5;
+    width: 4rem;
+    height: 2.75rem;
+    flex: none;
+  }
+
+  .glyph--lg {
+    --k: 2.5;
+    height: 100%;
+    min-height: 15rem;
+  }
+
+  .art {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 120px;
+    height: 80px;
+    margin: -40px 0 0 -60px;
+    scale: var(--k);
+  }
+
+  /* Low specificity, so the shape rules below can override it. */
+  :where(.art > *, .art i) {
+    position: absolute;
+    display: block;
+  }
+
+  /* ── Reliable & calibrated AI: calibration bars against the diagonal ── */
+  .diag {
+    left: 14px;
+    bottom: 12px;
+    width: 104px;
+    height: 0;
+    border-top: 2px dashed color-mix(in srgb, var(--tone) 70%, transparent);
+    transform-origin: 0 0;
+    rotate: -29deg;
+  }
+
+  .cal-bar {
+    left: calc(18px + var(--i) * 18px);
+    bottom: 12px;
+    width: 13px;
+    height: calc(12px + var(--i) * 11px);
+    border-radius: 3px 3px 0 0;
+    background: linear-gradient(var(--tone), color-mix(in srgb, var(--tone) 40%, transparent));
+    transform-origin: bottom;
+  }
+
+  .thresh {
+    left: 10px;
+    right: 10px;
+    top: 30px;
+    height: 0;
+    border-top: 1px solid color-mix(in srgb, var(--tone) 45%, transparent);
+  }
+
+  .abstain {
+    right: 6px;
+    top: 4px;
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid var(--tone);
+    color: var(--tone);
+    font: 700 10px/1 var(--font-mono-stack);
+  }
+
+  /* ── Vision & 3D perception: a camera looking at a box ── */
+  .cam {
+    left: 8px;
+    top: 34px;
+    width: 14px;
+    height: 11px;
+    border-radius: 2px;
+    background: var(--tone);
+  }
+
+  .ray {
+    left: 22px;
+    top: 18px;
+    width: 52px;
+    height: 44px;
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 45%, transparent), transparent);
+  }
+
+  .cube {
+    left: 68px;
+    top: 22px;
+    width: 34px;
+    height: 34px;
+    transform-style: preserve-3d;
+    transform: rotateX(-24deg) rotateY(38deg);
+  }
+
+  .cube i {
+    inset: 0;
+    border: 1.5px solid var(--tone);
+    background: color-mix(in srgb, var(--tone) 12%, transparent);
+  }
+
+  .f1 {
+    transform: translateZ(17px);
+  }
+
+  .f2 {
+    transform: rotateY(180deg) translateZ(17px);
+  }
+
+  .f3 {
+    transform: rotateY(90deg) translateZ(17px);
+  }
+
+  .f4 {
+    transform: rotateY(-90deg) translateZ(17px);
+  }
+
+  .f5 {
+    transform: rotateX(90deg) translateZ(17px);
+  }
+
+  .f6 {
+    transform: rotateX(-90deg) translateZ(17px);
+  }
+
+  /* ── Health & biomedical AI: an ultrasound fan with follicles ── */
+  .fan {
+    left: 10px;
+    top: -6px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(from 145deg, color-mix(in srgb, var(--tone) 26%, transparent) 0 70deg, transparent 70deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 16%, #000 17% 100%);
+    mask: radial-gradient(circle, transparent 0 16%, #000 17% 100%);
+  }
+
+  .sweep {
+    left: 59px;
+    top: 44px;
+    width: 2px;
+    height: 46px;
+    background: linear-gradient(var(--tone), transparent);
+    transform-origin: 50% 0;
+    translate: 0 -50px;
+    rotate: -30deg;
+  }
+
+  .fol {
+    left: calc(var(--x) - var(--r));
+    top: calc(var(--y) - var(--r));
+    width: calc(var(--r) * 2);
+    height: calc(var(--r) * 2);
+    border-radius: 50%;
+    border: 1.5px solid var(--tone);
+  }
+
+  /* ── Assistive & agentic systems: an agent loop between edge and cloud ── */
+  .orbit {
+    left: 34px;
+    top: 14px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1.5px dashed color-mix(in srgb, var(--tone) 60%, transparent);
+  }
+
+  .core {
+    left: 53px;
+    top: 33px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--tone);
+    box-shadow: 0 0 12px var(--tone);
+  }
+
+  .sats {
+    left: 34px;
+    top: 14px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .sats i {
+    left: 50%;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    margin: -4.5px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--tone) 55%, #fff);
+    transform: rotate(var(--a)) translateY(-26px);
+  }
+
+  .edge {
+    left: 6px;
+    bottom: 8px;
+    width: 16px;
+    height: 11px;
+    border-radius: 2px;
+    border: 1.5px solid var(--tone);
+  }
+
+  .cloud {
+    right: 6px;
+    top: 8px;
+    width: 20px;
+    height: 10px;
+    border-radius: 999px;
+    border: 1.5px solid var(--tone);
+  }
+
+  /* ── Human–computer interaction: a fingertip over a virtual keyboard ── */
+  .kb {
+    left: 10px;
+    top: 38px;
+    width: 100px;
+    height: 34px;
+    display: grid;
+    gap: 2px;
+  }
+
+  .kb-row {
+    position: relative;
+    display: flex;
+    gap: 2px;
+    padding-left: calc(var(--r) * 5px);
+  }
+
+  .kb-row i {
+    position: static;
+    width: 8px;
+    height: 9px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--tone) 28%, transparent);
+  }
+
+  .kb-hit {
+    position: absolute;
+    left: 30px;
+    top: 0;
+    width: 8px;
+    height: 9px;
+    border-radius: 2px;
+    background: var(--tone);
+    box-shadow: 0 0 8px var(--tone);
+  }
+
+  .hand {
+    left: 38px;
+    top: 4px;
+    width: 30px;
+    height: 34px;
+  }
+
+  .tip {
+    left: 0;
+    top: 22px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--tone);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone) 30%, transparent);
+  }
+
+  .bone {
+    height: 1.5px;
+    background: color-mix(in srgb, var(--tone) 70%, transparent);
+    transform-origin: 0 50%;
+  }
+
+  .b1 {
+    left: 4px;
+    top: 26px;
+    width: 14px;
+    rotate: -70deg;
+  }
+
+  .b2 {
+    left: 9px;
+    top: 13px;
+    width: 14px;
+    rotate: -20deg;
+  }
+
+  .b3 {
+    left: 9px;
+    top: 13px;
+    width: 16px;
+    rotate: 30deg;
+  }
+
+  .suggest {
+    left: 10px;
+    top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .suggest b,
+  .suggest i {
+    position: static;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  .suggest b {
+    display: grid;
+    place-items: center;
+    padding: 0 2px;
+    background: var(--tone);
+    color: light-dark(#fff, #0d0d0d);
+    font: 700 5px/1 var(--font-mono-stack);
+  }
+
+  .suggest i {
+    width: 14px;
+    background: color-mix(in srgb, var(--tone) 35%, transparent);
+  }
+
+  .glyph--lg .suggest {
+    left: auto;
+    right: 4px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cal-bar {
+      animation: tg-cal 4s var(--ease) infinite alternate;
+      animation-delay: calc(var(--i) * -0.7s);
+    }
+
+    @keyframes tg-cal {
+      from {
+        transform: scaleY(0.62);
+      }
+
+      to {
+        transform: scaleY(1.04);
+      }
+    }
+
+    .abstain {
+      animation: tg-pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes tg-pulse {
+      50% {
+        transform: scale(1.18);
+        opacity: 0.6;
+      }
+    }
+
+    .cube {
+      animation: tg-spin 9s linear infinite;
+    }
+
+    @keyframes tg-spin {
+      to {
+        transform: rotateX(-24deg) rotateY(398deg);
+      }
+    }
+
+    .ray {
+      animation: tg-ray 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes tg-ray {
+      to {
+        opacity: 0.35;
+      }
+    }
+
+    .sweep {
+      animation: tg-sweep 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes tg-sweep {
+      to {
+        rotate: 30deg;
+      }
+    }
+
+    .fol {
+      animation: tg-fol 3s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 0.5s);
+    }
+
+    @keyframes tg-fol {
+      50% {
+        transform: scale(1.15);
+        opacity: 0.55;
+      }
+    }
+
+    .sats {
+      animation: tg-orbit 8s linear infinite;
+    }
+
+    @keyframes tg-orbit {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .core {
+      animation: tg-pulse 2.4s ease-in-out infinite;
+    }
+
+    /* Fingertip and the highlighted key move together across the keyboard. */
+    .hand,
+    .kb-hit {
+      animation: tg-type 5s steps(1, end) infinite;
+    }
+
+    @keyframes tg-type {
+      0% {
+        transform: translate(0, 0);
+      }
+
+      20% {
+        transform: translate(30px, 11px);
+      }
+
+      40% {
+        transform: translate(50px, 0);
+      }
+
+      60% {
+        transform: translate(15px, 22px);
+      }
+
+      80% {
+        transform: translate(60px, 11px);
+      }
+    }
+
+    .tip {
+      animation: tg-tap 1s ease-in-out infinite;
+    }
+
+    @keyframes tg-tap {
+      50% {
+        transform: scale(0.75);
+      }
+    }
+  }
+</style>

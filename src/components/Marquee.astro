@@ -1,0 +1,137 @@
+---
+// Infinite ticker (decorative). The text it repeats is always available
+// elsewhere on the page, so the marquee is hidden from assistive technology.
+interface Props {
+  items: string[];
+  tone?: 'ink' | 'lime' | 'plain';
+  reverse?: boolean;
+  speed?: string;
+  size?: 'xl' | 'l' | 'm';
+  outlineEvery?: number;
+  tilt?: number;
+}
+
+const { items, tone = 'ink', reverse = false, speed = '45s', size = 'l', outlineEvery = 0, tilt = 0 } = Astro.props;
+const track = items.map((text, i) => ({ text, outline: outlineEvery > 0 && i % outlineEvery === outlineEvery - 1 }));
+---
+
+<div class="band-clip" aria-hidden="true">
+<div class:list={['band', `band--${tone}`, `band--${size}`]} style={`--tilt:${tilt}deg`}>
+  <div class:list={['marquee', { 'marquee--reverse': reverse }]} style={`--speed:${speed}`}>
+    {
+      [0, 1].map(() => (
+        <div class="marquee-track">
+          {track.map((item) => (
+            <>
+              <span class:list={['word', { outline: item.outline }]}>{item.text}</span>
+              <span class="star">✦</span>
+            </>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>
+</div>
+
+<style>
+  /* Contains the tilted band so it never causes horizontal scrolling. */
+  .band-clip {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .band {
+    --gap: 1.6rem;
+    position: relative;
+    padding-block: 1.1rem;
+    rotate: var(--tilt);
+    border-block: var(--border);
+    overflow: hidden;
+  }
+
+  .band--ink {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .band--lime {
+    background: var(--lime);
+    color: var(--on-pop);
+    border-color: var(--on-pop);
+  }
+
+  .band--plain {
+    border: 0;
+    padding-block: 0.4rem;
+  }
+
+  .word {
+    font-family: var(--font-display-stack);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  .band--xl .word {
+    font-size: clamp(2.6rem, 1.4rem + 5vw, 6rem);
+  }
+
+  .band--l .word {
+    font-size: clamp(1.6rem, 1rem + 2.4vw, 3rem);
+  }
+
+  .band--m .word {
+    font-size: clamp(1.1rem, 0.9rem + 1vw, 1.6rem);
+  }
+
+  .outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px currentColor;
+    letter-spacing: 0;
+  }
+
+  .band--ink .outline {
+    -webkit-text-stroke-color: var(--bg);
+  }
+
+  .band--plain .outline {
+    -webkit-text-stroke-color: var(--ink);
+  }
+
+  .band--lime .outline {
+    -webkit-text-stroke-color: var(--on-pop);
+  }
+
+  .star {
+    font-size: 1.4em;
+    color: var(--lime);
+    line-height: 1;
+  }
+
+  .band--lime .star,
+  .band--plain .star {
+    color: var(--accent);
+  }
+
+  .band--lime .star {
+    color: var(--on-pop);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .star {
+      display: inline-block;
+      animation: spin 6s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        rotate: 360deg;
+      }
+    }
+  }
+</style>

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "grameenphone-nextern",
+    "role": "NEXTERN",
+    "short": "NEXTERN, Grameenphone",
+    "organisation": "Grameenphone Ltd.",
+    "unit": "Technology Infrastructure Management, Technology",
+    "kind": "industry",
+    "start": "2026-06",
+    "end": "2026-09",
+    "highlights": [
+      "Automated rectifier and Li-Ion battery deployment and connectivity monitoring and weekly reporting using Huawei NetEco.",
+      "Coordinated SMU upgrades with the Umbrella team and prepared requirements for an AI-assisted site power design tool."
+    ],
+    "photos": [
+      {
+        "file": "grameenphone-house.jpg",
+        "alt": "A woman in a blue outfit waving outside Grameenphone's head office, under the company sign."
+      },
+      {
+        "file": "team.jpg",
+        "alt": "Five NEXTERN interns wearing Grameenphone lanyards, posing in front of a patterned wall."
+      },
+      {
+        "file": "presentation.jpg",
+        "alt": "A presenter in a yellow outfit explaining a diagram on a whiteboard; the whiteboard content is blurred."
+      },
+      {
+        "file": "cohort-event.jpg",
+        "alt": "A large group of NEXTERN participants posing together indoors at an event."
+      },
+      {
+        "file": "cohort.jpg",
+        "alt": "The NEXTERN cohort gathered in front of the Grameenphone sign outside the head office."
+      }
+    ],
+    "order": 1
+  },
+  {
+    "id": "dristee-research-assistant",
+    "role": "Undergraduate Research Assistant — DRISTEE",
+    "short": "DRISTEE research",
+    "organisation": "BRAC University",
+    "unit": "RSGI Grant 2025",
+    "kind": "research",
+    "start": "2025-10",
+    "end": "2026-10",
+    "highlights": [
+      "Conducted analysis and experiments for an assistive technology project, supporting solution development and evaluation.",
+      "Prepared technical documentation and presentations and coordinated research activities within a collaborative team."
+    ],
+    "order": 4
+  },
+  {
+    "id": "data-structures-ta",
+    "role": "Undergraduate Teaching Assistant — Data Structures",
+    "short": "Data Structures TA",
+    "organisation": "BRAC University",
+    "unit": "Department of Computer Science and Engineering",
+    "kind": "teaching",
+    "start": "2025-02",
+    "end": "2026-01",
+    "highlights": [
+      "Mentored 250+ students through laboratory sessions and individual guidance, explaining programming concepts and supporting problem solving.",
+      "Evaluated assignments and supported course activities to maintain consistent academic delivery."
+    ],
+    "order": 3
+  },
+  {
+    "id": "mongoltori-mars-rover",
+    "role": "Core Team Member — Vision, Networking, and Mechanical Systems",
+    "short": "Mars rover team",
+    "organisation": "BRAC University Mars Rover Project (Mongoltori)",
+    "kind": "engineering-team",
+    "start": "2023-09",
+    "end": "2025-07",
+    "highlights": [
+      "Contributed to development, testing, and technical troubleshooting across vision, networking, and mechanical subsystems.",
+      "Collaborated with multidisciplinary teams to support system integration and project execution."
+    ],
+    "order": 2
+  }
+]

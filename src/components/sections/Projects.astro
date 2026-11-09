@@ -1,0 +1,652 @@
+---
+// Projects: category filters, a featured card, a balanced grid, and an inline
+// detail panel that opens full-width directly under the card's row
+// (CSS grid with dense packing; on mobile, directly under the card).
+// Deep link: #project-<id> opens the panel.
+import { Image } from 'astro:assets';
+import { getEntries, render } from 'astro:content';
+import FilterControls from '@/components/FilterControls.astro';
+import GameCover from '@/components/GameCover.astro';
+import ClinicCover from '@/components/covers/ClinicCover.astro';
+import MatchCover from '@/components/covers/MatchCover.astro';
+import NetworkCover from '@/components/covers/NetworkCover.astro';
+import RobotCover from '@/components/covers/RobotCover.astro';
+import TerminalCover from '@/components/covers/TerminalCover.astro';
+import WearableCover from '@/components/covers/WearableCover.astro';
+import VideoClip from '@/components/VideoClip.astro';
+import Gallery from '@/components/Gallery.astro';
+import Icon from '@/components/Icon.astro';
+import LinkList from '@/components/LinkList.astro';
+import ProjectCover from '@/components/ProjectCover.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import YouTubeEmbed from '@/components/YouTubeEmbed.astro';
+import { labelFor, projectCategories, sdgNames } from '@/data/taxonomy';
+import { getProjects, getSkills } from '@/lib/content';
+import { formatRange } from '@/lib/format';
+import { withBase } from '@/lib/url';
+
+const projects = await getProjects();
+const scenes = {
+  arena: GameCover,
+  wearable: WearableCover,
+  robot: RobotCover,
+  network: NetworkCover,
+  terminal: TerminalCover,
+  clinic: ClinicCover,
+  match: MatchCover,
+};
+const skills = await getSkills();
+const categories = projectCategories
+  .map((c) => ({ id: c.id, label: c.label, count: projects.filter((p) => p.data.categories.includes(c.id)).length }))
+  .filter((c) => c.count > 0);
+
+const items = await Promise.all(
+  projects.map(async (p, i) => {
+    const { Content } = await render(p);
+    return {
+      p,
+      i,
+      Content,
+      hasBody: Boolean(p.body?.trim()),
+      related: await getEntries(p.data.relatedResearch),
+      skills: skills.flatMap((g) => g.data.items.filter((s) => s.usedIn?.projects.some((x) => x.id === p.id)).map((s) => s.name)),
+      featured: i === 0 && p.data.featured,
+    };
+  }),
+);
+---
+
+<section class="section section--alt" id="projects" aria-labelledby="projects-title">
+  <div class="wrap">
+    <SectionHeading
+      id="projects-title"
+      title="Projects & impact"
+      sub="Each project framed by the problem it tackles and the value it was built to deliver — in healthcare, infrastructure, automation and data."
+    />
+
+    <div data-filter-root data-filter-noun="project|projects">
+      <FilterControls idPrefix="projects" facets={[{ name: 'category', legend: 'Category', total: projects.length, options: categories }]} />
+
+      <p class="count mono" data-filter-count role="status" aria-live="polite" aria-atomic="true">
+        {projects.length} projects
+      </p>
+
+      <div class="grid glass-scene" data-expander-group>
+        {
+          items.map(({ p, i, Content, hasBody, related, skills: used, featured }) => {
+            const anchor = `project-${p.id}`;
+            const panelId = `${anchor}-details`;
+            const videos = p.data.media.filter((m) => m.type === 'youtube');
+            const clips = p.data.media.filter((m) => m.type === 'video');
+            const images = p.data.media.filter((m) => m.type === 'image');
+            const Scene = p.data.scene ? scenes[p.data.scene] : p.data.cover ? undefined : p.data.categories[0] === 'graphics' ? GameCover : undefined;
+            const when = p.data.period ?? (p.data.start ? formatRange(p.data.start, p.data.end) : '');
+            const cats = p.data.categories.map((c) => labelFor(projectCategories, c));
+            return (
+              <>
+                <article
+                  class:list={['card project', { 'project--featured': featured }]}
+                  id={anchor}
+                  data-filter-item
+                  data-category={p.data.categories.join(' ')}
+                  data-search={`${p.data.title} ${p.data.summary}`.toLowerCase()}
+                  data-reveal
+                  data-spotlight
+                  data-panel={panelId}
+                  aria-labelledby={`${anchor}-title`}
+                >
+                  <div class="media">
+                    {Scene ? (
+                      <Scene />
+                    ) : p.data.cover ? (
+                      <Image
+                        src={p.data.cover.src}
+                        alt={p.data.cover.alt}
+                        widths={[480, 800, 1200]}
+                        sizes={featured ? '(max-width: 56rem) 100vw, 55vw' : '(max-width: 56rem) 100vw, 45vw'}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <ProjectCover id={p.id} category={p.data.categories[0]} index={i + 1} />
+                    )}
+                    {videos.length + clips.length > 0 && (
+                      <span class="media-badge">
+                        <Icon name="play" /> Video demo
+                      </span>
+                    )}
+                  </div>
+                  <div class="body">
+                    {featured && <p class="eyebrow eyebrow--accent">Featured project</p>}
+                    <h3 id={`${anchor}-title`} class="title">
+                      {p.data.title}
+                    </h3>
+                    <p class="tagline">{p.data.tagline}</p>
+                    {p.data.impact && (
+                      <p class:list={['impact-line', `impact-line--${p.data.impact.value[0].kind}`]}>
+                        <span class="impact-kind">{p.data.impact.value[0].kind === 'social' ? 'Social impact' : 'Business value'}</span>
+                        {p.data.impact.value[0].text}
+                      </p>
+                    )}
+                    <ul class="chip-list" aria-label="Technologies">
+                      {p.data.technologies.slice(0, featured ? 6 : 4).map((t) => (
+                        <li class="chip">{t}</li>
+                      ))}
+                    </ul>
+                    <div class="bar">
+                      <span class="cats">
+                        {cats.join(' · ')}
+                        {when && (
+                          <>
+                            {' '}
+                            · <span class="mono">{when}</span>
+                          </>
+                        )}
+                      </span>
+                      <button
+                        class="btn btn--small explore"
+                        type="button"
+                        aria-expanded="true"
+                        aria-controls={panelId}
+                        data-expander-toggle
+                        hidden
+                      >
+                        <span data-label-open="Close project" data-label-closed="Explore project">
+                          Close project
+                        </span>
+                        <span class="toggle-icon" aria-hidden="true">
+                          <Icon name="plus" />
+                        </span>
+                        <span class="visually-hidden">: {p.data.title}</span>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+
+                <div
+                  class="expander panel"
+                  id={panelId}
+                  data-expander
+                  data-expander-hide
+                  data-owner={anchor}
+                  role="region"
+                  aria-label={`${p.data.title} — project details`}
+                >
+                  <div class="expander-inner">
+                    <div class="panel-body">
+                      <header class="panel-head">
+                        <div>
+                          <p class="eyebrow eyebrow--accent">{cats.join(' · ')}</p>
+                          <h4>{p.data.title}</h4>
+                          {(p.data.course || when) && (
+                            <p class="mono muted">{[p.data.course, when].filter(Boolean).join(' · ')}</p>
+                          )}
+                        </div>
+                        <button class="btn btn--small close" type="button" data-expander-close={panelId} hidden>
+                          <Icon name="close" /> Close
+                          <span class="visually-hidden"> {p.data.title} details</span>
+                        </button>
+                      </header>
+
+                      <div class="panel-grid">
+                        <div class="panel-main">
+                          {p.data.impact && (
+                            <div>
+                              <h5>The challenge</h5>
+                              <p class="overview">{p.data.impact.challenge}</p>
+                            </div>
+                          )}
+                          <div>
+                            <h5>What I built</h5>
+                            <p class="overview">{p.data.summary}</p>
+                          </div>
+                          {p.data.impact && (
+                            <div>
+                              <h5>Why it matters</h5>
+                              <ul class="impact-list">
+                                {p.data.impact.value.map((v) => (
+                                  <li class={`impact-item impact-item--${v.kind}`}>
+                                    <span class="impact-kind">{v.kind === 'social' ? 'Social impact' : 'Business value'}</span>
+                                    <span>{v.text}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                              {p.data.impact.sdgs.length > 0 && (
+                                <ul class="sdgs" aria-label="Related UN Sustainable Development Goals">
+                                  {p.data.impact.sdgs.map((n) => (
+                                    <li class="sdg">
+                                      <span class="sdg-num">SDG {n}</span> {sdgNames[n] ?? ''}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          )}
+                          {hasBody && (
+                            <div class="prose">
+                              <Content />
+                            </div>
+                          )}
+                          {p.data.technologies.length > 0 && (
+                            <div>
+                              <h5>Technologies & methods</h5>
+                              <ul class="chip-list">
+                                {p.data.technologies.map((t) => (
+                                  <li class="chip">{t}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {used.length > 0 && (
+                            <div>
+                              <h5>Skills applied</h5>
+                              <p>{used.join(', ')}</p>
+                            </div>
+                          )}
+                          {p.data.credits.length > 0 && (
+                            <div>
+                              <h5>Team & credits</h5>
+                              <ul class="credits">
+                                {p.data.credits.map((c) => (
+                                  <li>{c}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {related.length > 0 && (
+                            <div>
+                              <h5>Related research</h5>
+                              <ul class="related">
+                                {related.map((r) => (
+                                  <li>
+                                    <StatusBadge status={r.data.status} />
+                                    <a href={withBase(`#research-${r.id}`)}>{r.data.shortTitle ?? r.data.title}</a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+
+                        <div class="panel-side">
+                          {videos.map((v) => (
+                            <div>
+                              <h5>Demo</h5>
+                              <YouTubeEmbed videoId={v.videoId} title={v.title} caption={v.caption} hostedBy={v.hostedBy} />
+                            </div>
+                          ))}
+                          {clips.length > 0 && (
+                            <div>
+                              <h5>{clips.length > 1 ? 'Videos' : 'Video'}</h5>
+                              <div class="clips">
+                                {clips.map((c) => (
+                                  <VideoClip {...c} />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {images.length > 0 && (
+                            <div>
+                              <h5>Gallery</h5>
+                              <Gallery images={images} label={`Images from ${p.data.title}`} />
+                            </div>
+                          )}
+                          {p.data.links.length > 0 && (
+                            <div>
+                              <h5>Links</h5>
+                              <LinkList links={p.data.links} context={p.data.title} />
+                            </div>
+                          )}
+                          {p.data.cover?.credit && <p class="credit muted">Card image: {p.data.cover.credit}.</p>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            );
+          })
+        }
+      </div>
+
+      <div class="empty" data-filter-empty hidden>
+        <p class="empty-title">No projects in that category.</p>
+        <button type="button" class="btn btn--primary" data-filter-reset>Show all projects</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .count {
+    margin-block: var(--s-3) var(--s-2);
+    color: var(--muted);
+    font-size: var(--step--1);
+    text-align: center;
+  }
+
+  .clips {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    gap: var(--s-2);
+    align-items: start;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row dense;
+    gap: var(--s-3);
+  }
+
+  /* Glass finish and hover lift come from .card (global.css). */
+  .project {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 20px;
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+
+  .project:hover,
+  .project:has([aria-expanded='true']) {
+    border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  }
+
+  .project--featured {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+
+  .media {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: var(--bg-alt);
+  }
+
+  .media :global(img),
+  .media :global(.cover) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 400ms var(--ease);
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .project:hover .media :global(img),
+    .project:hover .media :global(.cover) {
+      transform: scale(1.02);
+    }
+  }
+
+  .project--featured .media {
+    flex: 1.15;
+    aspect-ratio: auto;
+    min-height: 20rem;
+  }
+
+  .media-badge {
+    position: absolute;
+    left: var(--s-2);
+    bottom: var(--s-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius-s);
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: var(--step--2);
+    font-weight: 700;
+  }
+
+  .media-badge :global(svg) {
+    width: 0.9em;
+    height: 0.9em;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    padding: var(--s-3);
+    flex: 1;
+  }
+
+  .project--featured .body {
+    padding: var(--s-4);
+    justify-content: center;
+  }
+
+  .title {
+    font-size: var(--step-1);
+    line-height: 1.3;
+  }
+
+  .project--featured .title {
+    font-size: var(--step-3);
+    line-height: 1.15;
+  }
+
+  .tagline {
+    color: var(--text-2);
+  }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-2);
+    margin-top: auto;
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--border);
+  }
+
+  .cats {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .explore[aria-expanded='true'] {
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+
+  /* Detail panel: spans the full row, placed right after its card's row. */
+  .panel {
+    grid-column: 1 / -1;
+  }
+
+  .panel-body {
+    padding: var(--s-4);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius-l);
+    background: var(--surface);
+  }
+
+  .panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--s-2);
+    margin-bottom: var(--s-4);
+  }
+
+  .panel-head h4 {
+    font-size: var(--step-2);
+    margin-block: 0.2rem;
+  }
+
+  .panel-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: var(--s-4);
+  }
+
+  .panel-main,
+  .panel-side {
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+  }
+
+  h5 {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .overview {
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: var(--text);
+  }
+
+  .panel-main p {
+    color: var(--text-2);
+  }
+
+  .credits,
+  .related {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0;
+    list-style: none;
+    color: var(--text-2);
+  }
+
+  .related li {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .credit {
+    font-size: var(--step--2);
+  }
+
+  .empty {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-1);
+    margin-top: var(--s-3);
+    padding: var(--s-6) var(--s-4);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-l);
+  }
+
+  .empty-title {
+    font-size: var(--step-2);
+    font-weight: 700;
+  }
+
+  @media (max-width: 44rem) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 56rem) {
+    .project--featured {
+      flex-direction: column;
+    }
+
+    .project--featured .media {
+      aspect-ratio: 16 / 9;
+      min-height: 0;
+    }
+
+    .panel-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .panel-body {
+      padding: var(--s-3) var(--s-2);
+    }
+
+    .project--featured .body {
+      padding: var(--s-3);
+    }
+  }
+  /* ── Impact (career site) ── */
+  .impact-line {
+    display: grid;
+    gap: 0.2rem;
+    margin-top: var(--s-1);
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--accent);
+    color: var(--text-2);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  .impact-line--social {
+    border-left-color: var(--green);
+  }
+
+  .impact-kind {
+    color: var(--accent-text);
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .impact-line--social .impact-kind,
+  .impact-item--social .impact-kind {
+    color: var(--green);
+  }
+
+  .impact-list {
+    display: grid;
+    gap: var(--s-1);
+    padding: 0;
+    list-style: none;
+  }
+
+  .impact-item {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+  }
+
+  .impact-item--social {
+    background: var(--green-soft);
+    border-left-color: var(--green);
+  }
+
+  .sdgs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: var(--s-1);
+    padding: 0;
+    list-style: none;
+  }
+
+  .sdg {
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-2);
+    font-size: var(--step--2);
+  }
+
+  .sdg-num {
+    color: var(--text);
+    font-weight: 700;
+  }
+</style>

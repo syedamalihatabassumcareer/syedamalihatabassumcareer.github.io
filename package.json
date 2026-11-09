@@ -1,0 +1,26 @@
+{
+  "name": "syeda-maliha-tabassum-portfolio",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Academic and professional portfolio of Syeda Maliha Tabassum — static Astro site for GitHub Pages.",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "verify": "node scripts/verify.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "3.7.4",
+    "astro": "7.4.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "typescript": "6.0.3"
+  }
+}

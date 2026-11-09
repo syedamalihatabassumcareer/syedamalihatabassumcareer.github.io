@@ -1,0 +1,254 @@
+---
+import Icon from '@/components/Icon.astro';
+import Marquee from '@/components/Marquee.astro';
+import SectionTitle from '@/components/SectionTitle.astro';
+import { getSkills, resolveEvidence } from '@/lib/content';
+import { withBase } from '@/lib/url';
+
+const groups = await Promise.all(
+  (await getSkills()).map(async (group) => ({
+    ...group.data,
+    items: await Promise.all(
+      group.data.items.map(async (item) => ({ name: item.name, evidence: await resolveEvidence(item.usedIn) })),
+    ),
+  })),
+);
+const allNames = groups.flatMap((g) => g.items.map((i) => i.name));
+const half = Math.ceil(allNames.length / 2);
+const tones = ['lime', 'sky', 'lilac', 'sun', 'coral', 'lime'];
+---
+
+<section class="section skills" id="skills" aria-labelledby="skills-title">
+  <div class="wrap">
+    <SectionTitle
+      id="skills-title"
+      index="06"
+      kicker="What I work with"
+      solid="Skills"
+      outline="& tools"
+      sub="Grouped by area. Skills with a + open to show the projects, papers or roles where they were used."
+    />
+  </div>
+
+  <div class="ticker">
+    <Marquee items={allNames.slice(0, half)} tone="plain" size="l" outlineEvery={2} speed="60s" />
+    <Marquee items={allNames.slice(half)} tone="plain" size="l" outlineEvery={2} speed="70s" reverse />
+  </div>
+
+  <div class="wrap">
+    <div class="groups">
+      {
+        groups.map((group, gi) => (
+          <section
+            class={`group card spot group--${tones[gi % tones.length]}`}
+            aria-labelledby={`skills-${group.id}`}
+            data-reveal="up"
+            style={`--reveal-step:${gi % 3}`}
+          >
+            <header class="group-head">
+              <span class="group-n" aria-hidden="true">
+                {String(gi + 1).padStart(2, '0')}
+              </span>
+              <h3 id={`skills-${group.id}`}>{group.label}</h3>
+              <p>{group.description}</p>
+            </header>
+            <ul class="items">
+              {group.items.map((item) =>
+                item.evidence.length > 0 ? (
+                  <li class="item has-evidence">
+                    <details>
+                      <summary>
+                        {item.name}
+                        <span class="visually-hidden">— show where this was used</span>
+                      </summary>
+                      <ul class="evidence">
+                        {item.evidence.map((ev) => (
+                          <li>
+                            <span class="ev-kind">{ev.kind}</span>
+                            <a href={withBase(ev.href)}>
+                              {ev.label} <Icon name="arrow-right" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  </li>
+                ) : (
+                  <li class="item">{item.name}</li>
+                ),
+              )}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .ticker {
+    display: grid;
+    gap: 0.4rem;
+    margin-bottom: var(--space-xl);
+    color: var(--ink);
+  }
+
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-l);
+    align-items: start;
+  }
+
+  .group {
+    --tone: var(--lime);
+    display: grid;
+    gap: var(--space-s);
+    padding: 0 0 clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    overflow: hidden;
+  }
+
+  .group--sky {
+    --tone: var(--sky);
+  }
+  .group--lilac {
+    --tone: var(--lilac);
+  }
+  .group--sun {
+    --tone: var(--sun);
+  }
+  .group--coral {
+    --tone: var(--coral);
+  }
+
+  .group-head {
+    display: grid;
+    gap: 0.3rem;
+    padding: var(--space-m);
+    background: var(--tone);
+    color: var(--on-pop);
+    border-bottom: var(--border);
+  }
+
+  .group-n {
+    font-family: var(--font-mono-stack);
+    font-weight: 700;
+    font-size: var(--step--1);
+  }
+
+  .group-head h3 {
+    font-size: var(--step-1);
+    line-height: 1.1;
+  }
+
+  .group-head p {
+    font-size: var(--step--1);
+  }
+
+  .items {
+    list-style: none;
+    padding: 0 var(--space-m);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .item {
+    padding: 0.4rem 0.8rem;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 999px;
+    font-size: var(--step--1);
+    font-weight: 600;
+    transition:
+      transform 250ms var(--ease-spring),
+      background-color var(--dur);
+  }
+
+  .item:not(.has-evidence):hover {
+    transform: translateY(-3px) rotate(-2deg);
+  }
+
+  .item.has-evidence {
+    padding: 0;
+    background: color-mix(in srgb, var(--tone) 45%, transparent);
+  }
+
+  .item.has-evidence:has(details[open]) {
+    flex-basis: 100%;
+    border-radius: var(--radius);
+    background: var(--bg);
+  }
+
+  summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.4rem;
+    padding: 0.3rem 0.8rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: '+';
+    display: inline-grid;
+    place-items: center;
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-mono-stack);
+    font-size: 0.85rem;
+    transition: rotate 300ms var(--ease-spring);
+  }
+
+  details[open] summary::after {
+    rotate: 135deg;
+  }
+
+  .evidence {
+    list-style: none;
+    padding: 0 0.8rem 0.7rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .evidence li {
+    display: grid;
+    gap: 0;
+  }
+
+  .ev-kind {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .evidence a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 64rem) {
+    .groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .groups {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

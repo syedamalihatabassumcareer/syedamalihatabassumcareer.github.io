@@ -1,0 +1,14 @@
+---
+// Former per-entry page: forwards to the entry on the home page, where its
+// details open automatically (#research-<id>).
+import SectionRedirect from '@/components/SectionRedirect.astro';
+import { getResearch, type Research } from '@/lib/content';
+
+export async function getStaticPaths() {
+  return (await getResearch()).map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props as { entry: Research };
+---
+
+<SectionRedirect anchor={`research-${entry.id}`} label={entry.data.shortTitle ?? entry.data.title} />

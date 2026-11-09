@@ -1,0 +1,239 @@
+---
+import SectionTitle from '@/components/SectionTitle.astro';
+import { awardCategories, labelFor } from '@/data/taxonomy';
+import { getAwards, getEducation } from '@/lib/content';
+import { formatMonth, formatRange } from '@/lib/format';
+
+const education = await getEducation();
+const awards = await getAwards();
+const ordered = awardCategories.flatMap((c) => awards.filter((a) => a.data.category === c.id));
+const tones = ['lime', 'sun', 'sky', 'lilac', 'coral'];
+---
+
+<section class="section recognition invert" id="recognition" aria-labelledby="recognition-title">
+  <div class="blob" style="--blob: var(--lilac); --size: 36rem; top: 10%; right: -12rem;" aria-hidden="true"></div>
+  <div class="wrap">
+    <SectionTitle
+      id="recognition-title"
+      index="05"
+      kicker="Education & awards"
+      solid="Recognition"
+      sub="Qualifications, scholarships, distinctions and competition results."
+      sticker="Dean’s List ✦ VC’s List"
+      stickerTone="sun"
+    />
+
+    <h3 class="sub-head">Education</h3>
+    <ol class="degrees">
+      {
+        education.map((e, i) => (
+          <li class="degree card" data-reveal={i ? 'right' : 'left'}>
+            <div class="degree-text">
+              <span class="mono muted">{formatRange(e.data.start, e.data.end)}</span>
+              <h4>{e.data.qualification}</h4>
+              <p>{e.data.institution}</p>
+            </div>
+            {e.data.result && (
+              <p class="result">
+                <span class="result-label">{e.data.result.label}</span>
+                <span class="result-value" data-count={e.data.result.value}>
+                  {e.data.result.value}
+                </span>
+                <span class="result-scale">out of {e.data.result.scale}</span>
+              </p>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+
+    <h3 class="sub-head">Honours & awards</h3>
+    <ol class="awards">
+      {
+        ordered.map((a, i) => (
+          <li
+            class={`award award--${tones[i % tones.length]}`}
+            data-reveal="pop"
+            style={`--reveal-step:${i % 4}; --r:${[-2, 1.5, -1, 2.5][i % 4]}deg`}
+          >
+            <span class="award-cat">{labelFor(awardCategories, a.data.category)}</span>
+            <span class="award-result">{a.data.result ?? 'Awarded'}</span>
+            <span class="award-title">{a.data.title}</span>
+            <span class="award-meta">
+              {a.data.organiser} · {a.data.start ? formatRange(a.data.start, a.data.date) : formatMonth(a.data.date)}
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .recognition {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .sub-head {
+    font-size: var(--step-2);
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    margin-block: var(--space-l) var(--space-m);
+  }
+
+  .degrees {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-l);
+  }
+
+  .degree {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-m);
+    padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+  }
+
+  .degree-text {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .degree h4 {
+    font-size: var(--step-2);
+  }
+
+  .degree p {
+    color: var(--ink-soft);
+  }
+
+  .result {
+    display: grid;
+    justify-items: end;
+    text-align: right;
+    flex: none;
+  }
+
+  .result-label {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .result-value {
+    font-family: var(--font-display-stack);
+    font-weight: 800;
+    font-size: clamp(3.2rem, 2rem + 4vw, 6rem);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-scale {
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+  }
+
+  .awards {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: var(--space-m);
+  }
+
+  .award {
+    --tone: var(--lime);
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    padding: var(--space-m);
+    border: 2px solid var(--on-pop);
+    border-radius: var(--radius-l);
+    background: var(--tone);
+    color: var(--on-pop);
+    box-shadow: 5px 5px 0 var(--on-pop);
+    rotate: var(--r);
+    transition:
+      rotate 400ms var(--ease-spring),
+      transform 400ms var(--ease-spring);
+  }
+
+  .award:hover {
+    transform: translateY(-6px) scale(1.02);
+  }
+
+  /* Kept in its own rule: the CSS minifier drops `rotate` when it shares a rule
+     with a fixed `transform` (see tests/css.test.mjs). */
+  .award:where(:hover) {
+    rotate: 0deg;
+  }
+
+  .award--sun {
+    --tone: var(--sun);
+  }
+  .award--sky {
+    --tone: var(--sky);
+  }
+  .award--lilac {
+    --tone: var(--lilac);
+  }
+  .award--coral {
+    --tone: var(--coral);
+  }
+
+  .award-cat {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .award-result {
+    font-family: var(--font-display-stack);
+    font-size: var(--step-2);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+  }
+
+  .award-title {
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .award-meta {
+    font-size: var(--step--1);
+  }
+
+  @media (max-width: 52rem) {
+    .degrees {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .degree {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .result {
+      justify-items: start;
+      text-align: left;
+    }
+  }
+</style>

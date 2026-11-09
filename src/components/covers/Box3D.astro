@@ -1,0 +1,110 @@
+---
+// A solid box standing on a CSS-3D plane (the parent must use
+// transform-style: preserve-3d). Footprint w×d px, height h px, centred at
+// (x, y) on the plane and lifted by z. Used by the animated project covers.
+// `windows` paints a grid of lit windows on the side faces (buildings);
+// children are placed on the roof (top face) — e.g. a red cross. Set --win
+// in `style` to change the window colour.
+interface Props {
+  w: number;
+  d: number;
+  h: number;
+  x?: number;
+  y?: number;
+  z?: number;
+  /** Face colour (any CSS colour); tops are lighter, sides darker. */
+  color: string;
+  windows?: boolean;
+  class?: string;
+  style?: string;
+}
+
+const { w, d, h, x = 0, y = 0, z = 0, color, windows = false, class: className, style = '' } = Astro.props;
+---
+
+<span
+  class:list={['box', { 'box--win': windows }, className]}
+  style={`--w:${w}px;--d:${d}px;--h:${h}px;--c:${color};left:calc(50% + ${x - w / 2}px);top:calc(50% + ${y - d / 2}px);transform:translateZ(${z}px);${style}`}
+>
+  <i class="top"><slot /></i>
+  <i class="front"></i>
+  <i class="back"></i>
+  <i class="left"></i>
+  <i class="right"></i>
+</span>
+
+<style>
+  .box {
+    position: absolute;
+    width: var(--w);
+    height: var(--d);
+    transform-style: preserve-3d;
+  }
+
+  i {
+    position: absolute;
+    display: block;
+    background: var(--f);
+    border: 1px solid rgb(255 255 255 / 0.18);
+  }
+
+  .top {
+    --f: color-mix(in srgb, var(--c) 78%, #fff);
+    inset: 0;
+    transform-style: preserve-3d;
+    transform: translateZ(var(--h));
+  }
+
+  .front {
+    --f: color-mix(in srgb, var(--c) 82%, #000);
+    left: 0;
+    top: calc(var(--d) - var(--h));
+    width: var(--w);
+    height: var(--h);
+    transform-origin: 50% 100%;
+    transform: rotateX(-90deg);
+  }
+
+  .back {
+    --f: color-mix(in srgb, var(--c) 70%, #000);
+    left: 0;
+    top: 0;
+    width: var(--w);
+    height: var(--h);
+    transform-origin: 50% 0;
+    transform: rotateX(90deg);
+  }
+
+  .left {
+    --f: color-mix(in srgb, var(--c) 64%, #000);
+    left: 0;
+    top: 0;
+    width: var(--h);
+    height: var(--d);
+    transform-origin: 0 50%;
+    transform: rotateY(-90deg);
+  }
+
+  .right {
+    --f: color-mix(in srgb, var(--c) 74%, #000);
+    left: calc(var(--w) - var(--h));
+    top: 0;
+    width: var(--h);
+    height: var(--d);
+    transform-origin: 100% 50%;
+    transform: rotateY(90deg);
+  }
+
+  /* Lit windows: face-coloured bands over window-coloured stripes. */
+  .box--win :is(.front, .back) {
+    background-image:
+      repeating-linear-gradient(0deg, var(--f) 0 5px, transparent 5px 11px),
+      repeating-linear-gradient(90deg, var(--f) 0 5px, var(--win, rgb(255 226 160 / 0.45)) 5px 10px);
+  }
+
+  .box--win :is(.left, .right) {
+    background-image:
+      repeating-linear-gradient(90deg, var(--f) 0 5px, transparent 5px 11px),
+      repeating-linear-gradient(0deg, var(--f) 0 5px, var(--win, rgb(255 226 160 / 0.35)) 5px 10px);
+  }
+</style>

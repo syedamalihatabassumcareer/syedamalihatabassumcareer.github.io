@@ -1,0 +1,425 @@
+---
+// Animated cover for the healthcare network design (decorative), laid out
+// like the Packet Tracer topology in the report: six sites — main hospital
+// (MH), research institute (RI), emergency response unit (ERU), diagnostic
+// centre (DC), pharmacy hub (PH), remote clinic (RHC) — each a building with
+// its router, joined by a router backbone and a shared switch. Packets travel
+// the links; the clinic's uplink periodically drops and the direct
+// clinic-to-ERU backup link carries the traffic.
+import Box3D from './Box3D.astro';
+
+// Positions are taken from the topology picture (px, py) and spread a little.
+const P = (px: number, py: number) => ({ x: Math.round((px - 400) * 1.18), y: Math.round((py - 318) * 0.9) });
+
+type Kind = 'hospital' | 'institute' | 'emergency' | 'diagnostic' | 'pharmacy' | 'clinic';
+const sites: {
+  id: string;
+  kind: Kind;
+  c: string;
+  r: [number, number];
+  b: [number, number];
+}[] = [
+  { id: 'MH', kind: 'hospital', c: '#e8e2d8', r: [345, 222], b: [252, 186] },
+  { id: 'RI', kind: 'institute', c: '#8fa6c4', r: [447, 150], b: [460, 88] },
+  { id: 'ERU', kind: 'emergency', c: '#c9877b', r: [530, 228], b: [632, 240] },
+  { id: 'DC', kind: 'diagnostic', c: '#8fbf9f', r: [215, 388], b: [150, 470] },
+  { id: 'PH', kind: 'pharmacy', c: '#ad9cc6', r: [335, 425], b: [330, 512] },
+  { id: 'RHC', kind: 'clinic', c: '#8dbdb6', r: [470, 385], b: [528, 466] },
+];
+const shared = P(335, 328);
+const routers = Object.fromEntries(sites.map((s) => [s.id, P(...s.r)]));
+const at = { ...routers, SW: shared } as Record<string, { x: number; y: number }>;
+
+type Link = { a: { x: number; y: number }; b: { x: number; y: number }; tier: 'core' | 'site'; kind?: 'fail' | 'backup' };
+const links: Link[] = [
+  ...(
+    [
+      ['MH', 'RI'],
+      ['MH', 'ERU'],
+      ['RI', 'ERU'],
+      ['MH', 'SW'],
+      ['SW', 'DC'],
+      ['SW', 'PH'],
+      ['SW', 'RHC', 'fail'],
+      ['RHC', 'ERU', 'backup'],
+    ] as [string, string, Link['kind']?][]
+  ).map(([a, b, kind]) => ({ a: at[a], b: at[b], tier: 'core' as const, kind })),
+  ...sites.flatMap((s) => {
+    const home = P(...s.b);
+    return [
+      { a: routers[s.id], b: home, tier: 'site' as const },
+    ];
+  }),
+];
+const drawn = links.map((l, i) => {
+  const len = Math.hypot(l.b.x - l.a.x, l.b.y - l.a.y);
+  const ang = (Math.atan2(l.b.y - l.a.y, l.b.x - l.a.x) * 180) / Math.PI;
+  return { ...l, len: len.toFixed(1), ang: ang.toFixed(2), i };
+});
+
+const roofLabel: Record<Kind, number> = { hospital: 66, institute: 70, emergency: 40, diagnostic: 44, pharmacy: 32, clinic: 30 };
+---
+
+<div class="cover-scene net" aria-hidden="true">
+  <div class="stage">
+    <div class="floor">
+      {
+        drawn.map((l) => (
+          <span
+            class:list={['link', `link--${l.tier}`, l.kind && `link--${l.kind}`]}
+            style={`left:calc(50% + ${l.a.x}px);top:calc(50% + ${l.a.y}px);width:${l.len}px;transform:rotate(${l.ang}deg);--len:${l.len}px;--i:${l.i}`}
+          >
+            <span class="packet" />
+          </span>
+        ))
+      }
+
+      <!-- Shared switch -->
+      <Box3D w={48} d={20} h={9} x={shared.x} y={shared.y} color="#8b95a5"><span class="ports"></span></Box3D>
+
+      {
+        sites.map((s) => {
+          const r = routers[s.id];
+          const b = P(...s.b);
+          return (
+            <>
+
+              {/* Router */}
+              <Box3D w={22} d={22} h={9} x={r.x} y={r.y} color="#4b5563">
+                <span class="xr" />
+              </Box3D>
+
+
+              {/* The site's building */}
+              {s.kind === 'hospital' && (
+                <>
+                  <Box3D w={70} d={50} h={62} x={b.x} y={b.y} color="#e8e2d8" windows>
+                    <span class="cross" />
+                  </Box3D>
+                  <Box3D w={34} d={34} h={30} x={b.x + 50} y={b.y + 6} color="#d6d0c6" windows />
+                </>
+              )}
+              {s.kind === 'institute' && (
+                <>
+                  <Box3D w={42} d={42} h={64} x={b.x} y={b.y} color="#8fa6c4" windows>
+                    <span class="dish" />
+                  </Box3D>
+                  <Box3D w={30} d={34} h={34} x={b.x - 38} y={b.y + 4} color="#7d93b0" windows />
+                </>
+              )}
+              {s.kind === 'emergency' && (
+                <>
+                  <Box3D w={58} d={42} h={36} x={b.x} y={b.y} color="#c9877b" windows>
+                    <span class="siren" />
+                  </Box3D>
+                  <Box3D w={26} d={13} h={12} x={b.x + 6} y={b.y + 40} color="#f2f2f2">
+                    <span class="stripe" />
+                  </Box3D>
+                </>
+              )}
+              {s.kind === 'diagnostic' && (
+                <Box3D w={56} d={44} h={40} x={b.x} y={b.y} color="#8fbf9f" windows>
+                  <span class="ring" />
+                </Box3D>
+              )}
+              {s.kind === 'pharmacy' && (
+                <Box3D w={46} d={40} h={28} x={b.x} y={b.y} color="#ad9cc6" windows>
+                  <span class="cross cross--green" />
+                </Box3D>
+              )}
+              {s.kind === 'clinic' && (
+                <Box3D w={42} d={36} h={26} x={b.x} y={b.y} color="#8dbdb6" windows>
+                  <span class="cross cross--small" />
+                </Box3D>
+              )}
+
+              <span class="label" style={`left:calc(50% + ${b.x}px);top:calc(50% + ${b.y}px);--z:${roofLabel[s.kind] + 26}px;--c:${s.c}`}>
+                {s.id}
+              </span>
+            </>
+          );
+        })
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .cover-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+    background:
+      radial-gradient(55% 65% at 50% 58%, rgb(59 130 246 / 0.12), transparent 70%),
+      radial-gradient(120% 90% at 50% 0%, #0d1526, #05070c 70%);
+  }
+
+  .stage {
+    position: absolute;
+    inset: 0;
+    perspective: 1100px;
+    perspective-origin: 50% 25%;
+  }
+
+  .floor {
+    position: absolute;
+    left: 54%;
+    top: 52%;
+    width: 1000px;
+    height: 720px;
+    margin: -360px 0 0 -500px;
+    transform-style: preserve-3d;
+    transform: rotateX(60deg) rotateZ(-8deg);
+    background:
+      radial-gradient(circle at 45% 45%, rgb(80 140 255 / 0.12), transparent 60%),
+      repeating-linear-gradient(0deg, rgb(140 180 255 / 0.08) 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, rgb(140 180 255 / 0.08) 0 1px, transparent 1px 36px);
+    border-radius: 32px;
+  }
+
+  /* Kept in its own rule: the CSS minifier drops `scale` when it shares a rule
+     with a fixed `transform` (see tests/css.test.mjs). */
+  .floor:where(.cover-scene *) {
+    scale: 0.72;
+  }
+
+  /* ── Links ── */
+  .link {
+    position: absolute;
+    transform-origin: 0 50%;
+    border-radius: 2px;
+  }
+
+  .link--core {
+    height: 3px;
+    margin-top: -1.5px;
+    background: rgb(150 180 220 / 0.5);
+  }
+
+  .link--site {
+    height: 3px;
+    margin-top: -1.5px;
+    background: rgb(150 180 220 / 0.35);
+  }
+
+
+  .link--backup {
+    background: repeating-linear-gradient(90deg, rgb(255 200 120 / 0.7) 0 9px, transparent 9px 15px);
+    box-shadow: none;
+  }
+
+  .packet {
+    position: absolute;
+    left: -3px;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffd2a8;
+    box-shadow: 0 0 4px rgb(253 140 60 / 0.5);
+    opacity: 0;
+  }
+
+
+  /* ── Roof details (placed on a box's top face) ── */
+  .cross,
+  .cross--green,
+  .cross--small {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 22px;
+    height: 22px;
+    translate: -50% -50%;
+    background:
+      linear-gradient(#e5322d, #e5322d) center / 100% 34% no-repeat,
+      linear-gradient(#e5322d, #e5322d) center / 34% 100% no-repeat;
+  }
+
+  .cross--green {
+    background:
+      linear-gradient(#22c55e, #22c55e) center / 100% 34% no-repeat,
+      linear-gradient(#22c55e, #22c55e) center / 34% 100% no-repeat;
+  }
+
+  .cross--small {
+    width: 15px;
+    height: 15px;
+    background:
+      linear-gradient(#fff, #fff) center / 100% 34% no-repeat,
+      linear-gradient(#fff, #fff) center / 34% 100% no-repeat;
+  }
+
+  .dish,
+  .ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 22px;
+    height: 22px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    border: 3px solid #e6f0ff;
+    background: rgb(255 255 255 / 0.25);
+  }
+
+  .ring {
+    width: 18px;
+    height: 18px;
+    border-color: #f0fff4;
+  }
+
+  .siren {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: #ff4d3d;
+    box-shadow: 0 0 6px 2px rgb(255 60 50 / 0.45);
+  }
+
+  .stripe {
+    position: absolute;
+    inset: 40% 0;
+    background: #e5322d;
+  }
+
+  .ports {
+    position: absolute;
+    inset: 5px 6px;
+    background: repeating-linear-gradient(90deg, #2b3340 0 4px, transparent 4px 7px);
+  }
+
+  .xr {
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 2px solid rgb(255 255 255 / 0.85);
+  }
+
+  .label {
+    position: absolute;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgb(0 0 0 / 0.6);
+    border: 1px solid rgb(255 255 255 / 0.35);
+    color: #fff;
+    font-family: var(--font-mono-stack);
+    font-size: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+    translate: -50% -50%;
+    transform: translateZ(var(--z)) rotateZ(8deg) rotateX(-60deg);
+  }
+
+
+
+
+
+  @container (max-width: 460px) {
+    .floor {
+      top: 54%;
+      scale: 0.42;
+    }
+
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .packet {
+      animation: nc-packet 4.5s linear infinite;
+      animation-delay: calc(var(--i) * -0.6s);
+    }
+
+        @keyframes nc-packet {
+      0% {
+        opacity: 0;
+        transform: translateX(0);
+      }
+
+      15%,
+      80% {
+        opacity: 0.75;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateX(var(--len));
+      }
+    }
+
+    /* The clinic's uplink drops; meanwhile the backup link lights up. */
+    .link--fail {
+      animation: nc-fail 9s ease infinite;
+    }
+
+    @keyframes nc-fail {
+      0%,
+      42% {
+        opacity: 1;
+      }
+
+      46%,
+      78% {
+        opacity: 0.06;
+      }
+
+      82%,
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .link--backup {
+      animation: nc-backup 9s ease infinite;
+    }
+
+    @keyframes nc-backup {
+      0%,
+      42% {
+        opacity: 0.4;
+      }
+
+      46%,
+      78% {
+        opacity: 1;
+      }
+
+      82%,
+      100% {
+        opacity: 0.4;
+      }
+    }
+
+
+
+    .siren {
+      animation: nc-siren 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes nc-siren {
+      to {
+        opacity: 0.55;
+      }
+    }
+
+    .floor {
+      animation: nc-sway 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes nc-sway {
+      from {
+        transform: rotateX(61deg) rotateZ(-12deg);
+      }
+
+      to {
+        transform: rotateX(58deg) rotateZ(-4deg);
+      }
+    }
+  }
+</style>

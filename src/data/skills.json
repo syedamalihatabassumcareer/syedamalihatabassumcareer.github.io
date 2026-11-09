@@ -1,0 +1,98 @@
+[
+  {
+    "id": "machine-learning",
+    "label": "AI, Machine Learning & Data",
+    "description": "Turning data into predictions and decisions — and checking that they hold up.",
+    "order": 1,
+    "items": [
+      { "name": "Python" },
+      { "name": "PyTorch", "usedIn": { "projects": ["pet-segmentation"] } },
+      { "name": "Scikit-learn", "usedIn": { "projects": ["smoking-behavior-prediction"] } },
+      { "name": "Deep Learning", "usedIn": { "projects": ["pet-segmentation"] } },
+      { "name": "Feature Engineering", "usedIn": { "projects": ["smoking-behavior-prediction"] } },
+      { "name": "Model Evaluation", "usedIn": { "projects": ["smoking-behavior-prediction", "pet-segmentation"] } },
+      { "name": "Statistical Modeling" },
+      { "name": "Data-Driven Decision-Making" }
+    ]
+  },
+  {
+    "id": "programming",
+    "label": "Software & Web Development",
+    "description": "Building applications end to end — databases, back ends and user interfaces.",
+    "order": 2,
+    "items": [
+      { "name": "MERN Stack", "usedIn": { "projects": ["weheal"] } },
+      { "name": "JavaScript", "usedIn": { "projects": ["matrimonial-hub"] } },
+      { "name": "SQL", "usedIn": { "projects": ["matrimonial-hub"] } },
+      { "name": "REST APIs" },
+      { "name": "Java" },
+      { "name": "C/C++" },
+      { "name": "Data Structures", "usedIn": { "experience": ["data-structures-ta"] } },
+      { "name": "Algorithmic Problem Solving" },
+      { "name": "Git" },
+      { "name": "Linux" }
+    ]
+  },
+  {
+    "id": "agentic-systems",
+    "label": "Networks & Infrastructure",
+    "description": "Monitoring and connecting the systems that keep services running.",
+    "order": 3,
+    "items": [
+      { "name": "Infrastructure Automation", "usedIn": { "experience": ["grameenphone-nextern"] } },
+      { "name": "Network Design", "usedIn": { "projects": ["smart-city-healthcare-network"] } },
+      { "name": "VLSM Subnetting", "usedIn": { "projects": ["smart-city-healthcare-network"] } },
+      { "name": "Routing (RIPv2, static and backup routes)", "usedIn": { "projects": ["smart-city-healthcare-network"] } },
+      { "name": "Communication Networks", "usedIn": { "experience": ["mongoltori-mars-rover"] } },
+      { "name": "Edge–Cloud Architectures" },
+      { "name": "HAM Radio" }
+    ]
+  },
+  {
+    "id": "computer-vision",
+    "label": "Computer Vision & Intelligent Systems",
+    "description": "Systems that see, understand and respond to people and places.",
+    "order": 4,
+    "items": [
+      { "name": "OpenCV" },
+      { "name": "YOLO" },
+      { "name": "MediaPipe" },
+      { "name": "Pose Estimation" },
+      { "name": "Gesture Recognition", "usedIn": { "research": ["gesture-virtual-keyboard-mouse"] } },
+      { "name": "Assistive AI Systems", "usedIn": { "experience": ["dristee-research-assistant"] } },
+      { "name": "Agentic AI Systems" },
+      { "name": "Low-Latency Inference" }
+    ]
+  },
+  {
+    "id": "embedded-robotics",
+    "label": "Embedded Systems, Robotics & IoT",
+    "description": "Hardware, sensors and control — from wearables to autonomous robots.",
+    "order": 5,
+    "items": [
+      { "name": "Embedded Systems", "usedIn": { "projects": ["arduino-health-monitoring", "aruco-service-bot"] } },
+      { "name": "ESP32", "usedIn": { "projects": ["aruco-service-bot"] } },
+      { "name": "Arduino", "usedIn": { "projects": ["arduino-health-monitoring"] } },
+      { "name": "Sensor Fusion", "usedIn": { "projects": ["arduino-health-monitoring"] } },
+      { "name": "GSM/GPS", "usedIn": { "projects": ["arduino-health-monitoring"] } },
+      { "name": "I2C", "usedIn": { "projects": ["arduino-health-monitoring"] } },
+      { "name": "Autonomous Navigation", "usedIn": { "projects": ["aruco-service-bot", "pathguard"] } }
+    ]
+  },
+  {
+    "id": "tools",
+    "label": "Professional Skills",
+    "description": "Working with teams and stakeholders to get things delivered.",
+    "order": 6,
+    "items": [
+      { "name": "Cross-Team Coordination", "usedIn": { "experience": ["grameenphone-nextern", "mongoltori-mars-rover"] } },
+      { "name": "Requirements Preparation", "usedIn": { "experience": ["grameenphone-nextern"] } },
+      { "name": "Automated Reporting", "usedIn": { "experience": ["grameenphone-nextern"] } },
+      { "name": "Mentoring & Training", "usedIn": { "experience": ["data-structures-ta"] } },
+      { "name": "Technical Documentation", "usedIn": { "experience": ["dristee-research-assistant"] } },
+      { "name": "Presentations", "usedIn": { "experience": ["dristee-research-assistant"] } },
+      { "name": "Microsoft Excel" },
+      { "name": "LaTeX" }
+    ]
+  }
+]

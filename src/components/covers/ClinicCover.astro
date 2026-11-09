@@ -1,0 +1,755 @@
+---
+// Animated cover for WeHeal (decorative): a tilted patient dashboard with a
+// live heartbeat strip and a video consultation, surrounded by floating module
+// cards taken from the platform's screens — appointment booking, digital
+// prescription, lab-test tracking and the ambulance driver's live route.
+// No numbers or claims; labels name features only.
+const ecg = 'M0 20 H30 L36 20 L40 6 L45 34 L50 14 L54 20 H90 L96 20 L100 6 L105 34 L110 14 L114 20 H150 L156 20 L160 6 L165 34 L170 14 L174 20 H210 L216 20 L220 6 L225 34 L230 14 L234 20 H240';
+---
+
+<div class="cover-scene clinic" aria-hidden="true">
+  <div class="rig">
+    <!-- Patient dashboard -->
+    <div class="dash">
+      <p class="d-bar">
+        <span class="logo"><i></i></span>
+        <span class="d-title"></span>
+        <span class="d-dot"></span>
+      </p>
+      <div class="d-body">
+        <ul class="side">
+          <li class="on"></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+        <div class="d-main">
+          <div class="ecg">
+            <svg viewBox="0 0 240 40" preserveAspectRatio="none"><path d={ecg}></path></svg>
+            <svg viewBox="0 0 240 40" preserveAspectRatio="none"><path d={ecg}></path></svg>
+          </div>
+          <div class="video">
+            <span class="doc"><i class="head"></i><i class="body"></i></span>
+            <span class="self"></span>
+            <span class="rec"><i></i>LIVE</span>
+            <span class="call"><i></i><i></i><i class="end"></i></span>
+          </div>
+          <div class="tiles">
+            <span><i style="--w:0.7"></i><i style="--w:0.45"></i></span>
+            <span><i style="--w:0.55"></i><i style="--w:0.8"></i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointment booking -->
+    <div class="card cal">
+      <p class="c-head">APPOINTMENT</p>
+      <div class="slots">
+        {Array.from({ length: 15 }, (_, i) => <i class:list={{ taken: [2, 6, 11].includes(i) }} />)}
+        <b class="pick"></b>
+      </div>
+      <p class="toast">✓ Booked</p>
+    </div>
+
+    <!-- Digital prescription -->
+    <div class="card rx">
+      <p class="rx-mark">℞</p>
+      <span class="ln" style="--w:0.9;--i:0"></span>
+      <span class="ln" style="--w:0.7;--i:1"></span>
+      <span class="ln" style="--w:0.8;--i:2"></span>
+      <span class="ln" style="--w:0.5;--i:3"></span>
+      <p class="pdf">PDF</p>
+    </div>
+
+    <!-- Ambulance driver: live route -->
+    <div class="card map">
+      <p class="c-head">AMBULANCE · LIVE</p>
+      <div class="streets">
+        <span class="route"></span>
+        <span class="pin"></span>
+        <span class="amb"><i></i></span>
+      </div>
+    </div>
+
+    <!-- Lab test tracking -->
+    <div class="card lab">
+      <p class="c-head">LAB TEST</p>
+      <div class="steps">
+        <span class="track"><i></i></span>
+        <b></b><b></b><b></b><b></b>
+      </div>
+    </div>
+  </div>
+  <span class="chip">MERN · MODULAR HEALTH SERVICES</span>
+</div>
+
+<style>
+  .cover-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+    background:
+      radial-gradient(50% 60% at 50% 52%, rgb(47 107 255 / 0.3), transparent 70%),
+      radial-gradient(30% 40% at 82% 70%, rgb(229 50 45 / 0.16), transparent 70%),
+      radial-gradient(120% 90% at 50% 0%, #13213f, #060a14 70%);
+  }
+
+  .rig {
+    position: absolute;
+    left: 50%;
+    top: 53%;
+    width: 600px;
+    height: 360px;
+    margin: -180px 0 0 -300px;
+    perspective: 1000px;
+    font-family: var(--font-mono-stack);
+  }
+
+  /* ── Dashboard ── */
+  .dash {
+    position: absolute;
+    left: 150px;
+    top: 58px;
+    width: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgb(140 170 255 / 0.35);
+    background: #0d1730;
+    box-shadow:
+      0 40px 70px -25px rgb(0 0 0 / 0.9),
+      0 0 60px rgb(47 107 255 / 0.25);
+    transform: rotateX(16deg) rotateY(-14deg);
+  }
+
+  .d-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 28px;
+    padding: 0 10px;
+    background: #0a1124;
+    border-bottom: 1px solid rgb(140 170 255 / 0.18);
+  }
+
+  .logo {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    background: #2f6bff;
+  }
+
+  .logo i {
+    position: absolute;
+    inset: 3px;
+    background:
+      linear-gradient(#fff, #fff) center / 100% 30% no-repeat,
+      linear-gradient(#fff, #fff) center / 30% 100% no-repeat;
+  }
+
+  .d-title {
+    width: 70px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgb(255 255 255 / 0.55);
+  }
+
+  .d-dot {
+    margin-left: auto;
+    width: 46px;
+    height: 14px;
+    border-radius: 7px;
+    background: #2f6bff;
+  }
+
+  .d-body {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+  }
+
+  .side {
+    display: grid;
+    align-content: start;
+    gap: 9px;
+    margin: 0;
+    padding: 10px 9px;
+    list-style: none;
+    background: #0a1124;
+  }
+
+  .side li {
+    height: 14px;
+    border-radius: 4px;
+    background: rgb(255 255 255 / 0.12);
+  }
+
+  .side .on {
+    background: #2f6bff;
+  }
+
+  .d-main {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .ecg {
+    position: relative;
+    height: 34px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: rgb(47 107 255 / 0.12);
+  }
+
+  .ecg svg {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ecg svg + svg {
+    left: 100%;
+  }
+
+  .ecg path {
+    fill: none;
+    stroke: #ff5a6a;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 3px rgb(255 90 106 / 0.8));
+  }
+
+  .video {
+    position: relative;
+    height: 96px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(160deg, #1e3a6e, #0b1530);
+  }
+
+  .doc {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    translate: -50% 0;
+  }
+
+  .doc .head {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 0 auto 3px;
+    border-radius: 50%;
+    background: #c9d8f2;
+  }
+
+  .doc .body {
+    display: block;
+    width: 74px;
+    height: 34px;
+    border-radius: 36px 36px 0 0;
+    background: linear-gradient(#e9f0ff 0 40%, #2f6bff 40%);
+  }
+
+  .self {
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    width: 34px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid rgb(255 255 255 / 0.4);
+    background: #33507f;
+  }
+
+  .rec {
+    position: absolute;
+    left: 7px;
+    top: 7px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgb(0 0 0 / 0.45);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+  }
+
+  .rec i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff3b3b;
+  }
+
+  .call {
+    position: absolute;
+    left: 8px;
+    bottom: 7px;
+    display: flex;
+    gap: 4px;
+  }
+
+  .call i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.3);
+  }
+
+  .call .end {
+    background: #e5322d;
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .tiles span {
+    display: grid;
+    gap: 5px;
+    padding: 8px;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 0.06);
+  }
+
+  .tiles i {
+    display: block;
+    height: 5px;
+    border-radius: 3px;
+    background: #6f9bff;
+    transform: scaleX(var(--w));
+    transform-origin: left;
+  }
+
+  /* ── Floating module cards ── */
+  .card {
+    position: absolute;
+    padding: 9px 10px;
+    border-radius: 10px;
+    border: 1px solid rgb(160 190 255 / 0.3);
+    background: rgb(14 26 54 / 0.82);
+    box-shadow: 0 24px 40px -18px rgb(0 0 0 / 0.85);
+    color: #dbe6ff;
+  }
+
+  .c-head {
+    margin-bottom: 7px;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #9fbaff;
+  }
+
+  .cal {
+    left: 6px;
+    top: 14px;
+    width: 140px;
+    transform: rotateY(18deg) rotateX(6deg);
+  }
+
+  .slots {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+
+  .slots i {
+    height: 13px;
+    border-radius: 3px;
+    background: rgb(255 255 255 / 0.12);
+  }
+
+  .slots .taken {
+    background: rgb(255 255 255 / 0.04);
+    outline: 1px dashed rgb(255 255 255 / 0.18);
+  }
+
+  /* The selected slot: a 5-column grid cell (width ≈ (140-20-16)/5). */
+  .pick {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc((100% - 16px) / 5);
+    height: 13px;
+    border-radius: 3px;
+    background: #2f6bff;
+    box-shadow: 0 0 10px #2f6bff;
+    transform: translate(calc(300% + 12px), calc(100% + 4px));
+  }
+
+  .toast {
+    margin-top: 8px;
+    width: fit-content;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #16a34a;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+  }
+
+  .rx {
+    left: 24px;
+    top: 214px;
+    width: 116px;
+    padding: 10px 12px 12px;
+    background: #fbfaf7;
+    border-color: transparent;
+    color: #1b2a4a;
+    transform: rotateY(22deg) rotateZ(-3deg);
+  }
+
+  .rx-mark {
+    margin-bottom: 4px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    color: #2f6bff;
+  }
+
+  .rx .ln {
+    display: block;
+    height: 5px;
+    margin-top: 5px;
+    border-radius: 3px;
+    background: #cdd6e6;
+    transform: scaleX(var(--w));
+    transform-origin: left;
+  }
+
+  .pdf {
+    position: absolute;
+    right: 8px;
+    top: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: #e5322d;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+  }
+
+  .map {
+    right: 4px;
+    top: 10px;
+    width: 156px;
+    transform: rotateY(-20deg) rotateX(6deg);
+  }
+
+  .streets {
+    position: relative;
+    height: 92px;
+    border-radius: 6px;
+    overflow: hidden;
+    background:
+      linear-gradient(90deg, transparent 0 30%, rgb(255 255 255 / 0.14) 30% 34%, transparent 34% 70%, rgb(255 255 255 / 0.14) 70% 74%, transparent 74%),
+      linear-gradient(0deg, transparent 0 22%, rgb(255 255 255 / 0.14) 22% 27%, transparent 27% 66%, rgb(255 255 255 / 0.14) 66% 71%, transparent 71%),
+      #12213f;
+  }
+
+  /* Route: along the bottom street, then up the right-hand street. */
+  .route {
+    position: absolute;
+    left: 8%;
+    bottom: 24%;
+    width: 64%;
+    height: 50%;
+    border-right: 2px dashed #ff6b5a;
+    border-bottom: 2px dashed #ff6b5a;
+  }
+
+  .pin {
+    position: absolute;
+    left: calc(72% - 6px);
+    top: calc(26% - 14px);
+    width: 12px;
+    height: 12px;
+    border-radius: 50% 50% 50% 0;
+    background: #ff3b3b;
+    rotate: -45deg;
+    box-shadow: 0 0 10px rgb(255 59 59 / 0.8);
+  }
+
+  .amb {
+    position: absolute;
+    left: calc(8% - 7px);
+    top: calc(76% - 6px);
+    width: 14px;
+    height: 10px;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 0 10px rgb(255 255 255 / 0.7);
+  }
+
+  .amb i {
+    position: absolute;
+    inset: 3px 5px;
+    background: #e5322d;
+  }
+
+  .lab {
+    right: 18px;
+    top: 214px;
+    width: 140px;
+    transform: rotateY(-22deg) rotateX(4deg);
+  }
+
+  .steps {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 2px 6px;
+  }
+
+  .track {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 9px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.15);
+  }
+
+  .track i {
+    position: absolute;
+    inset: 0;
+    border-radius: 2px;
+    background: #22c55e;
+    transform: scaleX(0.66);
+    transform-origin: left;
+  }
+
+  .steps b {
+    position: relative;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #22c55e;
+    background: #0e1a36;
+  }
+
+  .steps b:nth-of-type(-n + 3) {
+    background: #22c55e;
+  }
+
+  .chip {
+    position: absolute;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background: rgb(0 0 0 / 0.4);
+    color: #cfe0ff;
+    font-family: var(--font-mono-stack);
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+  }
+
+  @container (max-width: 620px) {
+    .rig {
+      scale: 0.93;
+    }
+  }
+
+  @container (max-width: 520px) {
+    .rig {
+      scale: 0.56;
+      top: 50%;
+    }
+
+    .chip {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ecg svg {
+      animation: cl-ecg 3s linear infinite;
+    }
+
+    @keyframes cl-ecg {
+      to {
+        transform: translateX(-100%);
+      }
+    }
+
+    .rec i {
+      animation: cl-blink 1.2s steps(2, jump-none) infinite;
+    }
+
+    @keyframes cl-blink {
+      to {
+        opacity: 0.2;
+      }
+    }
+
+    .doc {
+      animation: cl-talk 2.4s ease-in-out infinite;
+    }
+
+    @keyframes cl-talk {
+      50% {
+        transform: translateY(-2px) rotate(-1.5deg);
+      }
+    }
+
+    /* Booking: the highlight moves to a free slot, then "Booked" pops in. */
+    .pick {
+      animation: cl-pick 8s steps(1, end) infinite;
+    }
+
+    @keyframes cl-pick {
+      0% {
+        transform: translate(0, 0);
+      }
+
+      12% {
+        transform: translate(calc(100% + 4px), 0);
+      }
+
+      24% {
+        transform: translate(calc(300% + 12px), 0);
+      }
+
+      36%,
+      100% {
+        transform: translate(calc(300% + 12px), calc(100% + 4px));
+      }
+    }
+
+    .toast {
+      animation: cl-toast 8s var(--ease) infinite;
+    }
+
+    @keyframes cl-toast {
+      0%,
+      38% {
+        opacity: 0;
+        transform: translateY(5px) scale(0.9);
+      }
+
+      44%,
+      92% {
+        opacity: 1;
+        transform: none;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .rx .ln {
+      animation: cl-write 8s var(--ease) infinite;
+      animation-delay: calc(var(--i) * 0.35s);
+    }
+
+    @keyframes cl-write {
+      0% {
+        transform: scaleX(0);
+      }
+
+      12%,
+      90% {
+        transform: scaleX(var(--w));
+      }
+
+      100% {
+        transform: scaleX(0);
+      }
+    }
+
+    /* Ambulance drives the route: right along the street, then up to the pin. */
+    .amb {
+      animation: cl-drive 6s ease-in-out infinite;
+    }
+
+    @keyframes cl-drive {
+      0% {
+        transform: translate(0, 0);
+      }
+
+      50% {
+        transform: translate(88px, 0);
+      }
+
+      85%,
+      100% {
+        transform: translate(88px, -46px);
+      }
+    }
+
+    .pin {
+      animation: cl-pin 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes cl-pin {
+      to {
+        translate: 0 -3px;
+      }
+    }
+
+    .track i {
+      animation: cl-track 8s steps(3, end) infinite;
+    }
+
+    @keyframes cl-track {
+      from {
+        transform: scaleX(0.33);
+      }
+
+      to {
+        transform: scaleX(1.33);
+      }
+    }
+
+    .dash {
+      animation: cl-dash 9s ease-in-out infinite alternate;
+    }
+
+    @keyframes cl-dash {
+      to {
+        transform: rotateX(12deg) rotateY(-8deg) translateY(-6px);
+      }
+    }
+
+    .cal,
+    .rx,
+    .map,
+    .lab {
+      animation: cl-float 6s ease-in-out infinite alternate;
+    }
+
+    .rx {
+      animation-delay: -1.5s;
+    }
+
+    .map {
+      animation-delay: -3s;
+    }
+
+    .lab {
+      animation-delay: -4.5s;
+    }
+
+    @keyframes cl-float {
+      to {
+        translate: 0 -8px;
+      }
+    }
+  }
+</style>

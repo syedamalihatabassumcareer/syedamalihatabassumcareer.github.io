@@ -1,0 +1,101 @@
+---
+// Full reference with "Copy citation" and an expandable BibTeX record.
+import CopyButton from './CopyButton.astro';
+
+interface Props {
+  id: string;
+  citation: string;
+  bibtex?: string;
+}
+const { id, citation, bibtex } = Astro.props;
+const citationId = `cite-${id}`;
+const bibtexId = `bibtex-${id}`;
+---
+
+<div class="citation">
+  <p class="eyebrow">Cite this paper</p>
+  <p id={citationId} class="citation-text">{citation}</p>
+  <div class="citation-actions">
+    <CopyButton label="Copy citation" what="Citation" target={citationId} />
+  </div>
+  {
+    bibtex && (
+      <details class="bibtex">
+        <summary>BibTeX</summary>
+        <pre id={bibtexId} tabindex="0" aria-label="BibTeX entry"><code>{bibtex}</code></pre>
+        <CopyButton label="Copy BibTeX" what="BibTeX entry" target={bibtexId} />
+      </details>
+    )
+  }
+</div>
+
+<style>
+  .citation {
+    display: grid;
+    gap: var(--s-1);
+    padding: var(--s-3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .citation-text {
+    font-family: var(--font-display-stack);
+    font-size: var(--step-0);
+    line-height: 1.6;
+    max-width: 75ch;
+  }
+
+  .citation-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .bibtex summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: var(--step--1);
+    color: var(--accent);
+    list-style: none;
+  }
+
+  .bibtex summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .bibtex summary::before {
+    content: '+';
+    display: inline-grid;
+    place-items: center;
+    width: 1.3rem;
+    height: 1.3rem;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-family: var(--font-mono-stack);
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: transform var(--fast) var(--ease);
+  }
+
+  .bibtex[open] summary::before {
+    content: '−';
+  }
+
+  pre {
+    margin-block: 0.5rem 0.8rem;
+    padding: 1rem;
+    overflow-x: auto;
+    border-radius: var(--radius);
+    background: var(--bg-alt);
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    line-height: 1.7;
+    white-space: pre;
+  }
+</style>

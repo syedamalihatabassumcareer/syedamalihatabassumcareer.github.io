@@ -1,0 +1,127 @@
+---
+// External resource links (repository, demo, report…) with hosting credits.
+import Icon, { type IconName } from './Icon.astro';
+import { withBase } from '@/lib/url';
+
+interface Link {
+  label: string;
+  url: string;
+  kind: 'repository' | 'website' | 'video' | 'report' | 'paper' | 'doi' | 'other';
+  hostedBy?: string;
+}
+
+interface Props {
+  links: Link[];
+  /** Used to make link text unique for screen readers. */
+  context: string;
+}
+
+const { links, context } = Astro.props;
+// Files published with the site (e.g. reports/x.pdf) get the base path.
+const isLocal = (url: string) => !/^https?:/.test(url);
+const hrefFor = (url: string) => (isLocal(url) ? withBase(url) : url);
+const hostFor = (link: Link) =>
+  link.hostedBy ? `Hosted by ${link.hostedBy}` : isLocal(link.url) ? 'PDF' : new URL(link.url).hostname.replace(/^www\./, '');
+const icons: Record<Link['kind'], IconName> = {
+  repository: 'github',
+  website: 'globe',
+  video: 'video',
+  report: 'document',
+  paper: 'document',
+  doi: 'document',
+  other: 'link',
+};
+---
+
+<ul class="links">
+  {
+    links.map((link) => (
+      <li>
+        <a href={hrefFor(link.url)} target="_blank" rel="noopener noreferrer">
+          <span class="icon-wrap">
+            <Icon name={icons[link.kind]} size={20} />
+          </span>
+          <span class="text">
+            <span class="label">
+              {link.label}
+              <span class="visually-hidden">
+                — {context} (opens in a new tab)
+              </span>
+            </span>
+            <span class="host">{hostFor(link)}</span>
+          </span>
+          <Icon name="arrow-up-right" class="go" />
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .links {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-height: 3.5rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    text-decoration: none;
+    transition:
+      border-color var(--fast),
+      transform var(--fast) var(--ease);
+  }
+
+  a:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    transform: translateX(2px);
+  }
+
+  .icon-wrap {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    flex: none;
+  }
+
+  .text {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .label {
+    font-weight: 600;
+    font-size: var(--step--1);
+  }
+
+  .host {
+    font-size: var(--step--2);
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+
+  a :global(.go) {
+    flex: none;
+    color: var(--muted);
+    transition: transform var(--fast) var(--ease), color var(--fast);
+  }
+
+  a:hover :global(.go) {
+    color: var(--accent);
+    transform: translate(2px, -2px);
+  }
+</style>

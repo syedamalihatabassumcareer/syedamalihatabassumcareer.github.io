@@ -1,0 +1,296 @@
+---
+// Animated cover for PathGuard (decorative): a small two-wheeled robot car
+// built like the real one (clear chassis, battery pack, breadboard of gates,
+// red motor driver, two IR sensors) drives a loop on a tilted floor. Its IR
+// beams flash when an obstacle is ahead and it turns away (static, front-facing
+// floor); a truth table on
+// the side highlights the active row — no microcontroller involved.
+import Box3D from './Box3D.astro';
+
+const obstacles = [
+  { x: 165, y: -110, h: 34 },
+  { x: 110, y: 165, h: 28 },
+  { x: -165, y: 110, h: 38 },
+  { x: -110, y: -165, h: 30 },
+];
+---
+
+<div class="cover-scene robot" aria-hidden="true">
+  <div class="stage">
+    <div class="floor">
+      <span class="loop"></span>
+      {obstacles.map((o) => <Box3D w={26} d={26} h={o.h} x={o.x} y={o.y} color="#7a3b1f" />)}
+      <div class="path">
+        <div class="car">
+          <span class="beam beam--l"></span>
+          <span class="beam beam--r"></span>
+          <span class="shadow"></span>
+          <Box3D w={14} d={30} h={30} x={-44} y={-26} color="#1b1b1b" />
+          <Box3D w={14} d={30} h={30} x={44} y={-26} color="#1b1b1b" />
+          <Box3D w={74} d={104} h={4} z={12} color="rgb(200 230 255 / 0.35)" />
+          <Box3D w={58} d={26} h={7} y={-28} z={16} color="#e9e4da" />
+          <Box3D w={34} d={46} h={16} y={8} z={16} color="#1fb6c9" />
+          <Box3D w={30} d={18} h={8} y={40} z={16} color="#d4202a" />
+          <Box3D w={10} d={8} h={10} x={-24} y={-50} z={16} color="#2d4fd8" />
+          <Box3D w={10} d={8} h={10} x={24} y={-50} z={16} color="#2d4fd8" />
+          <Box3D w={8} d={8} h={8} y={54} z={4} color="#888" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table">
+    <p class="t-head"><span>L</span><span>R</span><span>ACTION</span></p>
+    <p><span>1</span><span>1</span><span>FORWARD</span></p>
+    <p><span>0</span><span>1</span><span>RIGHT</span></p>
+    <p><span>1</span><span>0</span><span>LEFT</span></p>
+    <p><span>0</span><span>0</span><span>BACK</span></p>
+    <span class="hl"></span>
+  </div>
+  <span class="chip">NO MICROCONTROLLER · RTL LOGIC</span>
+</div>
+
+<style>
+  .cover-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+    background:
+      radial-gradient(55% 70% at 45% 60%, rgb(25 170 248 / 0.22), transparent 70%),
+      radial-gradient(120% 90% at 50% 0%, #10202a, #06080c 70%);
+  }
+
+  .stage {
+    position: absolute;
+    inset: 0;
+    perspective: 820px;
+    perspective-origin: 45% 10%;
+  }
+
+  .floor {
+    position: absolute;
+    left: 41%;
+    top: 49%;
+    width: 600px;
+    height: 600px;
+    margin: -300px 0 0 -300px;
+    transform-style: preserve-3d;
+    transform: rotateX(58deg);
+    background:
+      repeating-linear-gradient(0deg, rgb(120 200 255 / 0.12) 0 1px, transparent 1px 30px),
+      repeating-linear-gradient(90deg, rgb(120 200 255 / 0.12) 0 1px, transparent 1px 30px);
+    border-radius: 24px;
+    box-shadow: inset 0 0 0 1px rgb(120 200 255 / 0.2);
+  }
+
+  /* Kept in its own rule: the CSS minifier drops `scale` when it shares a rule
+     with a fixed `transform` (see tests/css.test.mjs). */
+  .floor:where(.cover-scene *) {
+    scale: 0.98;
+  }
+
+  /* The route the car drives */
+  .loop {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 220px;
+    height: 220px;
+    margin: -110px 0 0 -110px;
+    border: 2px dashed rgb(255 255 255 / 0.12);
+    border-radius: 18px;
+  }
+
+  .path {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform-style: preserve-3d;
+    transform: translate(-110px, -110px) rotate(90deg);
+  }
+
+  .car {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-style: preserve-3d;
+    scale: 0.9;
+  }
+
+  .shadow {
+    position: absolute;
+    left: -46px;
+    top: -60px;
+    width: 92px;
+    height: 120px;
+    border-radius: 30px;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), transparent);
+  }
+
+  .beam {
+    position: absolute;
+    top: -160px;
+    width: 60px;
+    height: 106px;
+    background: linear-gradient(to top, rgb(255 80 60 / 0.75), transparent);
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    opacity: 0.25;
+  }
+
+  .beam--l {
+    left: -58px;
+  }
+
+  .beam--r {
+    left: -2px;
+  }
+
+  /* Truth table */
+  .table {
+    position: absolute;
+    right: 4%;
+    top: 50%;
+    translate: 0 -50%;
+    display: grid;
+    gap: 2px;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    border-radius: 10px;
+    background: rgb(5 10 16 / 0.6);
+    font-family: var(--font-mono-stack);
+    font-size: 0.62rem;
+    color: #cfe8ff;
+  }
+
+  .table p {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1rem 1rem 4.2rem;
+    padding: 0.12rem 0.3rem;
+    line-height: 1.3;
+  }
+
+  .t-head {
+    color: #ff9a4d;
+    border-bottom: 1px solid rgb(255 255 255 / 0.15);
+  }
+
+  .hl {
+    position: absolute;
+    left: 0.6rem;
+    right: 0.6rem;
+    top: calc(0.5rem + 1.25rem + 2px);
+    height: 1.12rem;
+    border-radius: 4px;
+    background: rgb(25 170 248 / 0.45);
+  }
+
+
+  .chip {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.75rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background: rgb(0 0 0 / 0.35);
+    color: #ffd8b8;
+    font-family: var(--font-mono-stack);
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+  }
+
+  @container (max-width: 460px) {
+    .floor {
+      scale: 0.6;
+      left: 41%;
+      top: 56%;
+    }
+
+    .table {
+      scale: 0.85;
+      right: 1%;
+      transform-origin: right center;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Clockwise square loop: drive, see the obstacle ahead, turn right. */
+    .path {
+      animation: rc-drive 12s linear infinite;
+    }
+
+    @keyframes rc-drive {
+      0% {
+        transform: translate(-110px, -110px) rotate(90deg);
+      }
+
+      20% {
+        transform: translate(110px, -110px) rotate(90deg);
+      }
+
+      25% {
+        transform: translate(110px, -110px) rotate(180deg);
+      }
+
+      45% {
+        transform: translate(110px, 110px) rotate(180deg);
+      }
+
+      50% {
+        transform: translate(110px, 110px) rotate(270deg);
+      }
+
+      70% {
+        transform: translate(-110px, 110px) rotate(270deg);
+      }
+
+      75% {
+        transform: translate(-110px, 110px) rotate(360deg);
+      }
+
+      95% {
+        transform: translate(-110px, -110px) rotate(360deg);
+      }
+
+      100% {
+        transform: translate(-110px, -110px) rotate(450deg);
+      }
+    }
+
+    .beam {
+      animation: rc-beam 3s linear infinite;
+    }
+
+    @keyframes rc-beam {
+      0%,
+      55% {
+        opacity: 0.22;
+      }
+
+      65%,
+      98% {
+        opacity: 0.95;
+      }
+    }
+
+    .hl {
+      animation: rc-row 3s steps(1, end) infinite;
+    }
+
+    @keyframes rc-row {
+      0% {
+        transform: translateY(0);
+      }
+
+      80% {
+        transform: translateY(calc(1.12rem + 2px));
+      }
+    }
+
+  }
+</style>

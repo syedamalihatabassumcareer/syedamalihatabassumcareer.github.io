@@ -1,0 +1,371 @@
+---
+// Original, code-native hero artwork (decorative).
+// Reads left → right as the research arc: a sensor senses (ripples), perceives
+// a 3D object through its field of view (wireframe box with uncertainty
+// ellipses), reasons over a graph, and either decides or abstains.
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+// Dot field
+const dots: { x: number; y: number }[] = [];
+for (let y = 24; y <= 536; y += 26) {
+  for (let x = 24; x <= 536; x += 26) dots.push({ x, y });
+}
+---
+
+<div class:list={['hero-art', className]} aria-hidden="true">
+  <svg viewBox="0 0 560 560" focusable="false">
+    <defs>
+      <radialGradient id="hero-fade" cx="55%" cy="45%" r="60%">
+        <stop offset="0" stop-color="#fff" stop-opacity="1"></stop>
+        <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
+      </radialGradient>
+      <mask id="hero-mask">
+        <rect width="560" height="560" fill="url(#hero-fade)"></rect>
+      </mask>
+      <linearGradient id="hero-beam" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0" class="beam-a"></stop>
+        <stop offset="1" class="beam-b"></stop>
+      </linearGradient>
+    </defs>
+
+    <!-- perception field -->
+    <g class="field" mask="url(#hero-mask)">
+      {dots.map((d) => <circle cx={d.x} cy={d.y} r="1.3" />)}
+    </g>
+
+    <!-- 1 · sense: sensor + ripples -->
+    <g class="sense">
+      <circle class="ripple r1" cx="96" cy="420" r="34"></circle>
+      <circle class="ripple r2" cx="96" cy="420" r="34"></circle>
+      <circle class="ripple r3" cx="96" cy="420" r="34"></circle>
+    </g>
+
+    <!-- 2 · perceive: field of view onto a 3D box -->
+    <path class="beam" d="M96 420 L292 214 L292 362 Z"></path>
+    <path class="ray" d="M96 420 L292 214"></path>
+    <path class="ray" d="M96 420 L292 362"></path>
+
+    <g class="object">
+      <path class="box-back" d="M344 176 H464 V296 H344 Z"></path>
+      <path class="box-edge" d="M292 214 L344 176 M412 214 L464 176 M412 334 L464 296 M292 334 L344 296"></path>
+      <path class="box-front" d="M292 214 H412 V334 H292 Z"></path>
+      <ellipse class="uncert u1" cx="412" cy="334" rx="26" ry="13"></ellipse>
+      <ellipse class="uncert u2" cx="464" cy="176" rx="18" ry="9"></ellipse>
+      <circle class="corner" cx="412" cy="334" r="3.2"></circle>
+      <circle class="corner" cx="464" cy="176" r="3.2"></circle>
+    </g>
+
+    <!-- 3 · reason: graph with a highlighted path; 4 · decide or abstain -->
+    <g class="graph">
+      <path class="edge" d="M352 255 L230 120 M230 120 L330 70 M330 70 L450 82 M330 70 L402 22"></path>
+      <path class="edge faint" d="M230 120 L170 196 M450 82 L512 140"></path>
+      <path class="trace" pathLength="1" d="M96 420 C 200 330, 250 300, 352 255 S 220 140, 230 120 S 300 75, 330 70 S 420 78, 450 82"></path>
+      <circle class="node faint-node" cx="170" cy="196" r="4"></circle>
+      <circle class="node faint-node" cx="512" cy="140" r="4"></circle>
+      <circle class="node n1" cx="352" cy="255" r="5.5"></circle>
+      <circle class="node n2" cx="230" cy="120" r="5.5"></circle>
+      <circle class="node n3" cx="330" cy="70" r="5.5"></circle>
+      <circle class="abstain" cx="402" cy="22" r="8"></circle>
+      <circle class="decide-ring" cx="450" cy="82" r="15"></circle>
+      <circle class="node n4 decide" cx="450" cy="82" r="7"></circle>
+      <circle class="sensor" cx="96" cy="420" r="7"></circle>
+    </g>
+
+    <g class="labels">
+      <text x="72" y="466">sense</text>
+      <text x="292" y="390">perceive</text>
+      <text x="168" y="104">reason</text>
+      <text x="476" y="70">decide</text>
+      <text x="418" y="16">abstain?</text>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .hero-art {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    color: var(--muted);
+  }
+
+  .hero-art svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .field circle {
+    fill: currentColor;
+    opacity: 0.22;
+  }
+
+  .beam-a {
+    stop-color: var(--accent);
+    stop-opacity: 0.22;
+  }
+
+  .beam-b {
+    stop-color: var(--accent);
+    stop-opacity: 0.02;
+  }
+
+  .beam {
+    fill: url(#hero-beam);
+  }
+
+  .ray {
+    stroke: var(--accent);
+    stroke-width: 1;
+    stroke-dasharray: 3 5;
+    fill: none;
+    opacity: 0.7;
+  }
+
+  .ripple {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.2;
+    opacity: 0.35;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .r2 {
+    transform: scale(1.7);
+    opacity: 0.2;
+  }
+
+  .r3 {
+    transform: scale(2.4);
+    opacity: 0.1;
+  }
+
+  .box-front,
+  .box-back,
+  .box-edge {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.3;
+    stroke-linejoin: round;
+  }
+
+  .box-front {
+    fill: var(--surface);
+    fill-opacity: 0.55;
+    stroke-width: 1.6;
+  }
+
+  .box-back {
+    opacity: 0.45;
+    stroke-dasharray: 4 4;
+  }
+
+  .box-edge {
+    opacity: 0.6;
+  }
+
+  .uncert {
+    fill: var(--accent-soft);
+    stroke: var(--accent);
+    stroke-width: 1;
+    transform-box: fill-box;
+    transform-origin: center;
+    rotate: -18deg;
+  }
+
+  .corner {
+    fill: var(--accent);
+  }
+
+  .edge {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1;
+    opacity: 0.4;
+  }
+
+  .edge.faint {
+    stroke-dasharray: 2 5;
+    opacity: 0.3;
+  }
+
+  .trace {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .node {
+    fill: var(--bg);
+    stroke: var(--accent);
+    stroke-width: 2;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .faint-node {
+    stroke: currentColor;
+    stroke-width: 1.2;
+    opacity: 0.45;
+  }
+
+  .decide {
+    fill: var(--accent);
+  }
+
+  .decide-ring {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1;
+    opacity: 0.45;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .abstain {
+    fill: var(--bg);
+    stroke: var(--muted);
+    stroke-width: 1.4;
+    stroke-dasharray: 3 3;
+  }
+
+  .sensor {
+    fill: var(--accent);
+    stroke: var(--bg);
+    stroke-width: 3;
+  }
+
+  .labels text {
+    font-family: var(--font-mono-stack);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    fill: var(--muted);
+  }
+
+  /* ── Motion (optional; disabled for reduced-motion) ──────────────── */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-art {
+      animation: art-in 1.4s var(--ease) 0.25s both;
+    }
+
+    @keyframes art-in {
+      from {
+        opacity: 0;
+        transform: scale(0.96);
+      }
+    }
+
+    .ripple {
+      animation: ripple 4.8s ease-out infinite;
+    }
+
+    .r2 {
+      animation-delay: 1.6s;
+    }
+
+    .r3 {
+      animation-delay: 3.2s;
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0.6);
+        opacity: 0.55;
+      }
+      100% {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+
+    .trace {
+      stroke-dasharray: 1;
+      animation: draw 2.4s var(--ease) 0.7s both;
+    }
+
+    @keyframes draw {
+      from {
+        stroke-dashoffset: 1;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .object {
+      animation: float 9s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    .uncert {
+      animation: breathe 5s ease-in-out infinite;
+    }
+
+    .u2 {
+      animation-delay: -2.5s;
+    }
+
+    @keyframes breathe {
+      50% {
+        transform: scale(1.18);
+      }
+    }
+
+    .n1,
+    .n2,
+    .n3,
+    .n4 {
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    .n1 {
+      animation-delay: 3s;
+    }
+    .n2 {
+      animation-delay: 3.4s;
+    }
+    .n3 {
+      animation-delay: 3.8s;
+    }
+    .n4 {
+      animation-delay: 4.2s;
+    }
+
+    @keyframes pulse {
+      0%,
+      12%,
+      100% {
+        transform: scale(1);
+      }
+      6% {
+        transform: scale(1.45);
+      }
+    }
+
+    .decide-ring {
+      animation: ring 6s ease-out 4.2s infinite;
+    }
+
+    @keyframes ring {
+      0% {
+        transform: scale(0.6);
+        opacity: 0.6;
+      }
+      30%,
+      100% {
+        transform: scale(1.8);
+        opacity: 0;
+      }
+    }
+  }
+</style>

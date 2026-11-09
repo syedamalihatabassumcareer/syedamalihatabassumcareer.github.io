@@ -1,0 +1,198 @@
+---
+import ResearchRow from '@/components/ResearchRow.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { researchStatuses } from '@/data/taxonomy';
+import { getResearch } from '@/lib/content';
+
+const research = await getResearch();
+const statuses = researchStatuses
+  .map((s) => ({ ...s, entries: research.filter((r) => r.data.status === s.id) }))
+  .filter((s) => s.entries.length > 0);
+const variantFor = (status: string, featured: boolean) =>
+  (status === 'published' || status === 'accepted') && featured ? 'feature' : 'row';
+---
+
+<section class="section" id="research" aria-labelledby="research-title">
+  <div class="wrap">
+    <SectionHeading
+      id="research-title"
+      title="Publications & research"
+      sub="Peer-reviewed and submitted work in applied AI — evidence of analytical rigour and clear technical writing."
+    />
+
+    <div class="pubs">
+      {
+        statuses.map((s) => (
+          <div class={`group group--${s.id}`} data-filter-group>
+            <h3 class="group-title" id={`group-${s.id}`}>
+              {s.label} <span class="mono muted">({s.entries.length})</span>
+            </h3>
+            {s.entries.some((e) => variantFor(s.id, e.data.featured) === 'row') && (
+              <p class="ledger-head mono" aria-hidden="true">
+                <span>No.</span>
+                <span>Title</span>
+                <span>Stage</span>
+              </p>
+            )}
+            <ol class:list={['list', `list--${s.id}`]} aria-labelledby={`group-${s.id}`}>
+              {s.entries.map((entry, i) => (
+                <ResearchRow entry={entry} variant={variantFor(s.id, entry.data.featured)} index={i} />
+              ))}
+            </ol>
+          </div>
+        ))
+      }
+
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── Pipeline: ongoing → submitted → published ── */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+    gap: var(--s-4);
+    margin: 0 0 var(--s-6);
+    padding: 0;
+    list-style: none;
+    counter-reset: none;
+  }
+
+  .stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  /* Arrow to the next stage */
+  .stage:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: calc(var(--s-4) / -2 - 0.35rem);
+    top: 50%;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-top: 2px solid var(--border-strong);
+    border-right: 2px solid var(--border-strong);
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .stage-count {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 50%;
+    border: 2px solid var(--status-color);
+    background: color-mix(in srgb, var(--status-color) 10%, transparent);
+    color: var(--text);
+    font-size: var(--step-2);
+    font-weight: 900;
+  }
+
+  .stage--published,
+  .stage--accepted {
+    --status-color: var(--status-published);
+  }
+
+  .stage--under-review {
+    --status-color: var(--status-review);
+  }
+
+  .stage--in-progress {
+    --status-color: var(--status-progress);
+  }
+
+  .stage-text {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .stage-note {
+    font-size: var(--step--1);
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .count {
+    margin-block: var(--s-3) var(--s-2);
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+
+  .group + .group {
+    margin-top: var(--s-6);
+  }
+
+  .group-title {
+    font-size: var(--step-2);
+    margin-bottom: var(--s-2);
+  }
+
+  .group-title .mono {
+    font-size: var(--step--1);
+  }
+
+  .list {
+    display: grid;
+    gap: var(--s-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Ledger: ruled rows, no cards */
+  .list:has(> :global(.entry--row)) {
+    gap: 0;
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .ledger-head {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) 13rem 7.5rem;
+    gap: var(--s-3);
+    padding: 0 var(--s-2) 0.5rem;
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .empty {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-1);
+    margin-top: var(--s-3);
+    padding: var(--s-6) var(--s-4);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-l);
+  }
+
+  .empty-title {
+    font-size: var(--step-2);
+    font-weight: 700;
+  }
+
+  @media (max-width: 60rem) {
+    .ledger-head {
+      display: none;
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .pipeline {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s-2);
+    }
+
+    .stage:not(:last-child)::after {
+      right: auto;
+      left: 1.35rem;
+      top: auto;
+      bottom: calc(var(--s-2) / -2 - 0.45rem);
+      transform: rotate(135deg);
+    }
+  }
+</style>

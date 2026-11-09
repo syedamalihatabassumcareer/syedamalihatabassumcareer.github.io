@@ -1,0 +1,857 @@
+/* ==========================================================================
+   Design system — Syeda Maliha Tabassum · career site
+   Light-first, in Grameenphone's brand blues with green as the second accent.
+   Every colour is defined once with light-dark(); the theme switch only sets
+   `color-scheme`. Text tokens meet WCAG AA on every surface. Accent fills
+   carry --on-accent text (white on deep blue, near-black on bright blue).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Palette taken from Grameenphone's brand colours: blue #19AAF8, deep blue
+     #0078CF, green #1ABE51, ink #1A1A1A on white and pale blue-grey. */
+  --bg: light-dark(#ffffff, #0b1220);
+  --bg-alt: light-dark(#f1f6fa, #0f182a);
+  --surface: light-dark(#ffffff, #142033);
+  --surface-2: light-dark(#f4f8fb, #1a2840);
+  --border: light-dark(#dde6ee, #263650);
+  --border-strong: light-dark(#7d8a99, #5a6d8a);
+  --text: light-dark(#1a1a1a, #f2f6fa);
+  --text-2: light-dark(#454c55, #b8c4d2);
+  --muted: light-dark(#5f6874, #8d9bb0);
+  --accent: light-dark(#0078cf, #19aaf8);
+  --accent-hover: light-dark(#0067b3, #4dbefa);
+  --accent-text: light-dark(#0068b4, #5cc3fa);
+  --accent-soft: light-dark(rgb(0 120 207 / 0.08), rgb(25 170 248 / 0.12));
+  --on-accent: light-dark(#ffffff, #06121f);
+  --green: light-dark(#13873b, #1abe51);
+  --green-soft: light-dark(rgb(26 190 81 / 0.1), rgb(26 190 81 / 0.14));
+  --accent-gradient: linear-gradient(90deg, light-dark(#0068b4, #0a8ad8) 0%, light-dark(#0078cf, #19aaf8) 55%, light-dark(#0f8f6a, #1abe51) 100%);
+  --brand-gradient: linear-gradient(90deg, #19aaf8, #1abe51);
+
+  --status-published: light-dark(#13873b, #5fd38d);
+  --status-accepted: light-dark(#13873b, #5fd38d);
+  --status-review: var(--accent-text);
+  --status-progress: light-dark(#5b4bb0, #b2a6f5);
+  /* Research-topic tones (decoration and small labels; AA on --surface in both themes) */
+  --tone-reliable-ai: light-dark(#8a5a00, #f7b246);
+  --tone-perception: light-dark(#0b6a80, #4fd1e8);
+  --tone-health: light-dark(#b0234a, #ff7f9c);
+  --tone-assistive: light-dark(#6a3fc2, #b49bff);
+  --tone-interaction: light-dark(#13873b, #5fd38d);
+
+  --shadow: 0 1px 0 rgb(15 40 70 / 0.04), 0 18px 40px -24px rgb(15 40 70 / 0.35);
+
+  /* Type: Lato for everything, JetBrains Mono for small metadata. */
+  --font-sans-stack: var(--font-sans, 'Lato', system-ui, 'Segoe UI', sans-serif);
+  --font-mono-stack: var(--font-mono, ui-monospace, 'Cascadia Mono', Consolas, monospace);
+  --font-display-stack: var(--font-sans-stack);
+  --font-body-stack: var(--font-sans-stack);
+
+  --step--2: clamp(0.75rem, 0.73rem + 0.1vw, 0.8rem);
+  --step--1: clamp(0.85rem, 0.83rem + 0.12vw, 0.9375rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+  --step-1: clamp(1.125rem, 1.06rem + 0.3vw, 1.3rem);
+  --step-2: clamp(1.35rem, 1.2rem + 0.7vw, 1.75rem);
+  --step-3: clamp(1.75rem, 1.45rem + 1.4vw, 2.5rem);
+  --step-4: clamp(2.25rem, 1.7rem + 2.6vw, 3.75rem);
+  --step-hero: clamp(2.75rem, 1.6rem + 5.2vw, 5.5rem);
+
+  /* 8px spacing scale */
+  --s-1: 0.5rem;
+  --s-2: 1rem;
+  --s-3: 1.5rem;
+  --s-4: 2rem;
+  --s-6: 3rem;
+  --s-8: 4rem;
+  --s-12: 6rem;
+  --s-16: 8rem;
+
+  --gutter: clamp(1.25rem, 0.6rem + 2.8vw, 3.5rem);
+  --max: 75rem;
+  --measure: 68ch;
+  --radius-s: 4px;
+  --radius: 8px;
+  --radius-l: 12px;
+  --header-h: 4.5rem;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --fast: 180ms;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* Light is the default for everyone; dark only when the visitor picks it. */
+
+/* Brief colour transition while the visitor switches theme (class set by JS). */
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+  transition:
+    background-color 250ms ease,
+    color 250ms ease,
+    border-color 250ms ease,
+    fill 250ms ease,
+    stroke 250ms ease !important;
+}
+
+/* ── Reset & base ───────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+/* Keep native modal dialogs centred (the reset above removes their auto margin). */
+dialog {
+  margin: auto;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans-stack);
+  font-size: var(--step-0);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+main {
+  flex: 1;
+}
+
+img,
+svg,
+video,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-sans-stack);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition:
+    color var(--fast),
+    text-decoration-color var(--fast);
+}
+
+a:hover {
+  color: var(--accent-text);
+  text-decoration-color: currentColor;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-s);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ── Utilities ──────────────────────────────────────────────────────────── */
+.wrap {
+  width: 100%;
+  max-width: calc(var(--max) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: -100px;
+  z-index: 200;
+  padding: 0.75rem 1rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--radius-s);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  top: 0.75rem;
+  color: var(--on-accent);
+}
+
+.eyebrow {
+  font-family: var(--font-mono-stack);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.eyebrow--accent {
+  color: var(--accent-text);
+}
+
+.mono {
+  font-family: var(--font-mono-stack);
+  font-size: 0.86em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.accent {
+  color: var(--accent-text);
+}
+
+.lead {
+  font-size: var(--step-1);
+  line-height: 1.6;
+  color: var(--text-2);
+  max-width: 62ch;
+}
+
+/* ── Sections ───────────────────────────────────────────────────────────── */
+.section {
+  position: relative;
+  padding-block: clamp(4rem, 2.5rem + 4vw, 6rem);
+}
+
+.section--alt {
+  background: var(--bg-alt);
+}
+
+/* Centred heading + grey subtitle, as in the reference. */
+.section-heading {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-2);
+  max-width: 46rem;
+  margin: 0 auto var(--s-6);
+  text-align: center;
+}
+
+.section-heading h2 {
+  font-size: var(--step-4);
+  font-weight: 700;
+}
+
+.section-heading p {
+  color: var(--muted);
+  font-size: var(--step-1);
+  line-height: 1.55;
+}
+
+.section-heading .rule {
+  width: 3rem;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 2.875rem;
+  padding: 0.65rem 1.5rem;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text);
+  font-weight: 700;
+  font-size: var(--step--1);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition:
+    background-color var(--fast),
+    border-color var(--fast),
+    color var(--fast),
+    transform var(--fast) var(--ease);
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.btn--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--on-accent);
+}
+
+.btn--small {
+  min-height: 2.5rem;
+  padding: 0.45rem 1rem;
+}
+
+.btn--quiet {
+  border-color: transparent;
+}
+
+.btn svg {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 2.75rem;
+  font-weight: 700;
+  font-size: var(--step--1);
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
+.text-link svg {
+  width: 1em;
+  height: 1em;
+  transition: transform var(--fast) var(--ease);
+}
+
+.text-link:hover svg {
+  transform: translateX(3px);
+}
+
+/* Circular icon buttons (social links). */
+.icon-circle {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--text-2);
+  text-decoration: none;
+  transition:
+    border-color var(--fast),
+    color var(--fast),
+    background-color var(--fast);
+}
+
+.icon-circle:hover {
+  border-color: var(--accent);
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.icon-circle svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* ── Surfaces & labels ──────────────────────────────────────────────────── */
+/* Frosted-glass cards: a translucent tint, a light sheen across the top-left,
+   a gradient rim (::before) and a soft "floating" shadow. Ambient colour
+   behind them comes from .glass-scene. Text sits on a tint that stays close to
+   --surface, so contrast is unchanged. */
+.card,
+.glass-card {
+  --glass-tint: light-dark(rgb(255 255 255 / 0.72), rgb(30 30 30 / 0.62));
+  --glass-rim: linear-gradient(
+    145deg,
+    light-dark(rgb(255 255 255 / 1), rgb(255 255 255 / 0.22)) 0%,
+    light-dark(rgb(25 170 248 / 0.28), rgb(25 170 248 / 0.3)) 22%,
+    transparent 48%,
+    transparent 70%,
+    light-dark(rgb(25 170 248 / 0.18), rgb(255 255 255 / 0.1)) 100%
+  );
+  --float-shadow:
+    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.07)),
+    0 1px 2px light-dark(rgb(60 30 10 / 0.06), rgb(0 0 0 / 0.3)),
+    0 22px 44px -26px light-dark(rgb(90 45 10 / 0.3), rgb(0 0 0 / 0.85));
+  --float-shadow-hover:
+    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.1)),
+    0 2px 4px light-dark(rgb(60 30 10 / 0.06), rgb(0 0 0 / 0.3)),
+    0 40px 70px -34px light-dark(rgb(90 45 10 / 0.38), rgb(0 0 0 / 0.9)),
+    0 18px 50px -30px rgb(25 170 248 / 0.45);
+  position: relative;
+  isolation: isolate;
+  border: 1px solid light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.06));
+  border-radius: var(--radius-l);
+  background:
+    linear-gradient(160deg, light-dark(rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.045)) 0%, transparent 42%),
+    var(--glass-tint);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow: var(--float-shadow);
+  transition:
+    transform 450ms var(--ease),
+    box-shadow 450ms var(--ease),
+    border-color 250ms ease;
+}
+
+.card::before,
+.glass-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--glass-rim);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  opacity: 0.75;
+  transition: opacity 350ms ease;
+  pointer-events: none;
+}
+
+.card:hover,
+.glass-card:hover {
+  box-shadow: var(--float-shadow-hover);
+}
+
+.card:hover::before,
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* Ambient light behind a group of glass cards, so the frosting has colour to
+   catch. Purely decorative; it never extends past its container. */
+.glass-scene {
+  position: relative;
+  isolation: isolate;
+}
+
+.glass-scene::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 4% 2%;
+  background:
+    radial-gradient(32% 42% at 18% 30%, light-dark(rgb(25 170 248 / 0.16), rgb(25 170 248 / 0.17)), transparent 70%),
+    radial-gradient(28% 38% at 82% 68%, light-dark(rgb(26 190 81 / 0.12), rgb(26 190 81 / 0.1)), transparent 70%),
+    radial-gradient(24% 30% at 55% 12%, light-dark(rgb(160 220 255 / 0.35), rgb(255 255 255 / 0.05)), transparent 70%);
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--step--2);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+/* Small status label with a coloured marker. */
+.status {
+  --status-color: var(--status-published);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono-stack);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--status-color);
+  white-space: nowrap;
+}
+
+.status::before {
+  content: '';
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--status-color);
+  flex: none;
+}
+
+.status--accepted {
+  --status-color: var(--status-accepted);
+}
+
+.status--under-review {
+  --status-color: var(--status-review);
+}
+
+.status--under-review::before {
+  background: transparent;
+  border: 2px solid var(--status-color);
+}
+
+.status--in-progress {
+  --status-color: var(--status-progress);
+}
+
+.status--in-progress::before {
+  background: linear-gradient(90deg, var(--status-color) 50%, transparent 50%);
+  border: 1.5px solid var(--status-color);
+}
+
+/* ── Inline expansion ───────────────────────────────────────────────────── */
+/* [data-expander] panels are open by default (no JS = everything readable).
+   site.ts collapses them and animates grid rows 0fr ↔ 1fr — no fixed heights. */
+.expander {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.expander > .expander-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.js-expanders .expander[data-collapsed] {
+  grid-template-rows: 0fr;
+}
+
+.js-expanders .expander[data-collapsed] > .expander-inner {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js-expanders .expander {
+    transition: grid-template-rows 320ms var(--ease);
+  }
+
+  .js-expanders .expander > .expander-inner {
+    transition: visibility 0s linear 0s;
+  }
+
+  .js-expanders .expander[data-collapsed] > .expander-inner {
+    transition: visibility 0s linear 320ms;
+  }
+}
+
+.toggle-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  flex: none;
+}
+
+.toggle-icon svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  transition: transform 250ms var(--ease);
+}
+
+[aria-expanded='true'] > .toggle-icon svg {
+  transform: rotate(45deg);
+}
+
+/* ── Prose ──────────────────────────────────────────────────────────────── */
+.prose {
+  max-width: var(--measure);
+}
+
+.prose > * + * {
+  margin-top: 1.1em;
+}
+
+.prose h2 {
+  font-size: var(--step-2);
+  margin-top: 2em;
+}
+
+.prose h3 {
+  font-size: var(--step-1);
+  margin-top: 1.6em;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.2em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose code {
+  font-family: var(--font-mono-stack);
+  font-size: 0.88em;
+  background: var(--surface-2);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-s);
+}
+
+/* ── Page header (writing & utility pages) ──────────────────────────────── */
+.page-header {
+  position: relative;
+  padding-block: clamp(3rem, 2rem + 5vw, 6rem) var(--s-6);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.page-header h1 {
+  font-size: var(--step-4);
+  max-width: 20ch;
+  margin-block: var(--s-1) var(--s-2);
+}
+
+/* ── Shared interactive effects ─────────────────────────────────────────── */
+/* Cursor spotlight on cards: --mx/--my are set by the site script on fine
+   pointers. Without the script the glow simply never appears. */
+[data-spotlight] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+[data-spotlight]::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, light-dark(rgb(25 170 248 / 0.14), rgb(25 170 248 / 0.18)), transparent);
+  opacity: 0;
+  transform: translate(calc(var(--mx, 50%) - 180px), calc(var(--my, 0px) - 180px));
+  transition: opacity 300ms var(--ease);
+  pointer-events: none;
+}
+
+[data-spotlight]:hover::after {
+  opacity: 1;
+}
+
+/* Arrow icons in buttons and links nudge toward where they lead. */
+.btn svg {
+  transition: transform 250ms var(--ease);
+}
+
+.btn:hover svg:last-child:not(:first-child) {
+  transform: translateX(3px);
+}
+
+.btn:hover svg:first-child:not(:last-child) {
+  transform: translateY(-1px) scale(1.08);
+}
+
+/* ── Motion ─────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  /* Hero stagger: CSS only, so content shows even if JS fails. */
+  .enter {
+    animation: enter 560ms var(--ease) both;
+    animation-delay: calc(var(--enter-step, 0) * 75ms + 60ms);
+  }
+
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  /* Scroll reveals: `.reveal-pending` is only ever added by JS, and only to
+     elements that start below the fold. */
+  .reveal-pending {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+  }
+
+  .reveal-in {
+    transition:
+      opacity 650ms var(--ease),
+      transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--reveal-step, 0) * 90ms);
+  }
+
+  /* Glass cards drift gently, as if floating. `translate` is separate from
+     `transform`, so it combines with the reveal and the hover lift. */
+  .float {
+    animation: card-float 7s ease-in-out infinite;
+    animation-delay: calc(var(--float-i, 0) * -1.7s);
+  }
+
+  @keyframes card-float {
+    50% {
+      translate: 0 -7px;
+    }
+  }
+
+  .card:hover,
+  .glass-card:hover {
+    transform: translateY(-6px);
+  }
+
+  /* Ambient light behind glass cards slowly shifts. */
+  .glass-scene::before {
+    animation: scene-drift 16s ease-in-out infinite alternate;
+  }
+
+  @keyframes scene-drift {
+    to {
+      transform: translate(3%, -4%) scale(1.06);
+    }
+  }
+
+  /* Section headings: the orange rule draws in after the title appears. */
+  .section-heading.reveal-pending .rule {
+    transform: scaleX(0);
+  }
+
+  .section-heading.reveal-in .rule {
+    transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1) 250ms;
+  }
+
+  .section-heading .rule {
+    transform-origin: center;
+  }
+
+  /* Headings breathe a little: the rule gently pulses its width. */
+  .section-heading:hover .rule {
+    transform: scaleX(1.6);
+    transition: transform 400ms var(--ease);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* ── Print ──────────────────────────────────────────────────────────────── */
+@media print {
+  .site-header,
+  .site-footer,
+  .to-top,
+  .filters,
+  .hero-art {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .expander {
+    grid-template-rows: 1fr !important;
+  }
+
+  .expander > .expander-inner {
+    visibility: visible !important;
+  }
+}

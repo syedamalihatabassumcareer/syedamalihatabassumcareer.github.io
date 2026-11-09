@@ -1,0 +1,240 @@
+---
+// Filter UI for a [data-filter-root] list. Renders hidden; the filter script
+// reveals it, so visitors without JavaScript simply see the full list.
+// Each facet is either a row of chips (radio buttons) or a compact <select>.
+import Icon from './Icon.astro';
+
+interface Facet {
+  name: string;
+  legend: string;
+  /** Number of items in the whole list (shown on "All"). */
+  total: number;
+  options: { id: string; label: string; count: number }[];
+  control?: 'chips' | 'select';
+}
+
+interface Props {
+  facets: Facet[];
+  /** Label for the search box; omit to hide search. */
+  searchLabel?: string;
+  searchPlaceholder?: string;
+  /** Prefix for element ids, so several filter bars can share a page. */
+  idPrefix: string;
+}
+
+const { facets, searchLabel, searchPlaceholder, idPrefix } = Astro.props;
+---
+
+<form class:list={['filters', { 'filters--search': searchLabel }]} data-filter-controls hidden aria-label="Filter the list">
+  {
+    searchLabel && (
+      <div class="search">
+        <label for={`${idPrefix}-search`} class="visually-hidden">
+          {searchLabel}
+        </label>
+        <div class="search-field">
+          <Icon name="search" size={18} />
+          <input
+            id={`${idPrefix}-search`}
+            type="search"
+            name="q"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder={searchPlaceholder}
+            data-filter-search
+          />
+        </div>
+      </div>
+    )
+  }
+  {
+    facets.map((facet) =>
+      facet.control === 'select' ? (
+        <div class="select-wrap" data-facet={facet.name}>
+          <label for={`${idPrefix}-${facet.name}`} class="visually-hidden">
+            {facet.legend}
+          </label>
+          <select id={`${idPrefix}-${facet.name}`} name={facet.name}>
+            <option value="all">All {facet.legend.toLowerCase()}s ({facet.total})</option>
+            {facet.options.map((option) => (
+              <option value={option.id}>
+                {option.label} ({option.count})
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : (
+        <fieldset data-facet={facet.name}>
+          <legend class="visually-hidden">{facet.legend}</legend>
+          <div class="options">
+            <label class="option">
+              <input type="radio" name={facet.name} value="all" checked />
+              <span>
+                All <span class="n">{facet.total}</span>
+              </span>
+            </label>
+            {facet.options.map((option) => (
+              <label class="option">
+                <input type="radio" name={facet.name} value={option.id} />
+                <span>
+                  {option.label} <span class="n">{option.count}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ),
+    )
+  }
+</form>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+  }
+
+  .filters--search {
+    justify-content: flex-start;
+    padding: var(--s-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  fieldset {
+    border: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-1);
+  }
+
+  .filters--search .options {
+    justify-content: flex-start;
+  }
+
+  .option {
+    position: relative;
+  }
+
+  .option input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .option > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.75rem;
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-s);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    font-size: var(--step--1);
+    font-weight: 700;
+    color: var(--text-2);
+    transition:
+      background-color var(--fast),
+      border-color var(--fast),
+      color var(--fast);
+  }
+
+  .option:hover > span {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  .option input:checked + span {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .option input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .n {
+    font-family: var(--font-mono-stack);
+    font-size: 0.8em;
+    opacity: 0.8;
+  }
+
+  .search {
+    flex: 1 1 16rem;
+  }
+
+  .search-field {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-inline: 0.9rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-s);
+    background: var(--bg);
+    color: var(--muted);
+  }
+
+  .search-field:focus-within {
+    border-color: var(--accent);
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .search-field input {
+    flex: 1;
+    min-width: 0;
+    min-height: 2.75rem;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    outline: none;
+  }
+
+  .search-field input::placeholder {
+    color: var(--muted);
+  }
+
+  .select-wrap {
+    max-width: 100%;
+  }
+
+  .select-wrap select {
+    min-height: 2.75rem;
+    max-width: 100%;
+    padding: 0.4rem 2.2rem 0.4rem 0.9rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-s);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23fd6f00' stroke-width='2'%3E%3Cpath d='m1 1 5 5 5-5'/%3E%3C/svg%3E")
+        no-repeat right 0.85rem center,
+      var(--bg);
+    color: var(--text);
+    font-weight: 700;
+    font-size: var(--step--1);
+    appearance: none;
+  }
+
+  .select-wrap select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+</style>
+
+<script>
+  import '@/scripts/filters';
+</script>

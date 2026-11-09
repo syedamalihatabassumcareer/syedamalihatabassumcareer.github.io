@@ -1,0 +1,1001 @@
+---
+// About + Skills. Asymmetric: framed identity mark left, statement and
+// biography right; expertise cards (reference "Services" style) below.
+import { Image } from 'astro:assets';
+import Icon, { type IconName } from '@/components/Icon.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import SkillVisual from '@/components/SkillVisual.astro';
+import { languageTests } from '@/data/language-tests';
+import { profile } from '@/data/profile';
+import { getAwards, getEducation, getExperience, getSkills, resolveEvidence } from '@/lib/content';
+import { formatRange } from '@/lib/format';
+import { withBase } from '@/lib/url';
+
+const [degree] = await getEducation();
+const [english] = languageTests;
+const testDate = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const photo = profile.aboutPortrait ?? profile.portrait;
+// Most recent industry role, for the "Now" card.
+const latestRole = (await getExperience()).find((e) => e.data.kind === 'industry');
+// Featured competition result (team achievement), for the third summary card.
+const team = (await getAwards()).find((a) => a.data.featured);
+// Distinctions shown with the degree (not on the photo).
+const distinctions = [degree?.data.honours, 'Dean’s List', 'Vice Chancellor’s List'].filter(Boolean) as string[];
+const groups = await Promise.all(
+  (await getSkills()).map(async (group) => {
+    const evidence = (await Promise.all(group.data.items.map((item) => resolveEvidence(item.usedIn)))).flat();
+    const unique = [...new Map(evidence.map((e) => [e.href, e])).values()];
+    // Grouped as Experience / Projects / Research, each with short names.
+    const applied = (['Experience', 'Project', 'Research'] as const)
+      .map((kind) => ({ kind, items: unique.filter((e) => e.kind === kind) }))
+      .filter((g) => g.items.length > 0);
+    return { ...group.data, applied };
+  }),
+);
+
+const icons: Record<string, IconName> = {
+  'machine-learning': 'flask',
+  'computer-vision': 'eye',
+  'agentic-systems': 'globe',
+  'embedded-robotics': 'cpu',
+  programming: 'terminal',
+  tools: 'briefcase',
+};
+---
+
+<section class="section section--alt" id="about" aria-labelledby="about-title">
+  <div class="wrap">
+    <SectionHeading
+      id="about-title"
+      title="About me"
+      sub="Computer science graduate with industry experience at Grameenphone, building AI, software and infrastructure solutions that work for the people who use them."
+    />
+
+    <div class="about-grid">
+      <div class:list={['frame', { 'frame--photo': photo }]} data-reveal data-tilt aria-hidden={photo ? undefined : 'true'}>
+        <div class="tilt">
+          <div class="arch"></div>
+          <span class="arch-ring" aria-hidden="true"><span></span></span>
+          {
+            photo ? (
+              <Image
+                class="portrait"
+                src={photo.src}
+                alt={photo.alt}
+                widths={[360, 560, 800, 1100]}
+                sizes="(max-width: 48rem) 70vw, 30vw"
+                quality={90}
+                loading="lazy"
+              />
+            ) : (
+              <div class="mark">
+                <span class="initials">SMT</span>
+                <span class="ring" />
+                <span class="ring ring--2" />
+              </div>
+            )
+          }
+        </div>
+      </div>
+
+      <div class="story" data-reveal style="--reveal-step:1">
+        <p class="eyebrow eyebrow--accent">Profile</p>
+        <p class="statement">
+          I turn technical skills into <span class="accent">working solutions</span> for real organisations.
+        </p>
+        <p>
+          As a NEXTERN at Grameenphone, in Technology Infrastructure Management, I automated deployment and connectivity
+          monitoring for rectifiers and Li-ion batteries, with weekly reporting through Huawei NetEco. I also coordinated SMU
+          upgrades with the Umbrella team and prepared the requirements for an AI-assisted site power design tool.
+        </p>
+        <p>
+          My projects range from WeHeal, a full-stack healthcare platform that is live today, to machine-learning pipelines
+          for health data, a network design linking six healthcare units, and autonomous robots built on embedded hardware.
+        </p>
+        <p>
+          I work well with people: I mentored more than 250 students as a Data Structures teaching assistant, and I was a
+          core member of BRAC University’s Mars rover team, which ranked 8th of 102 teams worldwide at the University Rover
+          Challenge 2025.
+        </p>
+        <blockquote class="thread">
+          <p>
+            What I bring: solid technical foundations, clear communication, and a focus on whether a solution actually works
+            for the people using it.
+          </p>
+        </blockquote>
+        <div class="story-actions">
+          <a class="btn btn--primary" href={withBase('#experience')}>
+            See my experience <Icon name="arrow-right" />
+          </a>
+          <a class="btn" href={withBase('#contact')}>
+            Let’s talk <Icon name="arrow-up-right" />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- At a glance: now, education, English, team result -->
+    <div class="glance glass-scene">
+      <article class="g-card glass-card g-now" data-reveal data-spotlight>
+        <p class="g-label"><Icon name="rocket" /> Now</p>
+        {profile.availability && <h3 class="g-title">{profile.availability.label}</h3>}
+        {
+          latestRole && (
+            <>
+              <p class="g-sub">
+                Most recently: {latestRole.data.role}, {latestRole.data.organisation}
+                {latestRole.data.unit && <> ({latestRole.data.unit})</>}
+                {' · '}
+                <span class="mono g-meta">{formatRange(latestRole.data.start, latestRole.data.end)}</span>
+              </p>
+              <a class="g-link" href={withBase(`#${latestRole.id}`)}>
+                About this role <span class="g-arrow"><Icon name="arrow-right" /></span>
+              </a>
+            </>
+          )
+        }
+      </article>
+
+      <!-- Three summary cards, one shared layout: label · number · two lines · footer -->
+      <article class="g-card g-stat glass-card float" data-reveal data-spotlight style="--reveal-step:2">
+        <p class="g-label"><Icon name="cap" /> Education</p>
+        {
+          degree?.data.result && (
+            <p class="g-big">
+              <span class="g-num">{degree.data.result.value}</span>
+              <span class="g-unit">
+                {degree.data.result.label} / {degree.data.result.scale}
+              </span>
+            </p>
+          )
+        }
+        <div class="g-text">
+          <h3 class="g-head">{degree?.data.qualification}</h3>
+          <p class="g-line">{degree?.data.institution}</p>
+        </div>
+        <ul class="g-foot g-chips" aria-label="Distinctions">
+          {distinctions.map((d) => <li>{d}</li>)}
+        </ul>
+      </article>
+
+      {
+        english && (
+          <article class="g-card g-stat glass-card float g-lang" data-reveal data-spotlight style="--reveal-step:3">
+            <p class="g-label">
+              <Icon name="globe" /> English
+            </p>
+            <p class="g-big">
+              <span class="g-num">{english.overall}</span>
+              <span class="g-unit">overall band / {english.max}</span>
+            </p>
+            <div class="g-text">
+              <h3 class="g-head">
+                {english.name}
+                {english.module && ` ${english.module}`}
+              </h3>
+              {english.date && (
+                <p class="g-line">
+                  Taken <time datetime={english.date}>{testDate(english.date)}</time>
+                </p>
+              )}
+            </div>
+            <div class="g-foot">
+              {english.cefr && (
+                <ul class="g-chips" aria-label="CEFR level">
+                  <li>CEFR {english.cefr}</li>
+                </ul>
+              )}
+              <button class="g-more" type="button" aria-expanded="true" aria-controls="ielts-modules" data-expander-toggle hidden>
+                <span data-label-open="Hide module scores" data-label-closed="Module scores">
+                  Hide module scores
+                </span>
+                <span class="g-more-icon" aria-hidden="true">
+                  <Icon name="plus" />
+                </span>
+              </button>
+            </div>
+            <div class="expander" id="ielts-modules" data-expander role="region" aria-label={`${english.name} module scores`}>
+              <div class="expander-inner">
+                <dl class="bands">
+                  {english.parts.map((b) => (
+                    <div class="band">
+                      <dt>{b.label}</dt>
+                      <dd>
+                        <span class="band-bar" aria-hidden="true">
+                          <i style={`--v:${b.score / english.max}`} />
+                        </span>
+                        <span class="band-score">{b.score.toFixed(1)}</span>
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </div>
+          </article>
+        )
+      }
+
+      {
+        team && (
+          <article class="g-card g-stat glass-card float" data-reveal data-spotlight style="--reveal-step:4">
+            <p class="g-label">
+              <Icon name="trophy" /> Teamwork
+            </p>
+            <p class="g-big">
+              <span class="g-num">{team.data.badge}</span>
+              <span class="g-unit">{team.data.result?.replace(/^Globally ranked [^ ]+ /, '')} worldwide</span>
+            </p>
+            <div class="g-text">
+              <h3 class="g-head">{team.data.title}</h3>
+              <p class="g-line">
+                {team.data.team} · {team.data.organiser}
+              </p>
+            </div>
+            <a class="g-foot g-link" href={withBase('#recognition')}>
+              All awards <span class="g-arrow"><Icon name="arrow-right" /></span>
+            </a>
+          </article>
+        )
+      }
+
+      {
+        profile.cv && (
+          <div class="g-card glass-card g-cv" data-reveal data-spotlight>
+            <p class="g-label">
+              <Icon name="document" /> CV
+            </p>
+            <p class="g-cv-text">Experience, projects, education and awards in one PDF.</p>
+            <div class="g-cv-actions">
+              <a class="btn g-btn-glass" href={withBase(profile.cv.path)} target="_blank" rel="noopener noreferrer">
+                <Icon name="eye" /> View CV (PDF)
+                <span class="visually-hidden">(opens in a new tab)</span>
+              </a>
+              <a class="btn btn--primary" href={withBase(profile.cv.path)} download>
+                <Icon name="download" /> Download
+              </a>
+            </div>
+          </div>
+        )
+      }
+    </div>
+
+    <!-- Skills -->
+    <div class="skills" id="skills">
+      <div class="skills-head" data-reveal>
+        <h3>Core capabilities</h3>
+        <p>Grouped by area, with links to the roles and projects where each was applied. No self-rated percentages.</p>
+      </div>
+      <ul class="skill-grid glass-scene">
+        {
+          groups.map((group, i) => (
+            <li class="skill glass-card float" data-reveal data-spotlight style={`--reveal-step:${i % 3};--float-i:${i}`}>
+              <div class="skill-top">
+                <span class="skill-pill">
+                  {String(i + 1).padStart(2, '0')} · {group.items.length} skills
+                </span>
+                <span class="skill-icon" aria-hidden="true">
+                  <Icon name={icons[group.id] ?? 'flask'} />
+                </span>
+              </div>
+              <h4>{group.label}</h4>
+              <p class="skill-desc">{group.description}</p>
+              <ul class="skill-tags" aria-label={`${group.label} skills`}>
+                {group.items.map((item) => (
+                  <li>{item.name}</li>
+                ))}
+              </ul>
+              {group.applied.length > 0 && (
+                <div class="applied">
+                  {group.applied.map((g) => (
+                    <div class="applied-group">
+                      <p class="applied-kind">{g.kind === 'Project' ? 'Projects' : g.kind}</p>
+                      <ul>
+                        {g.items.map((e) => (
+                          <li>
+                            <a href={withBase(e.href)}>{e.label}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <SkillVisual kind={group.id} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* The decorative ring may extend past the photo; never past the page. */
+  #about {
+    overflow-x: clip;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
+    align-items: center;
+  }
+
+  /* Arch backdrop, echoing the reference's About portrait. */
+  .frame {
+    position: relative;
+    display: grid;
+    place-items: end center;
+    aspect-ratio: 4 / 5;
+    max-width: 26rem;
+    width: 100%;
+    justify-self: center;
+  }
+
+  .arch {
+    position: absolute;
+    inset: 12% 0 0;
+    border-radius: 999px 999px var(--radius-l) var(--radius-l);
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  /* With a photo: tall frame, arch in the lower part, head rising above it. */
+  .frame--photo {
+    aspect-ratio: 3 / 4.4;
+    max-width: 28rem;
+  }
+
+  .frame--photo .arch {
+    inset: 22% 4% 0;
+    background:
+      radial-gradient(80% 60% at 50% 30%, var(--accent-soft), transparent 70%),
+      var(--surface);
+  }
+
+  .portrait {
+    position: relative;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom;
+  }
+
+  .mark {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 1;
+    margin-bottom: 14%;
+  }
+
+  .initials {
+    font-size: clamp(4rem, 3rem + 5vw, 7rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .ring {
+    position: absolute;
+    inset: 14%;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 50%;
+  }
+
+  .ring--2 {
+    inset: 4%;
+    border-style: dashed;
+    border-color: var(--border);
+  }
+
+  .ring::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: calc(50% - 6px);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .ring--2::after {
+    display: none;
+  }
+
+  .story {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-2);
+    color: var(--text-2);
+  }
+
+  .statement {
+    font-size: var(--step-3);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--text);
+  }
+
+  .story .eyebrow {
+    margin-bottom: calc(var(--s-1) * -1);
+  }
+
+  /* Pull-quote: the thread through the work. */
+  .thread {
+    margin: var(--s-1) 0 0;
+    padding: 0.1rem 0 0.1rem var(--s-2);
+    border-left: 2px solid var(--border-strong);
+  }
+
+  .thread p {
+    font-size: var(--step-0);
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .story-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    margin-top: var(--s-1);
+  }
+
+  /* ── At a glance ── */
+  .glance {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-2);
+    margin-top: clamp(3rem, 2rem + 3vw, 4.5rem);
+  }
+
+  /* Glass finish, rim and floating shadow come from .glass-card (global.css). */
+  .g-card {
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
+    padding: var(--s-3);
+    border-radius: 22px;
+  }
+
+  .g-now {
+    grid-column: 1 / -1;
+    background:
+      radial-gradient(120% 140% at 0% 0%, light-dark(rgb(25 170 248 / 0.14), rgb(25 170 248 / 0.16)), transparent 55%),
+      linear-gradient(160deg, light-dark(rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.045)) 0%, transparent 42%),
+      var(--glass-tint);
+  }
+
+  .g-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .g-label :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .g-meta {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .g-title {
+    font-size: var(--step-1);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .g-sub {
+    color: var(--text-2);
+  }
+
+  .g-note {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .g-big {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0.55rem;
+    margin-top: 0.35rem;
+  }
+
+  .g-num {
+    font-size: var(--step-4);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+
+  .g-unit {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+
+  .g-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.1rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .g-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.75rem;
+    font-size: var(--step--1);
+    font-weight: 700;
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  .g-arrow {
+    display: inline-grid;
+    place-items: center;
+    transition: transform 250ms var(--ease);
+  }
+
+  .g-arrow :global(svg) {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .g-link:hover .g-arrow {
+    transform: translate(2px, -2px);
+  }
+
+  .g-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .g-chips li {
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    font-size: var(--step--2);
+    white-space: nowrap;
+    font-weight: 700;
+    color: var(--text-2);
+  }
+
+  .g-chips li:first-child {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    color: var(--accent-text);
+  }
+
+  .g-cv {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+    padding-block: var(--s-2);
+  }
+
+  .g-cv-text {
+    flex: 1 1 14rem;
+    color: var(--text-2);
+  }
+
+  .g-cv-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+  }
+
+  .g-btn-glass {
+    background: light-dark(rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.05));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Summary cards: label · number · heading + line · footer pinned to the bottom */
+  .g-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .g-text {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .g-head {
+    font-size: var(--step-0);
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text);
+  }
+
+  .g-line {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .g-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem var(--s-1);
+    margin-top: auto;
+    padding-top: 0.6rem;
+  }
+
+  ul.g-foot {
+    justify-content: flex-start;
+    margin-bottom: 0;
+  }
+
+  .g-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--accent-text);
+    font-size: var(--step--1);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .g-more:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .g-more-icon :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 250ms var(--ease);
+  }
+
+  .g-more[aria-expanded='true'] .g-more-icon :global(svg) {
+    transform: rotate(45deg);
+  }
+
+  .bands {
+    display: grid;
+    gap: 0.6rem;
+    padding-top: var(--s-2);
+  }
+
+  .band {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr) 2rem;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .band dt {
+    font-size: var(--step--1);
+    color: var(--text-2);
+  }
+
+  .band dd {
+    display: contents;
+  }
+
+  .band-bar {
+    position: relative;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--border);
+  }
+
+  .band-bar i {
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    background: var(--accent-gradient);
+    transform: scaleX(var(--v));
+    transform-origin: left;
+  }
+
+  .band-score {
+    font-family: var(--font-mono-stack);
+    font-weight: 700;
+    text-align: right;
+    color: var(--text);
+  }
+
+  @media (min-width: 64rem) {
+    .glance {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 40.01rem) and (max-width: 63.99rem) {
+    .g-lang {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .glance {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Skills */
+  .skills {
+    margin-top: clamp(4rem, 2rem + 5vw, 6rem);
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+
+  .skills-head {
+    display: grid;
+    justify-items: center;
+    gap: var(--s-1);
+    text-align: center;
+    margin-bottom: var(--s-6);
+  }
+
+  .skills-head h3 {
+    font-size: var(--step-3);
+  }
+
+  .skills-head p {
+    color: var(--muted);
+  }
+
+  /* Expertise cards — adapted from the owner's "services" reference: a pill,
+     a round icon, title, description, then a visual at the bottom. The
+     all cards share one quiet style so the titles lead. Vertical grid, no horizontal scrolling. */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Glass finish, rim and floating shadow come from .glass-card (global.css). */
+  .skill {
+    --card-bg: linear-gradient(160deg, light-dark(rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.045)) 0%, transparent 42%),
+      var(--glass-tint);
+    --card-text: var(--text);
+    --card-muted: var(--text-2);
+    --card-line: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.08));
+    --tag-bg: light-dark(rgb(0 0 0 / 0.04), rgb(255 255 255 / 0.05));
+    --link: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    padding: var(--s-3);
+    border-radius: 22px;
+    background: var(--card-bg);
+    color: var(--card-text);
+  }
+
+
+  .skill-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-1);
+  }
+
+  .skill-pill {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
+  .skill-icon {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    color: var(--accent-text);
+  }
+
+
+  .skill-icon :global(svg) {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .skill h4 {
+    margin-top: var(--s-1);
+    font-size: var(--step-2);
+    font-weight: 700;
+    line-height: 1.15;
+  }
+
+  .skill-desc {
+    color: var(--card-muted);
+    font-size: var(--step--1);
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .skill-tags li {
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--tag-bg);
+    font-size: var(--step--2);
+    font-weight: 500;
+    color: var(--card-muted);
+  }
+
+  .applied {
+    display: grid;
+    gap: var(--s-1);
+    padding-top: var(--s-1);
+    border-top: 1px solid var(--card-line);
+  }
+
+  .applied-kind {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--card-muted);
+  }
+
+  .applied-group ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.9rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .applied-group a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    font-size: var(--step--1);
+    color: var(--card-muted);
+    text-decoration: underline;
+    text-decoration-color: var(--border-strong);
+    text-underline-offset: 0.25em;
+  }
+
+  .applied-group a:hover {
+    color: var(--accent-text);
+    text-decoration-color: currentColor;
+  }
+
+  .skill :global(.viz) {
+    margin-top: auto;
+  }
+
+  .applied + :global(.viz),
+  .skill-tags + :global(.viz) {
+    margin-top: auto;
+  }
+
+  /* ── Photo: 3D tilt wrapper and rotating ring ── */
+  .tilt {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: end center;
+    transform: perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .tilt > .portrait {
+    grid-area: 1 / 1;
+  }
+
+  .arch-ring {
+    position: absolute;
+    left: 50%;
+    top: 14%;
+    width: 104%;
+    aspect-ratio: 1;
+    translate: -50% 0;
+    border-radius: 50%;
+    border: 1.5px dashed light-dark(rgb(25 170 248 / 0.4), rgb(25 170 248 / 0.32));
+    pointer-events: none;
+  }
+
+  .arch-ring > span {
+    position: absolute;
+    top: 50%;
+    left: -6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 14px 3px rgb(25 170 248 / 0.5);
+  }
+
+  .frame:not(.frame--photo) .arch-ring {
+    display: none;
+  }
+
+  /* ── Statement highlight: soft marker underline (wraps cleanly across lines) ── */
+  .statement .accent {
+    color: var(--accent-text);
+  }
+
+  /* Expertise cards: the cursor spotlight comes from [data-spotlight] in global.css. */
+
+  .skill-icon {
+    transition: transform 400ms var(--ease);
+  }
+
+  .skill:hover .skill-icon {
+    transform: rotate(-12deg) scale(1.08);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .arch-ring {
+      animation: arch-spin 30s linear infinite;
+    }
+
+    @keyframes arch-spin {
+      to { transform: rotate(1turn); }
+    }
+  }
+
+  @media (max-width: 63.99rem) {
+    .skill-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .frame {
+      max-width: 18rem;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .skill-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

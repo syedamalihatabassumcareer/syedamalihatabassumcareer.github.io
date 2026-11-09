@@ -1,0 +1,62 @@
+---
+import { withBase } from '@/lib/url';
+
+interface Props {
+  items: { label: string; href: string }[];
+  current: string;
+}
+const { items, current } = Astro.props;
+---
+
+<nav class="crumbs" aria-label="Breadcrumb">
+  <ol>
+    <li><a href={withBase('/')}>Home</a></li>
+    {
+      items.map((item) => (
+        <li>
+          <a href={withBase(item.href)}>{item.label}</a>
+        </li>
+      ))
+    }
+    <li><span aria-current="page">{current}</span></li>
+  </ol>
+</nav>
+
+<style>
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  li {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  li + li::before {
+    content: '/';
+    margin-inline: 0.55rem;
+    opacity: 0.6;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    color: var(--text-2);
+  }
+
+  span[aria-current] {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 40ch;
+  }
+</style>

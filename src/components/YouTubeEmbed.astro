@@ -1,0 +1,155 @@
+---
+// Privacy-friendly YouTube demo: nothing is loaded from YouTube until the
+// visitor presses Play (then youtube-nocookie.com is used). Without JS, the
+// "Watch on YouTube" link still works.
+import Icon from './Icon.astro';
+
+interface Props {
+  videoId: string;
+  title: string;
+  caption?: string;
+  hostedBy?: string;
+}
+const { videoId, title, caption, hostedBy } = Astro.props;
+const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+---
+
+<figure class="video">
+  <div class="frame" data-youtube={videoId} data-youtube-title={title}>
+    <button type="button" class="play" data-youtube-play hidden>
+      <span class="play-icon"><Icon name="play" size={28} /></span>
+      <span class="play-text">
+        <span class="play-label">Play demo video</span>
+        <span class="play-note">Loads the video from YouTube</span>
+      </span>
+    </button>
+    <a class="fallback" href={watchUrl} target="_blank" rel="noopener noreferrer" data-youtube-fallback>
+      <Icon name="video" size={22} /> Watch the demo on YouTube
+      <span class="visually-hidden">(opens in a new tab)</span>
+    </a>
+  </div>
+  <figcaption>
+    <span>{caption ?? title}</span>
+    {hostedBy && <span class="muted">Video published by {hostedBy}.</span>}
+    <a href={watchUrl} target="_blank" rel="noopener noreferrer">
+      Open on YouTube <Icon name="arrow-up-right" />
+      <span class="visually-hidden">(opens in a new tab)</span>
+    </a>
+  </figcaption>
+</figure>
+
+<style>
+  .video {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-l);
+    border: 1px solid var(--border);
+    background:
+      repeating-linear-gradient(90deg, transparent 0 23px, color-mix(in srgb, var(--text) 7%, transparent) 23px 24px),
+      repeating-linear-gradient(0deg, transparent 0 23px, color-mix(in srgb, var(--text) 7%, transparent) 23px 24px),
+      radial-gradient(80% 80% at 30% 30%, var(--accent-soft), transparent),
+      var(--bg-alt);
+    display: grid;
+    place-items: center;
+  }
+
+  .frame :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .play {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.4rem 0.75rem 0.75rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    text-align: left;
+    box-shadow: var(--shadow);
+    transition: transform var(--fast) var(--ease), border-color var(--fast);
+  }
+
+  .play:hover {
+    transform: scale(1.03);
+    border-color: var(--accent);
+  }
+
+  .play-icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--on-accent);
+    padding-left: 3px;
+  }
+
+  .play-text {
+    display: grid;
+  }
+
+  .play-label {
+    font-weight: 600;
+  }
+
+  .play-note {
+    font-size: var(--step--2);
+    color: var(--muted);
+  }
+
+  .fallback {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 2.75rem;
+    font-weight: 600;
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    font-size: var(--step--1);
+    color: var(--text-2);
+  }
+
+  figcaption a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  for (const frame of document.querySelectorAll<HTMLElement>('[data-youtube]')) {
+    const play = frame.querySelector<HTMLButtonElement>('[data-youtube-play]');
+    const fallback = frame.querySelector<HTMLElement>('[data-youtube-fallback]');
+    if (!play) continue;
+    play.hidden = false;
+    if (fallback) fallback.hidden = true;
+    play.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${frame.dataset.youtube}?autoplay=1&rel=0`;
+      iframe.title = frame.dataset.youtubeTitle ?? 'Video';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      frame.replaceChildren(iframe);
+      iframe.focus();
+    });
+  }
+</script>

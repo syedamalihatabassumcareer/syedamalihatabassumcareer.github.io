@@ -1,0 +1,153 @@
+---
+import { Font } from 'astro:assets';
+import '@/styles/global.css';
+import SiteHeader from '@/components/SiteHeader.astro';
+import SiteFooter from '@/components/SiteFooter.astro';
+import Icon from '@/components/Icon.astro';
+import { profile } from '@/data/profile';
+import { absoluteUrl, withBase } from '@/lib/url';
+
+interface Props {
+  /** Page title without the site name. Omit on the home page. */
+  title?: string;
+  description?: string;
+  /** Social card image inside /public. */
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article' | 'profile';
+  noindex?: boolean;
+  /** Extra JSON-LD object for this page. */
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  title,
+  description = profile.description,
+  image = 'og/default.png',
+  imageAlt = `${profile.name} — ${profile.headline}`,
+  type = 'website',
+  noindex = false,
+  jsonLd,
+} = Astro.props;
+
+const fullTitle = title ? `${title} · ${profile.name}` : `${profile.name} — ${profile.headline}`;
+const site = Astro.site;
+const canonical = site ? new URL(Astro.url.pathname, site).href : undefined;
+const imageUrl = absoluteUrl(image, site);
+---
+
+<!doctype html>
+<html lang="en" id="top">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={profile.name} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    {site && <link rel="sitemap" href={withBase('sitemap-index.xml')} />}
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={profile.name} />
+    <meta property="og:title" content={title ?? fullTitle} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {imageUrl && <meta property="og:image" content={imageUrl} />}
+    {imageUrl && <meta property="og:image:width" content="1200" />}
+    {imageUrl && <meta property="og:image:height" content="630" />}
+    {imageUrl && <meta property="og:image:alt" content={imageAlt} />}
+    <meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title ?? fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {imageUrl && <meta name="twitter:image" content={imageUrl} />}
+
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    <link rel="icon" type="image/png" sizes="32x32" href={withBase('favicon-32.png')} />
+    <link rel="apple-touch-icon" href={withBase('apple-touch-icon.png')} />
+
+    <Font cssVariable="--font-sans" preload={[{ weight: 400, style: 'normal' }, { weight: 700, style: 'normal' }]} />
+    <Font cssVariable="--font-mono" />
+
+    {/* Applies the saved theme before first paint (no flash) and marks JS as available.
+        Dark is the default unless the system asks for light. */}
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        root.classList.add('js');
+        let saved = null;
+        try {
+          saved = localStorage.getItem('theme');
+        } catch {}
+        if (saved === 'light' || saved === 'dark') root.dataset.theme = saved;
+        root.dataset.effectiveTheme = root.dataset.theme || 'light';
+      })();
+    </script>
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <SiteHeader />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+
+    <a class="to-top" href="#top" data-to-top>
+      <Icon name="arrow-up" size={18} />
+      <span class="visually-hidden">Back to top</span>
+    </a>
+    <div class="visually-hidden" role="status" aria-live="polite" id="announcer"></div>
+
+    <script>
+      import '@/scripts/site';
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+
+  .to-top {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    width: 2.875rem;
+    height: 2.875rem;
+    border-radius: var(--radius-s);
+    background: var(--accent);
+    color: var(--on-accent);
+    box-shadow: var(--shadow);
+    transition:
+      opacity var(--fast),
+      transform var(--fast) var(--ease),
+      background-color var(--fast),
+      visibility 0s;
+  }
+
+  .to-top:hover {
+    color: var(--on-accent);
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+  }
+
+  /* With JS, only show once the visitor has scrolled down. */
+  :global(.js) .to-top:not(.is-shown) {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition:
+      opacity var(--fast),
+      transform var(--fast) var(--ease),
+      visibility 0s linear var(--fast);
+  }
+</style>

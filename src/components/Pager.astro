@@ -1,0 +1,94 @@
+---
+// Previous / next navigation between detail pages.
+import Icon from './Icon.astro';
+import { withBase } from '@/lib/url';
+
+interface Item {
+  href: string;
+  title: string;
+}
+
+interface Props {
+  label: string;
+  prev?: Item;
+  next?: Item;
+  prevLabel?: string;
+  nextLabel?: string;
+}
+
+const { label, prev, next, prevLabel = 'Previous', nextLabel = 'Next' } = Astro.props;
+---
+
+<nav class="wrap pager" aria-label={label}>
+  {
+    prev ? (
+      <a class="pager-link" href={withBase(prev.href)} rel="prev">
+        <span class="eyebrow">
+          <Icon name="arrow-left" /> {prevLabel}
+        </span>
+        <span class="pager-title">{prev.title}</span>
+      </a>
+    ) : (
+      <span />
+    )
+  }
+  {
+    next ? (
+      <a class="pager-link next" href={withBase(next.href)} rel="next">
+        <span class="eyebrow">
+          {nextLabel} <Icon name="arrow-right" />
+        </span>
+        <span class="pager-title">{next.title}</span>
+      </a>
+    ) : (
+      <span />
+    )
+  }
+</nav>
+
+<style>
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-m);
+    padding-bottom: var(--space-2xl);
+  }
+
+  .pager-link {
+    display: grid;
+    gap: 0.4rem;
+    padding: var(--space-m);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    text-decoration: none;
+    transition: border-color var(--dur);
+  }
+
+  .pager-link:hover {
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .pager-link .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .pager-link.next {
+    text-align: right;
+    justify-items: end;
+  }
+
+  .pager-title {
+    font-family: var(--font-display-stack);
+    font-size: var(--step-1);
+    line-height: 1.3;
+  }
+
+  @media (max-width: 36rem) {
+    .pager {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

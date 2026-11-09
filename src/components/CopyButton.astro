@@ -1,0 +1,118 @@
+---
+// Copies text to the clipboard with visible + screen-reader feedback.
+// Provide either `text` or `target` (the id of an element whose text to copy).
+import Icon from './Icon.astro';
+
+interface Props {
+  label: string;
+  /** What was copied, for the announcement, e.g. "Citation". */
+  what: string;
+  text?: string;
+  target?: string;
+  class?: string;
+}
+
+const { label, what, text, target, class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['btn btn--small copy-btn', className]}
+  data-copy
+  data-copy-text={text}
+  data-copy-target={target}
+  data-copy-what={what}
+  hidden
+>
+  <Icon name="copy" class="copy-idle" />
+  <Icon name="check" class="copy-done" />
+  <span data-copy-label>{label}</span>
+</button>
+
+<style>
+  .copy-btn :global(.copy-done) {
+    display: none;
+  }
+
+  .copy-btn[data-state='done'] {
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+
+  .copy-btn[data-state='done'] :global(.copy-done) {
+    display: block;
+  }
+
+  .copy-btn[data-state='done'] :global(.copy-idle) {
+    display: none;
+  }
+
+  .copy-btn[data-state='failed'] {
+    border-color: var(--text-2);
+  }
+</style>
+
+<script>
+  import { announce } from '@/scripts/announce';
+
+  async function writeClipboard(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Fallback for browsers/contexts without the async clipboard API.
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.append(area);
+      area.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+      area.remove();
+      return ok;
+    }
+  }
+
+  function selectElementText(el: Element) {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    button.hidden = false;
+    const label = button.querySelector<HTMLElement>('[data-copy-label]')!;
+    const original = label.textContent ?? '';
+    let timer: number | undefined;
+
+    button.addEventListener('click', async () => {
+      const targetId = button.dataset.copyTarget;
+      const targetEl = targetId ? document.getElementById(targetId) : null;
+      const text = button.dataset.copyText ?? targetEl?.textContent?.trim() ?? '';
+      const what = button.dataset.copyWhat ?? 'Text';
+      const ok = text ? await writeClipboard(text) : false;
+
+      window.clearTimeout(timer);
+      button.dataset.state = ok ? 'done' : 'failed';
+      label.textContent = ok ? 'Copied' : 'Copy failed';
+      if (ok) {
+        announce(`${what} copied to clipboard`);
+      } else {
+        if (targetEl) selectElementText(targetEl);
+        announce(`Could not copy automatically. ${targetEl ? 'The text is selected — ' : ''}press Control+C or Command+C to copy.`);
+      }
+      timer = window.setTimeout(() => {
+        delete button.dataset.state;
+        label.textContent = original;
+      }, 2400);
+    });
+  }
+</script>

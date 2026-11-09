@@ -1,0 +1,85 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import { sections } from '@/data/navigation';
+import { withBase } from '@/lib/url';
+---
+
+<BaseLayout title="Page not found" description="This page doesn’t exist." noindex>
+  <section class="section nf">
+    <div class="wrap nf-grid">
+      <div>
+        <p class="eyebrow eyebrow--accent">Error 404</p>
+        <h1>This page couldn’t be identified.</h1>
+        <p class="lead">
+          The link may be out of date, or the address may have a typo. When the evidence is insufficient, the right move is
+          to abstain — and point you somewhere useful instead.
+        </p>
+        <div class="actions">
+          <a class="btn btn--primary" href={withBase('/')}><Icon name="arrow-left" /> Back to the homepage</a>
+          <a class="btn" href={withBase('#research')}>Browse research</a>
+        </div>
+      </div>
+      <nav aria-label="Site sections">
+        <p class="eyebrow">Or try</p>
+        <ul>
+          {sections.map((item) => <li><a href={withBase(`#${item.id}`)}>{item.label}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    min-height: 70vh;
+    display: grid;
+    align-items: center;
+  }
+
+  .nf-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: var(--s-6);
+    align-items: end;
+  }
+
+  h1 {
+    font-size: var(--step-4);
+    margin-block: var(--s-1) var(--s-2);
+    max-width: 16ch;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: var(--s-4);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-1);
+    border-top: 1px solid var(--border);
+  }
+
+  li {
+    border-bottom: 1px solid var(--border);
+  }
+
+  li a {
+    display: flex;
+    align-items: center;
+    min-height: 3rem;
+    font-family: var(--font-display-stack);
+    font-size: var(--step-1);
+    text-decoration: none;
+  }
+
+  @media (max-width: 48rem) {
+    .nf-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

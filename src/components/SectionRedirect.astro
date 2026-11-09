@@ -1,0 +1,27 @@
+---
+// Keeps an old URL (e.g. /about/ or /research/camdet/) working now that the
+// site is a single page: forwards visitors to the matching anchor on the home
+// page. No content is duplicated here.
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { withBase } from '@/lib/url';
+
+interface Props {
+  /** Element id on the home page, e.g. "about" or "research-camdet". */
+  anchor: string;
+  label: string;
+}
+const { anchor, label } = Astro.props;
+const target = withBase(`#${anchor}`);
+---
+
+<BaseLayout title={label} description={`${label} — now part of the one-page portfolio.`} noindex>
+  <meta slot="head" http-equiv="refresh" content={`0; url=${target}`} />
+  <section class="section">
+    <div class="wrap">
+      <h1>{label} has moved</h1>
+      <p class="lead">
+        This content now lives on the home page. <a href={target}>Go to {label}</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,14 @@
+---
+// Former case-study page: forwards to the project on the home page, where its
+// details panel opens automatically (#project-<id>).
+import SectionRedirect from '@/components/SectionRedirect.astro';
+import { getProjects, type Project } from '@/lib/content';
+
+export async function getStaticPaths() {
+  return (await getProjects()).map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props as { entry: Project };
+---
+
+<SectionRedirect anchor={`project-${entry.id}`} label={entry.data.title} />

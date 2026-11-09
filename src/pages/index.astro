@@ -1,0 +1,38 @@
+---
+// The whole portfolio is this one scrolling page, ordered for recruiters.
+// Sections (in order): #home, #about (+ #skills), #experience, #projects,
+// #education (+ #recognition), #research (publications), #contact. Research entries and projects open inline (#research-<id>,
+// #project-<id>).
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import About from '@/components/sections/About.astro';
+import Contact from '@/components/sections/Contact.astro';
+import Education from '@/components/sections/Education.astro';
+import Experience from '@/components/sections/Experience.astro';
+import Hero from '@/components/sections/Hero.astro';
+import Projects from '@/components/sections/Projects.astro';
+import Research from '@/components/sections/Research.astro';
+import { profile } from '@/data/profile';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  jobTitle: profile.headline,
+  description: profile.description,
+  email: `mailto:${profile.email}`,
+  address: { '@type': 'PostalAddress', addressLocality: 'Dhaka', addressCountry: 'BD' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'BRAC University' },
+  knowsAbout: profile.interests,
+  sameAs: profile.links.map((l) => l.url),
+};
+---
+
+<BaseLayout type="profile" jsonLd={jsonLd}>
+  <Hero />
+  <About />
+  <Experience />
+  <Projects />
+  <Education />
+  <Research />
+  <Contact />
+</BaseLayout>

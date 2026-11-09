@@ -1,0 +1,428 @@
+---
+// Animated cover for ProCV (decorative): a tilted DOS-style terminal types
+// x86 Assembly while a CV sheet assembles beside it, section by section; the
+// contact line is marked encrypted, and the sheet switches between the
+// Classic and Modern styles, as in the report.
+const code = [
+  { t: '; ProCV — x86 Assembly', c: 'cm' },
+  { t: 'MOV AH, 09h' },
+  { t: 'INT 21h' },
+  { t: 'CALL ENCRYPT_CONTACT' },
+  { t: 'CALL GENERATE_CV' },
+];
+const rows = [
+  { label: 'EDUCATION', bars: [0.9, 0.7] },
+  { label: 'EXPERIENCE', bars: [0.85, 0.6] },
+];
+---
+
+<div class="cover-scene term" aria-hidden="true">
+  <div class="stage">
+    <div class="win">
+      <p class="bar"><i></i><i></i><i></i><span>PROCV.EXE</span></p>
+      <div class="code">
+        {
+          code.map((l, i) => (
+            <p class:list={['line', l.c]} style={`--i:${i}`}>
+              <span>{l.t}</span>
+            </p>
+          ))
+        }
+        <p class="prompt">C:\&gt; <span class="cursor"></span></p>
+      </div>
+    </div>
+
+
+    <div class="sheet">
+      <div class="head">
+        <span class="h h--classic"></span>
+        <span class="h h--modern"></span>
+        <span class="avatar"></span>
+        <span class="name"></span>
+        <span class="role"></span>
+      </div>
+      <p class="contact"><span class="lock">🔒</span><span class="cipher">•••• •••••••</span></p>
+      {
+        rows.map((r, i) => (
+          <div class="sec" style={`--i:${i}`}>
+            <p class="sec-label">{r.label}</p>
+            {r.bars.map((w) => (
+              <span class="ln" style={`--w:${w}`} />
+            ))}
+          </div>
+        ))
+      }
+      <p class="style-tag"><span class="t-classic">CLASSIC</span><span class="t-modern">MODERN</span></p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cover-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+    background:
+      radial-gradient(45% 60% at 30% 55%, rgb(40 220 120 / 0.14), transparent 70%),
+      radial-gradient(45% 60% at 74% 50%, rgb(25 170 248 / 0.22), transparent 70%),
+      radial-gradient(120% 90% at 50% 0%, #121417, #050607 70%);
+  }
+
+  .stage {
+    position: absolute;
+    inset: 0;
+    perspective: 900px;
+  }
+
+  /* ── Terminal ── */
+  .win {
+    position: absolute;
+    left: 29%;
+    top: 53%;
+    width: 270px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background: #050a06;
+    box-shadow:
+      0 30px 60px -20px rgb(0 0 0 / 0.85),
+      0 0 40px rgb(40 220 120 / 0.12);
+    transform: rotateY(24deg) rotateX(6deg);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 8px;
+    background: #d9d9d9;
+    color: #222;
+    font-family: var(--font-mono-stack);
+    font-size: 8px;
+    font-weight: 700;
+  }
+
+  .bar i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e5322d;
+  }
+
+  .bar i:nth-child(2) {
+    background: #f1c40f;
+  }
+
+  .bar i:nth-child(3) {
+    background: #2ecc71;
+  }
+
+  .bar span {
+    margin-left: auto;
+  }
+
+  .code {
+    display: grid;
+    gap: 3px;
+    padding: 10px 12px 12px;
+    font-family: var(--font-mono-stack);
+    font-size: 13px;
+    color: #5dff9b;
+    text-shadow: 0 0 6px rgb(93 255 155 / 0.6);
+  }
+
+  .line {
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .cm {
+    color: #ff9a4d;
+    text-shadow: 0 0 6px rgb(255 154 77 / 0.5);
+  }
+
+  .prompt {
+    color: #d7ffe6;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 11px;
+    vertical-align: -1px;
+    background: #5dff9b;
+  }
+
+
+  /* Kept in its own rule: the CSS minifier drops `translate` when it shares a rule
+     with a fixed `transform` (see tests/css.test.mjs). */
+  .stage > :is(.win, .sheet) {
+    translate: -50% -50%;
+  }
+
+  /* ── CV sheet ── */
+  .sheet {
+    position: absolute;
+    left: 72%;
+    top: 52%;
+    width: 190px;
+    padding: 0 14px 14px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #fbf8f3;
+    color: #222;
+    box-shadow: 0 30px 60px -18px rgb(0 0 0 / 0.85);
+    transform: rotateY(-22deg) rotateX(6deg);
+    font-family: var(--font-mono-stack);
+  }
+
+  .head {
+    position: relative;
+    height: 54px;
+    margin: 0 -12px 8px;
+  }
+
+  .h {
+    position: absolute;
+    inset: 0;
+  }
+
+  .h--classic {
+    background: #2b2f36;
+  }
+
+  .h--modern {
+    background: linear-gradient(120deg, #19aaf8, #1abe51);
+    opacity: 0;
+  }
+
+  .avatar {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f1e6d8;
+    border: 2px solid #fff;
+  }
+
+  .name,
+  .role {
+    position: absolute;
+    left: 50px;
+    height: 7px;
+    border-radius: 3px;
+    background: #fff;
+  }
+
+  .name {
+    top: 17px;
+    width: 80px;
+  }
+
+  .role {
+    top: 30px;
+    width: 54px;
+    opacity: 0.6;
+  }
+
+  .contact {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+    padding: 3px 5px;
+    border-radius: 4px;
+    background: #f1ebe2;
+    font-size: 10px;
+    color: #6b5a48;
+  }
+
+  .lock {
+    font-size: 9px;
+  }
+
+  .sec {
+    margin-top: 6px;
+  }
+
+  .sec-label {
+    margin-bottom: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #0068b4;
+  }
+
+  .ln {
+    display: block;
+    height: 5px;
+    margin-top: 3px;
+    border-radius: 3px;
+    background: #d8d0c4;
+    transform: scaleX(var(--w));
+    transform-origin: left;
+  }
+
+  .style-tag {
+    position: relative;
+    margin-top: 9px;
+    height: 12px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .style-tag span {
+    position: absolute;
+    right: 0;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .t-classic {
+    background: #2b2f36;
+    color: #fff;
+  }
+
+  .t-modern {
+    background: #19aaf8;
+    color: #111;
+    opacity: 0;
+  }
+
+
+  @container (max-width: 460px) {
+    .win {
+      scale: 0.7;
+      left: 30%;
+    }
+
+    .sheet {
+      scale: 0.72;
+      left: 76%;
+    }
+
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* A 10-second cycle: code types line by line, then the CV fills in. */
+    /* Each line is revealed left to right by a shrinking mask (typing). */
+    .line::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: #050a06;
+      transform-origin: right;
+      animation: tc-type 10s steps(14, end) infinite;
+      animation-delay: calc(var(--i) * 0.45s);
+    }
+
+    @keyframes tc-type {
+      0% {
+        transform: scaleX(1);
+      }
+
+      6%,
+      92% {
+        transform: scaleX(0);
+      }
+
+      97%,
+      100% {
+        transform: scaleX(1);
+      }
+    }
+
+    .cursor {
+      animation: tc-blink 1s steps(2, jump-none) infinite;
+    }
+
+    @keyframes tc-blink {
+      to {
+        opacity: 0;
+      }
+    }
+
+
+    .ln {
+      animation: tc-fill 10s var(--ease) infinite;
+      animation-delay: calc(1.6s + var(--i, 0) * 0.5s);
+    }
+
+    @keyframes tc-fill {
+      0% {
+        transform: scaleX(0);
+      }
+
+      8%,
+      90% {
+        transform: scaleX(var(--w));
+      }
+
+      96%,
+      100% {
+        transform: scaleX(0);
+      }
+    }
+
+    .lock {
+      display: inline-block;
+      animation: tc-lock 2.4s ease-in-out infinite;
+    }
+
+    @keyframes tc-lock {
+      50% {
+        transform: scale(1.25);
+      }
+    }
+
+    /* Classic ↔ Modern */
+    .h--modern,
+    .t-modern {
+      animation: tc-style 10s ease infinite;
+    }
+
+    @keyframes tc-style {
+      0%,
+      55% {
+        opacity: 0;
+      }
+
+      60%,
+      92% {
+        opacity: 1;
+      }
+
+      97%,
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .win {
+      animation: tc-float-a 7s ease-in-out infinite alternate;
+    }
+
+    .sheet {
+      animation: tc-float-b 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes tc-float-a {
+      to {
+        transform: rotateY(18deg) rotateX(4deg) translateY(-8px);
+      }
+    }
+
+    @keyframes tc-float-b {
+      to {
+        transform: rotateY(-16deg) rotateX(4deg) translateY(-6px);
+      }
+    }
+  }
+</style>

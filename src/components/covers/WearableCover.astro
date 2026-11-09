@@ -1,0 +1,546 @@
+---
+// Animated cover for the health monitor (decorative): a wearable floats in
+// 3D with a live heartbeat trace and sensor meters (heart rate, SpO₂,
+// temperature, stress, motion). Every few seconds it flags a fall; signal
+// waves carry an SMS alert with the GPS location to a phone. No readings are
+// shown as numbers — this illustrates the system, not its results.
+const ecg =
+  'M0 30 H22 L28 26 L32 30 H40 L44 6 L49 50 L53 30 H64 L70 24 L78 30 H100 ' +
+  'H122 L128 26 L132 30 H140 L144 6 L149 50 L153 30 H164 L170 24 L178 30 H200';
+const meters = [
+  { label: 'HR', w: 0.72 },
+  { label: 'SpO₂', w: 0.9 },
+];
+---
+
+<div class="cover-scene wear" aria-hidden="true">
+  <div class="stage">
+    <div class="device-wrap">
+      <div class="device">
+        <span class="strap strap--top"></span>
+        <span class="strap strap--bottom"></span>
+        <span class="slab"></span>
+        <div class="face">
+          <div class="screen">
+            <p class="s-head">
+              <span class="dot"></span> LIVE <span class="fall">FALL!</span>
+            </p>
+            <div class="ecg">
+              <svg viewBox="0 0 200 56" preserveAspectRatio="none" class="ecg-track">
+                <path d={ecg}></path>
+              </svg>
+            </div>
+            <div class="meters">
+              {
+                meters.map((m, i) => (
+                  <p>
+                    <span class="m-label">{m.label}</span>
+                    <span class="m-bar">
+                      <span style={`--w:${m.w};--i:${i}`} />
+                    </span>
+                  </p>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="waves">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <span class="notch"></span>
+        <div class="map">
+          <span class="road road--a"></span>
+          <span class="road road--b"></span>
+          <span class="pin"></span>
+        </div>
+        <div class="sms">
+          <p class="sms-title">⚠ Fall detected</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cover-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+    background:
+      radial-gradient(45% 60% at 30% 55%, rgb(25 170 248 / 0.26), transparent 70%),
+      radial-gradient(40% 55% at 78% 50%, rgb(40 180 200 / 0.18), transparent 70%),
+      radial-gradient(120% 90% at 50% 0%, #0e1d2b, #05080d 70%);
+  }
+
+  .stage {
+    position: absolute;
+    inset: 0;
+    perspective: 900px;
+  }
+
+  /* ── The wearable ── */
+  .device-wrap {
+    position: absolute;
+    left: 31%;
+    top: 52%;
+    translate: -50% -50%;
+    transform-style: preserve-3d;
+  }
+
+  .device {
+    position: relative;
+    width: 210px;
+    height: 142px;
+    transform-style: preserve-3d;
+    transform: rotateX(16deg) rotateY(-26deg) rotateZ(-4deg);
+  }
+
+  .strap {
+    position: absolute;
+    left: 50%;
+    width: 112px;
+    height: 120px;
+    margin-left: -56px;
+    border-radius: 18px;
+    background: repeating-linear-gradient(0deg, #2a1610 0 6px, #331c13 6px 12px);
+    transform: translateZ(-14px);
+  }
+
+  .strap--top {
+    bottom: 100%;
+    margin-bottom: -26px;
+  }
+
+  .strap--bottom {
+    top: 100%;
+    margin-top: -26px;
+  }
+
+  .slab {
+    position: absolute;
+    inset: 0;
+    border-radius: 28px;
+    background: #2b2f36;
+    transform: translateZ(-10px);
+    box-shadow: 0 30px 50px -10px rgb(0 0 0 / 0.7);
+  }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    padding: 9px;
+    border-radius: 28px;
+    background: linear-gradient(150deg, #5a606b, #1c1f25 60%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 0 40px rgb(25 170 248 / 0.25);
+  }
+
+  .screen {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    padding: 8px 10px;
+    border-radius: 20px;
+    background: radial-gradient(120% 120% at 20% 0%, #10222c, #04070b);
+    font-family: var(--font-mono-stack);
+    color: #9fe6ff;
+  }
+
+  .s-head {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff5a4f;
+    box-shadow: 0 0 8px #ff5a4f;
+  }
+
+  .fall {
+    margin-left: auto;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: #e5322d;
+    color: #fff;
+    opacity: 0;
+  }
+
+  .ecg {
+    height: 30px;
+    margin: 3px 0;
+    overflow: hidden;
+  }
+
+  .ecg-track {
+    display: block;
+    width: 200%;
+    height: 100%;
+  }
+
+  .ecg-track path {
+    fill: none;
+    stroke: #ff8a3d;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 3px rgb(255 138 61 / 0.9));
+  }
+
+  .meters {
+    display: grid;
+    gap: 5px;
+  }
+
+  .meters p {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    align-items: center;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  .m-bar {
+    height: 6px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.1);
+    overflow: hidden;
+  }
+
+  .m-bar span {
+    display: block;
+    height: 100%;
+    width: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #2fd0e0, #19aaf8);
+    transform: scaleX(var(--w));
+    transform-origin: left;
+  }
+
+  .gps {
+    position: absolute;
+    right: -16px;
+    top: -14px;
+    padding: 3px 6px;
+    border-radius: 6px;
+    background: #f1c40f;
+    color: #2b2100;
+    font-family: var(--font-mono-stack);
+    font-size: 8px;
+    font-weight: 700;
+    transform: translateZ(14px);
+    box-shadow: 0 6px 12px rgb(0 0 0 / 0.5);
+  }
+
+  /* ── Signal waves toward the phone ── */
+  .waves {
+    position: absolute;
+    left: 53%;
+    top: 50%;
+    width: 90px;
+    height: 90px;
+    translate: -50% -50%;
+  }
+
+  .waves span {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-right-color: rgb(25 170 248 / 0.85);
+    opacity: 0;
+  }
+
+  /* ── Phone ── */
+  .phone-wrap {
+    position: absolute;
+    left: 76%;
+    top: 52%;
+    translate: -50% -50%;
+    perspective: 700px;
+  }
+
+  .phone {
+    position: relative;
+    width: 108px;
+    height: 196px;
+    padding: 18px 8px 8px;
+    border-radius: 20px;
+    background: linear-gradient(160deg, #3a3f48, #15171b);
+    box-shadow:
+      inset 0 0 0 2px rgb(255 255 255 / 0.12),
+      0 26px 40px -12px rgb(0 0 0 / 0.75);
+    transform: rotateY(-22deg) rotateX(8deg);
+  }
+
+  .notch {
+    position: absolute;
+    left: 50%;
+    top: 7px;
+    width: 30px;
+    height: 5px;
+    margin-left: -15px;
+    border-radius: 3px;
+    background: #000;
+  }
+
+  .map {
+    position: relative;
+    height: 98px;
+    overflow: hidden;
+    border-radius: 10px;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 0.06) 0 1px, transparent 1px 12px),
+      repeating-linear-gradient(90deg, rgb(255 255 255 / 0.06) 0 1px, transparent 1px 12px),
+      #12303a;
+  }
+
+  .road {
+    position: absolute;
+    background: rgb(255 210 120 / 0.35);
+  }
+
+  .road--a {
+    left: -10%;
+    right: -10%;
+    top: 58%;
+    height: 6px;
+    transform: rotate(-14deg);
+  }
+
+  .road--b {
+    top: -10%;
+    bottom: -10%;
+    left: 38%;
+    width: 5px;
+    transform: rotate(8deg);
+  }
+
+  .pin {
+    position: absolute;
+    left: 50%;
+    top: 34%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    border-radius: 50% 50% 50% 0;
+    background: #e5322d;
+    transform: rotate(-45deg);
+    box-shadow: 0 0 12px rgb(229 50 45 / 0.8);
+  }
+
+  .sms {
+    margin-top: 8px;
+    padding: 6px 7px;
+    border-radius: 10px 10px 10px 3px;
+    background: #f7f3ee;
+    color: #1a1a1a;
+    font-family: var(--font-sans-stack);
+    line-height: 1.25;
+  }
+
+  .sms-title {
+    font-size: 9px;
+    font-weight: 900;
+    color: #c0261f;
+  }
+
+  .sms-body {
+    font-size: 7.5px;
+  }
+
+
+  @container (max-width: 460px) {
+    .device-wrap {
+      scale: 0.7;
+      left: 30%;
+    }
+
+    .phone-wrap {
+      scale: 0.72;
+      left: 78%;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .device {
+      animation: wc-float 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes wc-float {
+      from {
+        transform: translateY(6px) rotateX(16deg) rotateY(-30deg) rotateZ(-4deg);
+      }
+
+      to {
+        transform: translateY(-8px) rotateX(12deg) rotateY(-18deg) rotateZ(-2deg);
+      }
+    }
+
+    .ecg-track {
+      animation: wc-ecg 2.4s linear infinite;
+    }
+
+    @keyframes wc-ecg {
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    .m-bar span {
+      animation: wc-meter 2.8s ease-in-out infinite alternate;
+      animation-delay: calc(var(--i) * -0.7s);
+    }
+
+    @keyframes wc-meter {
+      from {
+        transform: scaleX(calc(var(--w) * 0.75));
+      }
+
+      to {
+        transform: scaleX(var(--w));
+      }
+    }
+
+    .dot {
+      animation: wc-blink 1.2s steps(2, jump-none) infinite;
+    }
+
+    @keyframes wc-blink {
+      to {
+        opacity: 0.2;
+      }
+    }
+
+    /* A 7-second alert cycle: fall flagged → waves → SMS and pin arrive. */
+    .fall {
+      animation: wc-fall 7s ease infinite;
+    }
+
+    @keyframes wc-fall {
+      0%,
+      30% {
+        opacity: 0;
+      }
+
+      34%,
+      80% {
+        opacity: 1;
+      }
+
+      86%,
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .waves span {
+      animation: wc-wave 7s ease-out infinite;
+    }
+
+    .waves span:nth-child(2) {
+      animation-delay: 0.35s;
+    }
+
+    .waves span:nth-child(3) {
+      animation-delay: 0.7s;
+    }
+
+    @keyframes wc-wave {
+      0%,
+      34% {
+        opacity: 0;
+        transform: scale(0.4);
+      }
+
+      40% {
+        opacity: 1;
+      }
+
+      56%,
+      100% {
+        opacity: 0;
+        transform: scale(1.8);
+      }
+    }
+
+    .sms {
+      animation: wc-sms 7s var(--ease) infinite;
+    }
+
+    @keyframes wc-sms {
+      0%,
+      48% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.92);
+      }
+
+      54%,
+      90% {
+        opacity: 1;
+        transform: none;
+      }
+
+      96%,
+      100% {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+    }
+
+    .pin {
+      animation: wc-pin 7s var(--ease) infinite;
+    }
+
+    @keyframes wc-pin {
+      0%,
+      50% {
+        opacity: 0;
+        transform: translateY(-26px) rotate(-45deg);
+      }
+
+      56%,
+      90% {
+        opacity: 1;
+        transform: rotate(-45deg);
+      }
+
+      96%,
+      100% {
+        opacity: 0;
+        transform: rotate(-45deg);
+      }
+    }
+
+    .phone {
+      animation: wc-phone 7s ease-in-out infinite;
+    }
+
+    @keyframes wc-phone {
+      0%,
+      100% {
+        transform: rotateY(-22deg) rotateX(8deg);
+      }
+
+      55% {
+        transform: rotateY(-12deg) rotateX(4deg) translateY(-6px);
+      }
+    }
+  }
+</style>

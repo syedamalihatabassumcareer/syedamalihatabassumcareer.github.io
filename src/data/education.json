@@ -1,0 +1,42 @@
+[
+  {
+    "id": "bsc-cse-bracu",
+    "qualification": "B.Sc. in Computer Science and Engineering",
+    "institution": "BRAC University",
+    "start": "2022-09",
+    "end": "2026-09",
+    "result": {
+      "label": "CGPA",
+      "value": "3.93",
+      "scale": "4.00"
+    },
+    "honours": "Highest Distinction",
+    "order": 1
+  },
+  {
+    "id": "hsc-bnmpc",
+    "qualification": "Higher Secondary Certificate",
+    "institution": "Birshreshtha Noor Mohammad Public College",
+    "start": "2019-07",
+    "end": "2022-02",
+    "result": {
+      "label": "GPA",
+      "value": "5.00",
+      "scale": "5.00"
+    },
+    "order": 2
+  },
+  {
+    "id": "ssc-sbualagc",
+    "qualification": "Secondary School Certificate",
+    "institution": "Shaheed Bir Uttam Lt. Anwar Girls College",
+    "start": "2017-01",
+    "end": "2019-05",
+    "result": {
+      "label": "GPA",
+      "value": "5.00",
+      "scale": "5.00"
+    },
+    "order": 3
+  }
+]

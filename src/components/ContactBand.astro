@@ -1,0 +1,200 @@
+---
+// Big lime contact block. Used as the home page's Contact section (pass
+// `id="contact"`) and as the closing call to action on detail pages.
+import CopyButton from './CopyButton.astro';
+import Icon from './Icon.astro';
+import Marquee from './Marquee.astro';
+import { profile } from '@/data/profile';
+import { withBase } from '@/lib/url';
+
+interface Props {
+  /** Section id for in-page navigation (home page only). */
+  id?: string;
+  title?: string;
+  text?: string;
+}
+
+const {
+  id,
+  title = 'Let’s talk.',
+  text = 'Hiring for a role in AI, software or technology? Email is the best way to reach me. I’m happy to walk you through any role or project here.',
+} = Astro.props;
+const headingId = id ? `${id}-title` : 'contact-band-title';
+const ticker = ['Say hello', ...(profile.availability ? [profile.availability.short] : []), 'Industry roles', 'Collaboration'];
+---
+
+<section class="contact-band" id={id} aria-labelledby={headingId}>
+  <Marquee
+    items={ticker}
+    tone="ink"
+    size="m"
+    speed="35s"
+  />
+  <div class="wrap band-grid">
+    <div class="band-copy" data-reveal="left">
+      <p class="eyebrow">
+        <span class="num">07</span> ✦ Contact
+      </p>
+      <h2 id={headingId}>{title}</h2>
+      <p class="band-text">{text}</p>
+      {profile.availability && <p class="sticker sticker--paper float" style="--r:-4deg">{profile.availability.short}</p>}
+    </div>
+    <div class="band-actions" data-reveal="right">
+      <a class="email" href={`mailto:${profile.email}`}>
+        <span class="email-icon"><Icon name="mail" size={26} /></span>
+        <span class="email-text">{profile.email}</span>
+        <Icon name="arrow-up-right" class="email-go" size={28} />
+      </a>
+      <div class="row">
+        <CopyButton label="Copy email" what="Email address" text={profile.email} class="btn--ink" />
+        {
+          profile.links.map((link) => (
+            <a class="btn" href={link.url} target="_blank" rel="noopener noreferrer me">
+              <Icon name={link.icon} /> {link.label}
+              <span class="visually-hidden">(opens in a new tab)</span>
+            </a>
+          ))
+        }
+        {
+          profile.cv && (
+            <a class="btn" href={withBase(profile.cv.path)} download>
+              <Icon name="download" /> CV
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-band {
+    position: relative;
+    overflow: clip;
+    background: var(--lime);
+    color: var(--on-pop);
+    border-top: 2px solid var(--on-pop);
+    /* Everything inside sits on lime: use dark ink for borders and shadows. */
+    --line-strong: var(--on-pop);
+    --hard: var(--on-pop);
+    --accent: #065c42;
+  }
+
+  .contact-band :global(.band) {
+    border-top: 0;
+  }
+
+  .band-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: var(--space-xl);
+    align-items: end;
+    padding-block: var(--space-2xl);
+  }
+
+  .band-copy {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-s);
+  }
+
+  .eyebrow {
+    color: var(--on-pop);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .num {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.2rem;
+    height: 1.6rem;
+    padding-inline: 0.4rem;
+    border: 2px solid var(--on-pop);
+    border-radius: 999px;
+  }
+
+  h2 {
+    font-size: clamp(3.4rem, 1rem + 10vw, 10rem);
+    font-weight: 800;
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    text-transform: uppercase;
+    max-width: 12ch;
+  }
+
+  .band-text {
+    max-width: 46ch;
+    font-size: var(--step-1);
+    line-height: 1.45;
+  }
+
+  .band-actions {
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  .email {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1.1rem 1.3rem;
+    border: 2px solid var(--on-pop);
+    border-radius: var(--radius-l);
+    background: var(--on-pop);
+    color: var(--lime);
+    text-decoration: none;
+    box-shadow: 6px 6px 0 #fffdf8;
+    transition:
+      transform 250ms var(--ease-out),
+      box-shadow 250ms var(--ease-out);
+  }
+
+  .email:hover {
+    color: var(--lime);
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 #fffdf8;
+  }
+
+  .email-text {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-display-stack);
+    font-weight: 700;
+    font-size: clamp(1rem, 0.6rem + 1.05vw, 1.4rem);
+    letter-spacing: -0.02em;
+    overflow-wrap: anywhere;
+  }
+
+  .email :global(.email-go) {
+    flex: none;
+    transition: transform 300ms var(--ease-spring);
+  }
+
+  .email:hover :global(.email-go) {
+    transform: translate(4px, -4px) rotate(8deg);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .row :global(.btn:not(.btn--ink)) {
+    --btn-bg: #fffdf8;
+    --btn-fg: var(--on-pop);
+  }
+
+  .row :global(.btn--ink) {
+    --btn-bg: var(--on-pop);
+    --btn-fg: #fffdf8;
+  }
+
+  @media (max-width: 52rem) {
+    .band-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

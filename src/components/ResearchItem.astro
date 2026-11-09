@@ -1,0 +1,182 @@
+---
+// One research entry as a card. `variant="feature"` is the large published-
+// paper card with the full citation and BibTeX.
+import AuthorList from './AuthorList.astro';
+import CitationBlock from './CitationBlock.astro';
+import CopyButton from './CopyButton.astro';
+import Icon from './Icon.astro';
+import StatusBadge from './StatusBadge.astro';
+import { labelFor, researchTopics, researchTypes } from '@/data/taxonomy';
+import type { Research } from '@/lib/content';
+import { withBase } from '@/lib/url';
+
+interface Props {
+  entry: Research;
+  headingLevel?: 'h3' | 'h4';
+  /** Adds data attributes used by the filter script. */
+  filterable?: boolean;
+  variant?: 'card' | 'feature';
+  index?: number;
+}
+
+const { entry, headingLevel: Heading = 'h3', filterable = false, variant = 'card', index = 0 } = Astro.props;
+const d = entry.data;
+const href = withBase(`research/${entry.id}/`);
+const searchText = [d.title, d.summary, d.authors.join(' '), d.venue, d.submittedTo, ...d.topics.map((t) => labelFor(researchTopics, t))]
+  .filter(Boolean)
+  .join(' ')
+  .toLowerCase();
+const venueLine = [d.venue, d.publisher, d.pages && `pp. ${d.pages}`].filter(Boolean).join(', ');
+const doiLink = d.links.find((l) => l.kind === 'doi');
+const feature = variant === 'feature';
+---
+
+<li
+  class:list={['research-item card spot', `research-item--${variant}`]}
+  data-filter-item={filterable ? '' : undefined}
+  data-status={filterable ? d.status : undefined}
+  data-topic={filterable ? d.topics.join(' ') : undefined}
+  data-search={filterable ? searchText : undefined}
+  data-reveal={feature ? 'scale' : 'up'}
+  style={`--reveal-step:${index % 2}`}
+>
+  {feature && <span class="sticker sticker--coral corner float" style="--r:8deg">Peer-reviewed ✦ {d.venueShort ?? d.year}</span>}
+
+  <div class="meta">
+    <StatusBadge status={d.status} />
+    <span class="type">{labelFor(researchTypes, d.type)}</span>
+    {d.year && <span class="year mono">{d.year}</span>}
+  </div>
+
+  <Heading class="title"><a href={href}>{d.title}</a></Heading>
+  {venueLine && <p class="venue">{venueLine}</p>}
+  {
+    d.submittedTo && (
+      <p class="venue">
+        Under review at <strong>{d.submittedTo}</strong>
+      </p>
+    )
+  }
+  {d.authors.length > 0 && <AuthorList authors={d.authors} />}
+  <p class="summary">{d.summary}</p>
+
+  {feature && d.citation && <CitationBlock id={entry.id} citation={d.citation} bibtex={d.bibtex} />}
+
+  <div class="foot">
+    <ul class="chip-list" aria-label="Topics">
+      {d.topics.map((t) => <li class="chip">{labelFor(researchTopics, t)}</li>)}
+    </ul>
+    <div class="actions">
+      {
+        doiLink && (
+          <a class="btn btn--small btn--primary" href={doiLink.url} target="_blank" rel="noopener noreferrer">
+            DOI <Icon name="arrow-up-right" />
+            <span class="visually-hidden">for {d.shortTitle ?? d.title} (opens in a new tab)</span>
+          </a>
+        )
+      }
+      {!feature && d.citation && <CopyButton label="Copy citation" what="Citation" text={d.citation} />}
+      <a class="arrow-link" href={href}>
+        Details <Icon name="arrow-right" />
+        <span class="visually-hidden">: {d.shortTitle ?? d.title}</span>
+      </a>
+    </div>
+  </div>
+</li>
+
+<style>
+  .research-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+    list-style: none;
+  }
+
+  .research-item:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 var(--hard);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.9rem;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .title {
+    font-size: var(--step-2);
+    line-height: 1.08;
+  }
+
+  .title a {
+    text-decoration: none;
+    background-image: linear-gradient(var(--lime), var(--lime));
+    background-size: 0% 0.35em;
+    background-repeat: no-repeat;
+    background-position: 0 88%;
+    transition:
+      background-size 500ms var(--ease-out),
+      color var(--dur);
+  }
+
+  .title a:hover {
+    color: var(--ink);
+    background-size: 100% 0.35em;
+  }
+
+  .venue {
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+  }
+
+  .summary {
+    color: var(--ink-soft);
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-m);
+    margin-top: auto;
+    padding-top: var(--space-xs);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+  }
+
+  /* Feature card */
+  .research-item--feature {
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+    background:
+      radial-gradient(90% 120% at 100% 0%, color-mix(in srgb, var(--lime) 35%, transparent), transparent 55%),
+      var(--bg-elev);
+  }
+
+  .research-item--feature .title {
+    font-size: var(--step-3);
+    max-width: 24ch;
+  }
+
+  .corner {
+    position: absolute;
+    top: -1rem;
+    right: 1.5rem;
+  }
+
+  @media (max-width: 40rem) {
+    .corner {
+      position: static;
+      align-self: flex-start;
+    }
+  }
+</style>

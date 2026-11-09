@@ -1,0 +1,33 @@
+---
+// Complete author list with the site owner's name emphasised.
+import { profile } from '@/data/profile';
+
+interface Props {
+  authors: string[];
+  class?: string;
+}
+const { authors, class: className } = Astro.props;
+// ", " between names, ", and " before the last (", and"/" and " for two names).
+const separator = (i: number) =>
+  i < authors.length - 2 ? ', ' : i === authors.length - 2 ? (authors.length > 2 ? ', and ' : ' and ') : '';
+---
+
+<p class:list={['authors', className]}>
+  {authors.map((name, i) => [name === profile.name ? <strong>{name}</strong> : name, separator(i)])}
+</p>
+
+<style>
+  .authors {
+    color: var(--text-2);
+    font-size: var(--step--1);
+  }
+
+  strong {
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
+  }
+</style>

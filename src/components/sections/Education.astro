@@ -1,0 +1,1008 @@
+---
+// Education & Recognition.
+// Education: one glass card per qualification.
+// Recognition: the featured award (laurel badge, photo, certificate, role link)
+// sits on one side; every other award is a compact row in a glass panel. Any
+// award can carry a certificate (in-page Drive preview + direct Drive link), a
+// photo (src/assets/awards/<id>.<ext>, previewed in the page) and links.
+import { getImage, Image } from 'astro:assets';
+import Icon, { type IconName } from '@/components/Icon.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { awardCategories, labelFor } from '@/data/taxonomy';
+import { getAwards, getEducation } from '@/lib/content';
+import { formatMonth, formatRange } from '@/lib/format';
+import { withBase } from '@/lib/url';
+
+const education = await getEducation();
+const awards = await getAwards();
+const featured = awards.filter((a) => a.data.featured);
+const others = awardCategories.flatMap((c) => awards.filter((a) => !a.data.featured && a.data.category === c.id));
+
+// A Google Drive share link → its embeddable preview URL (other links preview as-is).
+const previewUrl = (url: string) => {
+  const id = url.match(/drive\.google\.com\/file\/d\/([^/?#]+)/)?.[1];
+  return id ? `https://drive.google.com/file/d/${id}/preview` : url;
+};
+
+// Award photos in src/assets/awards/: those listed in the award's `photos`
+// (with alt text), or else a single file named after the award's id.
+const photoFiles = import.meta.glob<ImageMetadata>('/src/assets/awards/*.{jpg,jpeg,png,webp}', {
+  eager: true,
+  import: 'default',
+});
+type Photo = { src: ImageMetadata; full: string; alt: string };
+const photos = new Map<string, Photo[]>();
+for (const a of awards) {
+  const listed = a.data.photos.map((p) => {
+    const src = photoFiles[`/src/assets/awards/${p.file}`];
+    if (!src) throw new Error(`Missing award photo src/assets/awards/${p.file}`);
+    return { src, alt: p.alt };
+  });
+  const byId = Object.entries(photoFiles).find(([path]) => path.split('/').pop()!.replace(/\.\w+$/, '') === a.id)?.[1];
+  const found = listed.length ? listed : byId ? [{ src: byId, alt: a.data.photoAlt ?? `Photo: ${a.data.title}` }] : [];
+  if (!found.length) continue;
+  photos.set(
+    a.id,
+    await Promise.all(
+      found.map(async (f) => ({
+        ...f,
+        full: (await getImage({ src: f.src, width: Math.min(f.src.width, 1800), format: 'webp' })).src,
+      })),
+    ),
+  );
+}
+
+const hasPreview = awards.some((a) => a.data.document) || photos.size > 0;
+
+const iconFor: Record<string, IconName> = {
+  academic: 'award',
+  competition: 'trophy',
+  'personal-development': 'rocket',
+};
+const fullTitle = (a: (typeof awards)[number]) => `${a.data.result ? `${a.data.result} — ` : ''}${a.data.title}`;
+const when = (a: (typeof awards)[number]) =>
+  a.data.start ? formatRange(a.data.start, a.data.date) : formatMonth(a.data.date);
+const year = (ym: string) => ym.slice(0, 4);
+const yearLabel = (start: string | undefined, end: string) =>
+  start && year(start) !== year(end) ? `${year(start)}–${year(end)}` : year(end);
+
+// Laurel wreath: leaves placed along an arc (left branch; the right is mirrored).
+const leaves = Array.from({ length: 7 }, (_, i) => {
+  const t = ((118 + i * 19) * Math.PI) / 180;
+  const x = 32 + 23 * Math.cos(t);
+  const y = 31 + 23 * Math.sin(t);
+  const angle = (Math.atan2(-Math.sin(t), -Math.cos(t)) * 180) / Math.PI;
+  return { x: x.toFixed(2), y: y.toFixed(2), a: (angle - 32).toFixed(1), i };
+});
+---
+
+<section class="section section--alt" id="education" aria-labelledby="education-title">
+  <div class="wrap">
+    <SectionHeading
+      id="education-title"
+      title="Education & Recognition"
+      sub="Qualifications and results, then the scholarships, distinctions and competition results earned along the way."
+    />
+
+    <h3 class="part-title" data-reveal><Icon name="cap" /> Education</h3>
+    <ol class="edu-grid glass-scene">
+      {
+        education.map((e, i) => (
+          <li class="edu card" data-reveal data-spotlight style={`--reveal-step:${i}`}>
+            <p class="mono muted edu-when">{formatRange(e.data.start, e.data.end)}</p>
+            <h4>{e.data.qualification}</h4>
+            <p class="sub">{e.data.institution}</p>
+            <div class="edu-foot">
+              {e.data.result && (
+                <p class="result">
+                  <span class="result-value">{e.data.result.value}</span>
+                  <span class="result-label">
+                    {e.data.result.label} / {e.data.result.scale}
+                  </span>
+                </p>
+              )}
+              {e.data.honours && <p class="honours">{e.data.honours}</p>}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="recognition" id="recognition">
+      <h3 class="part-title" data-reveal><Icon name="award" /> Recognition</h3>
+
+      <div class:list={['rec-grid glass-scene', { 'rec-grid--single': featured.length === 0 }]}>
+        {
+          featured.length > 0 && (
+            <div class="feature-col">
+              {featured.map((a) => {
+                const pics = photos.get(a.id) ?? [];
+                return (
+                  <article class="feature" data-reveal data-spotlight aria-labelledby={`award-${a.id}`}>
+                    <div class="feature-top">
+                      <div class="laurel" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" class="laurel-svg">
+                          {[false, true].map((mirror) => (
+                            <g transform={mirror ? 'translate(64 0) scale(-1 1)' : undefined}>
+                              <path class="stem" d="M27 56 C 13 51, 7 38, 11 17" />
+                              {leaves.map((l) => (
+                                <g transform={`translate(${l.x} ${l.y}) rotate(${l.a})`}>
+                                  <path class="leaf" style={`--l:${l.i}`} d="M0 0C-2.7-3-2.9-7.2 0-11.5 2.9-7.2 2.7-3 0 0Z" />
+                                </g>
+                              ))}
+                            </g>
+                          ))}
+                        </svg>
+                        <span class="laurel-core">
+                          {a.data.badge ? (
+                            <span class="laurel-text">{a.data.badge}</span>
+                          ) : (
+                            <Icon name={iconFor[a.data.category] ?? 'award'} />
+                          )}
+                        </span>
+                      </div>
+
+                      <div class="feature-body">
+                        <p class="feature-pill">
+                          <span class="pill-dot" aria-hidden="true" />
+                          {yearLabel(a.data.start, a.data.date)} · {labelFor(awardCategories, a.data.category)}
+                        </p>
+                        <h4 class="feature-title" id={`award-${a.id}`}>
+                          {a.data.result ?? a.data.title}
+                        </h4>
+                        <p class="feature-sub">
+                          {[a.data.result && a.data.title, a.data.organiser].filter(Boolean).join(' · ') +
+                            (a.data.team ? `, with ${a.data.team}` : '')}
+                        </p>
+                        <div class="feature-actions">
+                          {a.data.document && (
+                            <a
+                              class="f-btn"
+                              href={a.data.document.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              data-doc-preview={previewUrl(a.data.document.url)}
+                              data-doc-title={fullTitle(a)}
+                            >
+                              <span class="f-btn-icon">
+                                <Icon name="certificate" />
+                              </span>
+                              Certificate
+                              <span class="visually-hidden">: {a.data.title}</span>
+                            </a>
+                          )}
+                          {a.data.role && (
+                            <a class="f-btn" href={withBase(`#${a.data.role.experience.id}`)}>
+                              {a.data.role.label}
+                              <span class="f-btn-icon">
+                                <Icon name="arrow-right" />
+                              </span>
+                            </a>
+                          )}
+                          {a.data.links.map((l) => (
+                            <a class="f-btn" href={l.url} target="_blank" rel="noopener noreferrer">
+                              {l.label}
+                              <span class="f-btn-icon">
+                                <Icon name="arrow-up-right" />
+                              </span>
+                              <span class="visually-hidden">(opens in a new tab)</span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {pics.length > 0 && (
+                      <div class:list={['feature-photos', { 'feature-photos--multi': pics.length > 1 }]}>
+                        {pics.map((pic, n) => (
+                          <a
+                            class="feature-photo"
+                            href={pic.full}
+                            data-img-preview={pic.full}
+                            data-doc-title={`${fullTitle(a)} — photo ${n + 1} of ${pics.length}`}
+                          >
+                            <Image
+                              src={pic.src}
+                              alt={pic.alt}
+                              widths={[360, 640, 1100]}
+                              sizes={n === 0 ? '(max-width: 56rem) 92vw, 40vw' : '(max-width: 56rem) 40vw, 16vw'}
+                              loading="lazy"
+                            />
+                            <span class="zoom" aria-hidden="true">
+                              <Icon name="eye" />
+                            </span>
+                            <span class="visually-hidden">(view larger)</span>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          )
+        }
+
+        <ol class="awards glass-card" data-reveal data-spotlight style="--reveal-step:1">
+          {
+            others.map((a) => {
+              const photo = photos.get(a.id)?.[0];
+              const hasActions = a.data.document || a.data.role || a.data.links.length > 0;
+              return (
+                <li class:list={['award', { 'award--photo': photo }]}>
+                  <span class="award-icon" aria-hidden="true">
+                    <Icon name={iconFor[a.data.category] ?? 'award'} />
+                  </span>
+                  <div class="award-main">
+                    <p class="award-title">
+                      {a.data.result && <strong class="accent">{a.data.result} — </strong>}
+                      {a.data.title}
+                    </p>
+                    <p class="sub">
+                      {a.data.team ? `${a.data.organiser}, with ${a.data.team}` : a.data.organiser} ·{' '}
+                      <span class="visually-hidden">{labelFor(awardCategories, a.data.category)} · </span>
+                      <span class="mono">{when(a)}</span>
+                    </p>
+                    {hasActions && (
+                      <div class="award-actions">
+                        {a.data.document && (
+                          <>
+                            <a
+                              class="doc-btn"
+                              href={a.data.document.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              data-doc-preview={previewUrl(a.data.document.url)}
+                              data-doc-title={fullTitle(a)}
+                            >
+                              <Icon name="certificate" />
+                              {a.data.document.label}
+                              <span class="visually-hidden">: {a.data.title}</span>
+                            </a>
+                            <a class="doc-link" href={a.data.document.url} target="_blank" rel="noopener noreferrer">
+                              Open in Drive <Icon name="arrow-up-right" />
+                              <span class="visually-hidden">: {a.data.title} (opens in a new tab)</span>
+                            </a>
+                          </>
+                        )}
+                        {a.data.role && (
+                          <a class="doc-link" href={withBase(`#${a.data.role.experience.id}`)}>
+                            {a.data.role.label} <Icon name="arrow-right" />
+                          </a>
+                        )}
+                        {a.data.links.map((l) => (
+                          <a class="doc-link" href={l.url} target="_blank" rel="noopener noreferrer">
+                            {l.label} <Icon name="arrow-up-right" />
+                            <span class="visually-hidden">(opens in a new tab)</span>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {photo && (
+                    <a class="thumb" href={photo.full} data-img-preview={photo.full} data-doc-title={fullTitle(a)}>
+                      <Image
+                        src={photo.src}
+                        alt={photo.alt}
+                        widths={[160, 320]}
+                        sizes="5.5rem"
+                        loading="lazy"
+                      />
+                      <span class="visually-hidden">(view larger)</span>
+                    </a>
+                  )}
+                </li>
+              );
+            })
+          }
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  {
+    hasPreview && (
+      <dialog class="doc-dialog" aria-labelledby="doc-dialog-title" data-doc-dialog>
+        <div class="doc-head">
+          <p id="doc-dialog-title" class="doc-title" data-doc-dialog-title>
+            Certificate
+          </p>
+          <div class="doc-actions">
+            <a class="btn btn--primary btn--small" href="#" target="_blank" rel="noopener noreferrer" data-doc-open>
+              <Icon name="external" /> <span data-doc-open-label>Open in Google Drive</span>
+              <span class="visually-hidden">(opens in a new tab)</span>
+            </a>
+            <button class="btn btn--small" type="button" data-doc-close>
+              <Icon name="close" /> Close
+            </button>
+          </div>
+        </div>
+        <div class="doc-frame">
+          <iframe title="Certificate preview" loading="lazy" data-doc-frame hidden />
+          <img alt="" data-doc-img hidden />
+        </div>
+      </dialog>
+    )
+  }
+</section>
+
+<script>
+  // Opens a certificate (Drive preview) or a photo in an in-page dialog.
+  // Without JS both are ordinary links. Nothing is requested from Drive until
+  // the visitor asks for it.
+  const dialog = document.querySelector<HTMLDialogElement>('[data-doc-dialog]');
+  const frame = dialog?.querySelector<HTMLIFrameElement>('[data-doc-frame]');
+  const img = dialog?.querySelector<HTMLImageElement>('[data-doc-img]');
+  const title = dialog?.querySelector<HTMLElement>('[data-doc-dialog-title]');
+  const open = dialog?.querySelector<HTMLAnchorElement>('[data-doc-open]');
+  const openLabel = dialog?.querySelector<HTMLElement>('[data-doc-open-label]');
+  let trigger: HTMLElement | null = null;
+
+  if (dialog && frame && img && title && open && openLabel && typeof dialog.showModal === 'function') {
+    document.addEventListener('click', (event) => {
+      const link = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-doc-preview], [data-img-preview]');
+      if (!link) return;
+      event.preventDefault();
+      trigger = link;
+      const name = link.dataset.docTitle ?? 'Certificate';
+      title.textContent = name;
+      open.href = link.href;
+      if (link.dataset.imgPreview) {
+        frame.hidden = true;
+        img.hidden = false;
+        img.src = link.dataset.imgPreview;
+        img.alt = link.querySelector('img')?.alt ?? name;
+        openLabel.textContent = 'Open full size';
+      } else {
+        img.hidden = true;
+        frame.hidden = false;
+        frame.title = `Preview: ${name}`;
+        frame.src = link.dataset.docPreview!;
+        openLabel.textContent = 'Open in Google Drive';
+      }
+      dialog.showModal();
+    });
+    dialog.querySelector('[data-doc-close]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('close', () => {
+      frame.src = 'about:blank';
+      img.removeAttribute('src');
+      trigger?.focus();
+    });
+  }
+</script>
+
+<style>
+  .part-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--step-2);
+    margin-bottom: var(--s-3);
+  }
+
+  .part-title :global(svg) {
+    color: var(--accent);
+    width: 1.3em;
+    height: 1.3em;
+  }
+
+  /* ── Education cards ── */
+  .edu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-2);
+    padding: 0;
+    list-style: none;
+  }
+
+  .edu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: var(--s-3);
+    border-radius: 20px;
+  }
+
+  .edu-when {
+    font-size: var(--step--1);
+  }
+
+  .edu h4 {
+    font-size: var(--step-1);
+    line-height: 1.3;
+  }
+
+  .sub {
+    color: var(--text-2);
+    font-size: var(--step--1);
+  }
+
+  .edu-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s-1);
+    margin-top: auto;
+    padding-top: var(--s-2);
+  }
+
+  .result {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .result-value {
+    font-size: var(--step-3);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--accent-text);
+  }
+
+  .result-label {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    color: var(--muted);
+  }
+
+  .honours {
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: var(--step--1);
+    font-weight: 700;
+  }
+
+  /* ── Recognition ── */
+  .recognition {
+    margin-top: clamp(3rem, 2rem + 3vw, 5rem);
+  }
+
+  .rec-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+    gap: var(--s-3);
+    align-items: start;
+  }
+
+  .rec-grid--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The featured award stays in view beside the list on wide screens. */
+  .feature-col {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  @media (min-width: 56.01rem) {
+    .feature-col {
+      position: sticky;
+      top: calc(var(--header-h) + 1.5rem);
+    }
+  }
+
+  .feature {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: var(--s-3);
+    border: 1px solid light-dark(rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.08));
+    border-radius: 26px;
+    background:
+      radial-gradient(120% 90% at 0% 0%, light-dark(rgb(25 170 248 / 0.16), rgb(25 170 248 / 0.2)), transparent 60%),
+      linear-gradient(160deg, light-dark(rgb(255 248 240 / 0.8), rgb(62 26 14 / 0.62)), light-dark(rgb(255 255 255 / 0.7), rgb(28 18 14 / 0.62)));
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    backdrop-filter: blur(20px) saturate(1.5);
+    box-shadow:
+      inset 0 1px 0 light-dark(#fff, rgb(255 255 255 / 0.1)),
+      0 30px 70px -40px light-dark(rgb(120 50 10 / 0.45), rgb(0 0 0 / 0.9)),
+      0 20px 60px -40px rgb(25 170 248 / 0.5);
+    transition:
+      transform 450ms var(--ease),
+      box-shadow 450ms var(--ease);
+  }
+
+  .feature:hover {
+    box-shadow:
+      inset 0 1px 0 light-dark(#fff, rgb(255 255 255 / 0.12)),
+      0 40px 80px -40px light-dark(rgb(120 50 10 / 0.5), rgb(0 0 0 / 0.95)),
+      0 24px 70px -36px rgb(25 170 248 / 0.65);
+  }
+
+  .feature-top {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: var(--s-2);
+    align-items: start;
+  }
+
+  .laurel {
+    position: relative;
+    width: 5.5rem;
+    aspect-ratio: 1;
+    color: var(--accent);
+  }
+
+  .laurel-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .stem {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+
+  .leaf {
+    fill: currentColor;
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+
+  .laurel-core {
+    position: absolute;
+    inset: 25%;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    background: light-dark(rgb(25 170 248 / 0.08), rgb(25 170 248 / 0.14));
+    color: var(--accent-text);
+  }
+
+  .laurel-core :global(svg) {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .laurel-text {
+    font-size: 0.95rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-body {
+    display: grid;
+    justify-items: start;
+    gap: 0.55rem;
+  }
+
+  .feature-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background: light-dark(rgb(25 170 248 / 0.12), rgb(25 170 248 / 0.18));
+    border: 1px solid light-dark(rgb(25 170 248 / 0.2), rgb(25 170 248 / 0.25));
+    color: var(--accent-text);
+    font-size: var(--step--2);
+    font-weight: 700;
+  }
+
+  .pill-dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .feature-title {
+    font-size: var(--step-3);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  .feature-sub {
+    color: var(--text-2);
+    line-height: 1.55;
+  }
+
+  .feature-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+  }
+
+  .f-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    font-weight: 700;
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  .f-btn-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 8px;
+    border: 1px solid light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.16));
+    background: light-dark(rgb(25 170 248 / 0.14), rgb(25 170 248 / 0.22));
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 14px -8px rgb(25 170 248 / 0.8);
+    transition: transform 250ms var(--ease);
+  }
+
+  .f-btn-icon :global(svg) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .f-btn:hover .f-btn-icon {
+    transform: translateY(-2px) rotate(-6deg);
+  }
+
+  .feature-photos {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  /* First photo wide, the others stacked beside it. */
+  .feature-photos--multi {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .feature-photos--multi .feature-photo {
+    aspect-ratio: auto;
+    min-height: 13rem;
+  }
+
+  /* Three or more: the first photo spans the rows of the others. */
+  .feature-photos--multi .feature-photo:first-child:nth-last-child(n + 3) {
+    grid-row: span 2;
+  }
+  .feature-photo {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 18px;
+    aspect-ratio: 16 / 9;
+    background: var(--bg-alt);
+  }
+
+  .feature-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 600ms var(--ease);
+  }
+
+  .zoom {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.4);
+    background: rgb(20 20 20 / 0.45);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    opacity: 0.85;
+    transition: opacity 250ms ease, transform 300ms var(--ease);
+  }
+
+  .zoom :global(svg) {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .feature-photo:hover :global(img) {
+    transform: scale(1.04);
+  }
+
+  .feature-photo:hover .zoom {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  /* Award list: one glass panel, compact rows (the earlier layout). */
+  .awards {
+    display: grid;
+    padding: var(--s-1) var(--s-3);
+    border-radius: 22px;
+    list-style: none;
+  }
+
+  .awards:hover {
+    transform: none;
+  }
+
+  .award {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+    gap: var(--s-2);
+    align-items: start;
+    padding-block: var(--s-2);
+  }
+
+  .award + .award {
+    border-top: 1px solid light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.07));
+  }
+
+  .award-icon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid light-dark(rgb(25 170 248 / 0.2), rgb(25 170 248 / 0.22));
+    background: light-dark(rgb(25 170 248 / 0.1), rgb(25 170 248 / 0.14));
+    color: var(--accent-text);
+    transition: transform 400ms var(--ease);
+  }
+
+  .award-icon :global(svg) {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .award:hover .award-icon {
+    transform: rotate(-10deg) scale(1.08);
+  }
+
+  .award-main {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .award-title {
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .award-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 1rem;
+    margin-top: 0.4rem;
+  }
+
+  .doc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.5rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.16));
+    background: light-dark(rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.06));
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
+    backdrop-filter: blur(12px) saturate(1.4);
+    box-shadow:
+      inset 0 1px 0 light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.12)),
+      0 8px 20px -14px rgb(0 0 0 / 0.6);
+    color: var(--text);
+    font-size: var(--step--2);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      border-color var(--fast),
+      background-color var(--fast),
+      transform var(--fast) var(--ease);
+  }
+
+  .doc-btn:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    transform: translateY(-1px);
+  }
+
+  .doc-btn :global(svg),
+  .doc-link :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--accent-text);
+  }
+
+  .doc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.5rem;
+    font-size: var(--step--1);
+    font-weight: 700;
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  .doc-link:hover {
+    text-decoration: underline;
+  }
+
+  .thumb {
+    display: block;
+    width: 5.5rem;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid light-dark(rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.12));
+    box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.7);
+  }
+
+  .thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 400ms var(--ease);
+  }
+
+  .thumb:hover :global(img) {
+    transform: scale(1.08);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* The featured card floats gently; its leaves grow in when revealed. */
+    .feature {
+      animation: card-float 8s ease-in-out infinite;
+    }
+
+    .feature:hover {
+      transform: translateY(-6px);
+    }
+
+    .feature:global(.reveal-pending) .leaf {
+      transform: scale(0);
+    }
+
+    .feature:global(.reveal-in) .leaf {
+      transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition-delay: calc(250ms + var(--l, 0) * 60ms);
+    }
+
+    .laurel,
+    .laurel-core {
+      transition: transform 500ms var(--ease);
+    }
+
+    .feature:hover .laurel {
+      transform: rotate(-6deg) scale(1.05);
+    }
+
+    .feature:hover .laurel-core {
+      transform: rotate(12deg);
+    }
+  }
+
+  /* Preview dialog */
+  .doc-dialog {
+    width: min(64rem, 94vw);
+    height: min(48rem, 90vh);
+    padding: 0;
+    border: 1px solid light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.14));
+    border-radius: 16px;
+    background: light-dark(rgb(255 255 255 / 0.85), rgb(24 24 24 / 0.82));
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    backdrop-filter: blur(20px) saturate(1.4);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  .doc-dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .doc-dialog::backdrop {
+    background: rgb(0 0 0 / 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  .doc-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-2);
+    padding: var(--s-2) var(--s-3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .doc-title {
+    font-weight: 700;
+  }
+
+  .doc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+  }
+
+  .doc-frame {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    background: var(--bg-alt);
+  }
+
+  .doc-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .doc-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .doc-frame [hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .doc-dialog[open] {
+      animation: dialog-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes dialog-in {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+    }
+  }
+
+  @media (max-width: 63.99rem) {
+    .edu-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 56rem) {
+    .rec-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .edu-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .feature-top {
+      grid-template-columns: 4.5rem minmax(0, 1fr);
+    }
+
+    .laurel {
+      width: 4.5rem;
+    }
+
+    .awards {
+      padding-inline: var(--s-2);
+    }
+
+    .award {
+      grid-template-columns: 2.5rem minmax(0, 1fr);
+    }
+
+    .thumb {
+      grid-column: 2;
+    }
+  }
+</style>

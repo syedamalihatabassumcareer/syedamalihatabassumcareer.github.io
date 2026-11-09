@@ -1,0 +1,65 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+}
+const { eyebrow, title, lead } = Astro.props;
+---
+
+<header class="page-header">
+  <div class="wrap">
+    <p class="eyebrow eyebrow--accent enter" style="--enter-step:0">{eyebrow}</p>
+    <h1 class="enter" style="--enter-step:1">{title}</h1>
+    {lead && <p class="lead enter" style="--enter-step:2">{lead}</p>}
+    <div class="enter" style="--enter-step:3">
+      <slot />
+    </div>
+  </div>
+  <svg class="page-header-mark" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+    <circle cx="100" cy="100" r="98"></circle>
+    <circle cx="100" cy="100" r="70"></circle>
+    <circle cx="100" cy="100" r="42"></circle>
+    <path d="M100 2 A98 98 0 0 1 198 100"></path>
+  </svg>
+</header>
+
+<style>
+  .page-header-mark {
+    position: absolute;
+    right: calc(var(--gutter) * -1 - 40px);
+    top: 50%;
+    width: clamp(220px, 32vw, 420px);
+    translate: 0 -50%;
+    pointer-events: none;
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 0.6;
+    opacity: 0.8;
+    z-index: -1;
+  }
+
+  .page-header-mark path {
+    stroke: var(--accent);
+    stroke-width: 1.4;
+  }
+
+  @media (max-width: 40rem) {
+    .page-header-mark {
+      opacity: 0.3;
+      top: 30%;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .page-header-mark {
+      animation: spin 90s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        rotate: 360deg;
+      }
+    }
+  }
+</style>

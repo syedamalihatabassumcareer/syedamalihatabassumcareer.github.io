@@ -1,0 +1,883 @@
+---
+// Portrait-centred hero. Composition adapted from the owner's reference
+// screenshots: cut-out portrait in the middle on a blue glow, a giant
+// outlined word behind it, the name on the left and the role on the right,
+// an availability pill and social links at the bottom-left, and the intro and
+// actions at the bottom-right. Colours follow the site's blue palette.
+import { Image } from 'astro:assets';
+import HeroArt from '@/components/HeroArt.astro';
+import Icon, { type IconName } from '@/components/Icon.astro';
+import { profile } from '@/data/profile';
+import { getAwards, getEducation, getExperience, getProjects } from '@/lib/content';
+import { withBase } from '@/lib/url';
+
+const projects = await getProjects();
+const experience = await getExperience();
+const [degree] = await getEducation();
+// Global competition result, from the awards data ("Globally ranked 8th of 102 teams").
+const globalRank = (await getAwards()).find((a) => /of \d+ teams/.test(a.data.result ?? ''));
+const teams = globalRank?.data.result?.match(/of (\d+) teams/)?.[1];
+
+// Teaching contribution, taken from the TA role's documented highlight ("Mentored 250+ students…").
+const mentored = experience
+  .flatMap((e) => e.data.highlights)
+  .map((h) => h.match(/Mentored (\d+\+?) students/)?.[1])
+  .find(Boolean);
+
+// Every number comes from the content files.
+const stats = [
+  degree?.data.result && { value: degree.data.result.value, label: `${degree.data.result.label} · Highest Distinction`, icon: 'cap', href: '#education' },
+  { value: String(projects.length), label: 'Projects built', icon: 'cpu', href: '#projects' },
+  mentored && { value: mentored, label: 'Students mentored', icon: 'users', href: '#experience' },
+  globalRank?.data.badge && teams && { value: globalRank.data.badge, label: `of ${teams} teams worldwide · URC`, icon: 'trophy', href: '#recognition' },
+].filter(Boolean) as { value: string; label: string; icon: IconName; href: string }[];
+
+const role = 'CSE Graduate';
+const roleRest = 'AI · Software · Infrastructure';
+const [first, ...rest] = profile.name.split(' ');
+// First sentence of the intro, as a short pitch beside the portrait.
+const pitch = profile.intro.split(/(?<=\.)\s/)[0];
+// Rotating focus line (static first word without motion). From the profile, projects and experience.
+const focusWords = ['AI & machine learning', 'Full-stack web platforms', 'Infrastructure automation', 'Embedded & IoT systems'];
+const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].filter(Boolean);
+---
+
+<section class="hero" id="home" aria-labelledby="hero-name" data-parallax>
+  <div class="glow" aria-hidden="true"></div>
+  <span class="orb" aria-hidden="true"></span>
+  <span class="orb orb--small" aria-hidden="true"></span>
+
+  <div class="wrap stage">
+    <p class="watermark" aria-hidden="true">Impact</p>
+
+    <div class="portrait-wrap enter" style="--enter-step:2">
+      <div class="orbit" aria-hidden="true">
+        <span class="orbit-ring"><span class="orbit-dot"></span></span>
+        <span class="orbit-ring orbit-ring--2"><span class="orbit-dot"></span></span>
+      </div>
+      <span class="float-chip float-chip--a" aria-hidden="true"><span class="float-chip-inner"><Icon name="briefcase" /> Industry experience</span></span>
+      <span class="float-chip float-chip--b" aria-hidden="true"><span class="float-chip-inner"><Icon name="cpu" /> AI &amp; data</span></span>
+      {
+        profile.portrait ? (
+          <Image
+            class="portrait"
+            src={profile.portrait.src}
+            alt={profile.portrait.alt}
+            widths={[400, 640, 900, 1200, 1600]}
+            sizes="(max-width: 48rem) 85vw, 46vw"
+            quality={90}
+            loading="eager"
+            fetchpriority="high"
+          />
+        ) : (
+          <div class="art">
+            <HeroArt />
+          </div>
+        )
+      }
+    </div>
+
+    <div class="intro-left">
+      <p class="hello enter" style="--enter-step:0">Hello, I’m</p>
+      <h1 id="hero-name" class="name enter" style="--enter-step:1">
+        {nameLines.map((line) => <span>{line}</span>)}
+      </h1>
+    </div>
+
+    <div class="intro-right">
+      <p class="kicker enter" style="--enter-step:2">
+        <span class="visually-hidden">{focusWords[0]}</span>
+        <span class="rotator" aria-hidden="true">
+          <span class="rot-track">
+            {focusWords.map((w) => <span>{w}</span>)}
+            <span>{focusWords[0]}</span>
+          </span>
+        </span>
+      </p>
+      <p class="role enter" style="--enter-step:3">
+        <span class="role-main">{role}</span>
+        <span class="role-rest">{roleRest}</span>
+      </p>
+    </div>
+
+    <div class="bottom-left enter" style="--enter-step:5">
+      {
+        profile.availability && (
+          <p class="pill">
+            <span class="dot" aria-hidden="true" />
+            {profile.availability.short}
+          </p>
+        )
+      }
+      <ul class="socials" aria-label="Profiles">
+        {
+          profile.links.map((link) => (
+            <li>
+              <a class="icon-circle" href={link.url} target="_blank" rel="noopener noreferrer me" aria-label={`${link.label} (opens in a new tab)`}>
+                <Icon name={link.icon} />
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a class="icon-circle" href={`mailto:${profile.email}`} aria-label={`Email ${profile.email}`}>
+            <Icon name="mail" />
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="bottom-right enter" style="--enter-step:6">
+      <p class="pitch">{pitch}</p>
+      <div class="actions">
+        <a class="btn btn--primary" href={withBase('#experience')}>
+          See my experience <Icon name="arrow-right" />
+        </a>
+        {
+          profile.cv ? (
+            <a class="btn btn--glass" href={withBase(profile.cv.path)} download>
+              <Icon name="download" /> Download CV
+            </a>
+          ) : (
+            <a class="btn btn--glass" href={withBase('#contact')}>
+              Get in touch <Icon name="arrow-up-right" />
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Frosted-glass stats bar, overlapping the bottom of the portrait. -->
+  <div class="wrap stats-wrap">
+    <dl class="stats enter" style="--enter-step:7" data-count-group>
+      {
+        stats.map((s) => (
+          <div class="stat">
+            <span class="stat-icon" aria-hidden="true">
+              <Icon name={s.icon} />
+            </span>
+            <div class="stat-text">
+              <dt>{s.label}</dt>
+              <dd>
+                <span class="visually-hidden">{s.value}</span>
+                <span aria-hidden="true" data-count={s.value}>{s.value}</span>
+              </dd>
+            </div>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding-top: var(--s-2);
+    padding-bottom: var(--s-6);
+  }
+
+  /* Orange glow behind the portrait (the reference used purple; this is the site's orange). */
+  .glow {
+    position: absolute;
+    z-index: -2;
+    left: 50%;
+    top: 46%;
+    width: min(62rem, 120vw);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      light-dark(rgb(25 170 248 / 0.32), rgb(25 170 248 / 0.42)),
+      light-dark(rgb(25 170 248 / 0.1), rgb(25 170 248 / 0.12)) 55%,
+      transparent 100%
+    );
+    filter: blur(10px);
+  }
+
+  .orb {
+    position: absolute;
+    z-index: -1;
+    top: 47%;
+    left: 21%;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #bfe9ff, var(--accent) 60%, #0068b4);
+    box-shadow: 0 0 40px 8px rgb(25 170 248 / 0.45);
+  }
+
+  /* ── Stage (desktop): layered. The portrait is anchored bottom-centre; the
+     name and role sit at head height on either side, where the cut-out is
+     transparent; the pill, socials, pitch and actions sit in the lower corners. */
+  .stage {
+    position: relative;
+    height: clamp(36rem, calc(100svh - var(--header-h) - 1.5rem), 52rem);
+  }
+  .watermark {
+    position: absolute;
+    z-index: -1;
+    top: 4%;
+    left: 50%;
+    translate: -50% 0;
+    font-size: clamp(4rem, 1rem + 13vw, 15rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1.5px light-dark(rgb(26 26 26 / 0.14), rgb(245 245 245 / 0.1));
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .portrait-wrap {
+    position: absolute;
+    z-index: 0;
+    bottom: 0;
+    left: 50%;
+    translate: -50% 0;
+    height: 90%;
+    aspect-ratio: 1600 / 1758;
+  }
+
+  .portrait {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom;
+  }
+
+
+  .art {
+    padding: var(--s-4);
+  }
+
+  .intro-left,
+  .intro-right,
+  .bottom-left,
+  .bottom-right {
+    position: absolute;
+    z-index: 1;
+  }
+
+  .intro-left {
+    top: 15%;
+    left: var(--gutter);
+  }
+
+  .hello,
+  .kicker {
+    font-size: var(--step-1);
+    font-weight: 700;
+    color: var(--accent-text);
+  }
+
+  .name {
+    margin-top: var(--s-1);
+    font-size: clamp(2.6rem, 1rem + 3.6vw, 4.4rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .name span {
+    display: block;
+  }
+
+  .intro-right {
+    top: 15%;
+    right: var(--gutter);
+    max-width: 24rem;
+    text-align: right;
+  }
+
+  .role {
+    margin-top: var(--s-1);
+    font-weight: 900;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+  }
+
+  .role-main {
+    display: block;
+    font-size: clamp(2.2rem, 0.9rem + 3vw, 3.6rem);
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    padding-bottom: 0.06em;
+  }
+
+  .role-rest {
+    display: block;
+    margin-top: 0.2em;
+    font-size: clamp(1.2rem, 0.8rem + 1vw, 1.65rem);
+    line-height: 1.15;
+    color: var(--text);
+  }
+
+  .bottom-left {
+    bottom: 20%;
+    left: var(--gutter);
+    display: grid;
+    justify-items: start;
+    gap: var(--s-3);
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 1.1rem 0.55rem 0.7rem;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    font-size: var(--step--1);
+    font-weight: 700;
+  }
+
+  .dot {
+    position: relative;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    flex: none;
+  }
+
+  .socials {
+    display: flex;
+    gap: var(--s-1);
+    padding: 0;
+    list-style: none;
+  }
+
+  .socials :global(.icon-circle) {
+    background: color-mix(in srgb, var(--surface) 70%, transparent);
+  }
+
+  .bottom-right {
+    bottom: 20%;
+    right: var(--gutter);
+    display: grid;
+    gap: var(--s-3);
+    max-width: min(17rem, 22%);
+  }
+
+  .pitch {
+    color: var(--text-2);
+    font-size: var(--step-0);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+  }
+
+  .btn--glass {
+    background: color-mix(in srgb, var(--surface) 75%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  /* ── Frosted-glass stats bar ── */
+  .stats-wrap {
+    position: relative;
+    z-index: 2;
+    margin-top: clamp(-6rem, -8vw, -3rem);
+  }
+
+  .stats {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.12));
+    background: light-dark(rgb(255 255 255 / 0.42), rgb(24 24 24 / 0.38));
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    box-shadow:
+      inset 0 1px 0 light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.1)),
+      0 24px 60px -30px rgb(0 0 0 / 0.6);
+  }
+
+  /* Soft sheen across the glass. */
+  .stats::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, rgb(255 255 255 / 0.1), transparent 40%, transparent 70%, rgb(25 170 248 / 0.08));
+    pointer-events: none;
+  }
+
+  .stat {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: var(--s-3) var(--s-3);
+  }
+
+  .stat + .stat::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 22%;
+    bottom: 22%;
+    width: 1px;
+    background: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.12));
+  }
+
+  .stat-icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid light-dark(rgb(0 0 0 / 0.12), rgb(255 255 255 / 0.18));
+    background: light-dark(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.06));
+    color: var(--accent-text);
+  }
+
+  .stat-icon :global(svg) {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .stat-text {
+    display: flex;
+    flex-direction: column-reverse;
+    min-width: 0;
+  }
+
+  .stat dd {
+    font-size: var(--step-2);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--text);
+  }
+
+  .stat dt {
+    font-size: var(--step--1);
+    color: var(--text-2);
+  }
+
+  /* ── Motion (CSS only; off for reduced motion) ── */
+  @media (prefers-reduced-motion: no-preference) {
+    .glow {
+      animation: breathe 7s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      50% {
+        scale: 1.06;
+        opacity: 0.85;
+      }
+    }
+
+    .orb {
+      animation: drift 11s ease-in-out infinite;
+    }
+
+    @keyframes drift {
+      33% {
+        translate: 1.5rem -1rem;
+      }
+      66% {
+        translate: -1rem 0.75rem;
+      }
+    }
+
+    .portrait-wrap.enter {
+      animation-name: rise;
+      animation-duration: 900ms;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.98);
+      }
+    }
+
+    .dot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: ping 2.4s var(--ease) infinite;
+    }
+
+    @keyframes ping {
+      70%,
+      100% {
+        transform: scale(2.2);
+        opacity: 0;
+      }
+    }
+  }
+
+  /* ── Rotating focus line ── */
+  .rotator {
+    display: inline-block;
+    height: 1.5em;
+    overflow: clip;
+    vertical-align: bottom;
+  }
+
+  .rot-track {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rot-track > span {
+    display: block;
+    height: 1.5em;
+    line-height: 1.5em;
+    white-space: nowrap;
+  }
+
+  .rot-track > span:not(:first-child) {
+    visibility: hidden;
+  }
+
+  /* ── Orbit rings and floating chips around the portrait (decorative) ── */
+  .orbit {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 36%;
+    width: 64%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    pointer-events: none;
+  }
+
+  .orbit-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px dashed light-dark(rgb(25 170 248 / 0.35), rgb(25 170 248 / 0.3));
+  }
+
+  .orbit-ring--2 {
+    inset: -12%;
+    border-style: solid;
+    border-color: light-dark(rgb(26 26 26 / 0.08), rgb(255 255 255 / 0.07));
+  }
+
+  .orbit-dot {
+    position: absolute;
+    top: -6px;
+    left: calc(50% - 6px);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 16px 3px rgb(25 170 248 / 0.55);
+  }
+
+  .orbit-ring--2 .orbit-dot {
+    top: auto;
+    bottom: 14%;
+    left: 4%;
+    width: 8px;
+    height: 8px;
+    background: light-dark(#1a1a1a, #f5f5f5);
+    box-shadow: none;
+  }
+
+  /* Background labels: behind the photo, at the outer edges, faint. */
+  .float-chip {
+    position: absolute;
+    z-index: -1;
+    display: none;
+    opacity: 0.38;
+    pointer-events: none;
+  }
+
+  .float-chip-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid light-dark(rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.14));
+    background: light-dark(rgb(255 255 255 / 0.55), rgb(24 24 24 / 0.45));
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    font-size: var(--step--1);
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--text);
+  }
+
+  .float-chip-inner :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--accent-text);
+  }
+
+  .float-chip--a {
+    left: -2%;
+    top: 47%;
+  }
+
+  .float-chip--b {
+    right: 0;
+    top: 3%;
+  }
+
+  @media (min-width: 72rem) {
+    .float-chip {
+      display: block;
+    }
+  }
+
+  /* ── Glass shine on the stats bar ── */
+  .stats::after {
+    content: '';
+    position: absolute;
+    inset: -50% auto -50% 0;
+    width: 30%;
+    background: linear-gradient(100deg, transparent, light-dark(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.1)), transparent);
+    transform: translateX(-150%) skewX(-18deg);
+    pointer-events: none;
+  }
+
+  .stat-icon {
+    transition: transform 300ms var(--ease), background-color var(--fast);
+  }
+
+  .stat:hover .stat-icon {
+    transform: scale(1.1) rotate(-8deg);
+  }
+
+  /* ── More motion (off for reduced motion) ── */
+  @media (prefers-reduced-motion: no-preference) {
+    .rot-track > span:not(:first-child) {
+      visibility: visible;
+    }
+
+    .rot-track {
+      animation: rotate-words 12s var(--ease) infinite 1.4s;
+    }
+
+    @keyframes rotate-words {
+      0%, 21% { transform: translateY(0); }
+      25%, 46% { transform: translateY(-20%); }
+      50%, 71% { transform: translateY(-40%); }
+      75%, 96% { transform: translateY(-60%); }
+      100% { transform: translateY(-80%); }
+    }
+
+    .orbit-ring {
+      animation: spin 28s linear infinite;
+    }
+
+    .orbit-ring--2 {
+      animation-duration: 46s;
+      animation-direction: reverse;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(1turn); }
+    }
+
+    .float-chip-inner {
+      animation: bob 5s ease-in-out infinite;
+    }
+
+    .float-chip--b .float-chip-inner {
+      animation-delay: -2.5s;
+    }
+
+    @keyframes bob {
+      50% { transform: translateY(-10px); }
+    }
+
+    .orb--small {
+      animation-duration: 15s;
+      animation-direction: reverse;
+    }
+
+    .stats::after {
+      animation: shine 1.4s var(--ease) 1.3s both;
+    }
+
+    .stats:hover::after {
+      animation: shine 1.1s var(--ease) both;
+    }
+
+    @keyframes shine {
+      to { transform: translateX(450%) skewX(-18deg); }
+    }
+
+    /* Pointer parallax: --px/--py (−1…1) set by script on fine pointers. */
+    .glow,
+    .orb,
+    .watermark,
+    .orbit,
+    .float-chip {
+      transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .glow { transform: translate(calc(var(--px, 0) * -18px), calc(var(--py, 0) * -14px)); }
+    .orb { transform: translate(calc(var(--px, 0) * 34px), calc(var(--py, 0) * 26px)); }
+    .watermark { transform: translate(calc(var(--px, 0) * -26px), 0); }
+    .orbit { transform: translate(calc(var(--px, 0) * 12px), calc(var(--py, 0) * 10px)); }
+    .float-chip { transform: translate(calc(var(--px, 0) * 22px), calc(var(--py, 0) * 16px)); }
+  }
+
+  .orb--small {
+    top: 12%;
+    left: auto;
+    right: 33%;
+    width: 1rem;
+    height: 1rem;
+    box-shadow: 0 0 22px 4px rgb(25 170 248 / 0.4);
+  }
+
+  /* ── Tablet & phone: normal flow (name & role, portrait, details) ── */
+  @media (max-width: 63.99rem) {
+    .stats-wrap {
+      margin-top: var(--s-4);
+    }
+
+    .stage {
+      height: auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-areas:
+        'left  right'
+        'photo photo'
+        'bleft bright';
+      align-items: end;
+      gap: var(--s-3);
+      padding-top: var(--s-4);
+    }
+
+    .intro-left,
+    .intro-right,
+    .bottom-left,
+    .bottom-right,
+    .portrait-wrap {
+      position: static;
+      translate: none;
+    }
+
+    .intro-left {
+      grid-area: left;
+    }
+
+    .intro-right {
+      grid-area: right;
+      justify-self: end;
+    }
+
+    .portrait-wrap {
+      position: relative;
+      inset: auto;
+      grid-area: photo;
+      justify-self: center;
+      width: min(100%, 26rem);
+      height: auto;
+    }
+
+    .bottom-left {
+      grid-area: bleft;
+      align-self: start;
+    }
+
+    .bottom-right {
+      grid-area: bright;
+      align-self: start;
+      justify-self: end;
+      max-width: 22rem;
+    }
+
+    .watermark {
+      top: 20%;
+    }
+
+    .orb {
+      top: 34%;
+      left: 16%;
+    }
+
+    .orb--small {
+      top: 24%;
+      left: auto;
+      right: 12%;
+    }
+
+    .glow {
+      top: 48%;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .stage {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'left'
+        'right'
+        'photo'
+        'bright'
+        'bleft';
+      gap: var(--s-2);
+    }
+
+    .intro-right {
+      justify-self: start;
+      text-align: left;
+    }
+
+    .portrait-wrap {
+      width: min(100%, 20rem);
+    }
+
+    .bottom-right {
+      justify-self: start;
+    }
+
+    .watermark {
+      top: 30%;
+    }
+
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stat {
+      padding: var(--s-2);
+      gap: var(--s-1);
+    }
+
+    .stat:nth-child(3)::before {
+      display: none;
+    }
+
+    .stat:nth-child(n + 3) {
+      border-top: 1px solid light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.1));
+    }
+
+    .stat-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+  }
+</style>

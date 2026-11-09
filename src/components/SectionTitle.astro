@@ -1,0 +1,61 @@
+---
+// Giant section heading: "02 ✦ Research & publications" with one solid and
+// one outlined word, plus an optional sticker and subtitle.
+interface Props {
+  id: string;
+  index: string;
+  /** Short line above the title, e.g. "What I study". */
+  kicker: string;
+  solid: string;
+  outline?: string;
+  sub?: string;
+  sticker?: string;
+  stickerTone?: 'lime' | 'coral' | 'lilac' | 'sky' | 'sun';
+}
+
+const { id, index, kicker, solid, outline, sub, sticker, stickerTone = 'lime' } = Astro.props;
+---
+
+<header class="mega">
+  <p class="mega-index eyebrow eyebrow--accent" data-reveal>
+    <span class="num">{index}</span>
+    <span aria-hidden="true">✦</span>
+    {kicker}
+  </p>
+  <h2 id={id} class="mega-title" data-reveal="left">
+    {solid}{outline && <> <span class="outline">{outline}</span></>}
+  </h2>
+  {
+    (sub || sticker) && (
+      <div class="mega-row" data-reveal>
+        {sub && <p class="mega-sub">{sub}</p>}
+        {sticker && (
+          <span class={`sticker sticker--${stickerTone} float`} style="--r:-4deg; --float-dur:5s">
+            {sticker}
+          </span>
+        )}
+      </div>
+    )
+  }
+</header>
+
+<style>
+  .num {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.2rem;
+    height: 1.6rem;
+    padding-inline: 0.4rem;
+    border: 2px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--ink);
+  }
+
+
+  .mega-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-m);
+  }
+</style>

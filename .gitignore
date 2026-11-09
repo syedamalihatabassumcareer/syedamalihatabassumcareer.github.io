@@ -1,0 +1,38 @@
+# Build output
+dist/
+dist-*/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Logs and local env
+npm-debug.log*
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+
+# ── PRIVATE: never commit these ─────────────────────────────────────────────
+# The original CV contains a phone number and referees' contact details.
+# Only the redacted copy in public/cv/ is meant to be published.
+/Maliha_Updated_Resume___PHD.pdf
+/private/
+
+# Reference recording of the Figma design (not part of the site)
+/Recording *.mp4
+
+# Throwaway Python environment for scripts/make-portrait-cutout.py
+.venv-photo/
+
+# Original photos (only the processed versions in src/assets/ ship)
+/Formal picture in suit.jpg
+/890187627_2338880053541560_6729595351594943307_n.jpg
+
+# Original pictures, reports and videos supplied by the owner (processed copies
+# live in src/assets and public/media; reports contain student IDs)
+/Pictures/

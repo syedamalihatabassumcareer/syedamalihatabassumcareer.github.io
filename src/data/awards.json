@@ -1,0 +1,109 @@
+[
+  {
+    "id": "highest-distinction",
+    "title": "Highest Distinction — B.Sc. in Computer Science and Engineering",
+    "organiser": "BRAC University",
+    "category": "academic",
+    "date": "2026-09",
+    "order": 0
+  },
+  {
+    "id": "deans-vc-list",
+    "title": "Dean’s List and Vice Chancellor’s List",
+    "organiser": "BRAC University",
+    "category": "academic",
+    "start": "2023-01",
+    "date": "2026-09",
+    "order": 1
+  },
+  {
+    "id": "merit-scholarship",
+    "title": "Merit-Based Academic Scholarship",
+    "organiser": "BRAC University",
+    "category": "academic",
+    "start": "2023-01",
+    "date": "2026-09",
+    "order": 2
+  },
+  {
+    "id": "urc-2025",
+    "title": "University Rover Challenge 2025",
+    "result": "Globally ranked 8th of 102 teams",
+    "badge": "8th",
+    "featured": true,
+    "team": "BRACU Mongol Tori",
+    "organiser": "The Mars Society",
+    "category": "competition",
+    "date": "2025",
+    "role": {
+      "experience": "mongoltori-mars-rover",
+      "label": "Rover team role"
+    },
+    "order": 0,
+    "photos": [
+      {
+        "file": "urc-2025-team.jpg",
+        "alt": "The BRACU Mongol Tori team, about forty people, standing in a line under a covered outdoor shelter."
+      },
+      {
+        "file": "urc-2025-rover.jpg",
+        "alt": "The Mongol Tori rover on desert terrain at the University Rover Challenge, with team members holding the flag of Bangladesh behind it."
+      }
+    ]
+  },
+  {
+    "id": "excelerate",
+    "title": "EXCELERATE National Excel Competition",
+    "result": "Top 6 Finalist",
+    "organiser": "FINACT, BRAC University",
+    "category": "competition",
+    "date": "2025-12",
+    "order": 1
+  },
+  {
+    "id": "cse471-demo",
+    "title": "CSE471 Project Demonstration",
+    "result": "1st Runner-Up",
+    "organiser": "BRAC University Computer Club",
+    "category": "competition",
+    "date": "2025-12",
+    "order": 2
+  },
+  {
+    "id": "robosoccer-traction",
+    "title": "RoboSoccer Competition — TRACTION",
+    "result": "Semi-Finalist",
+    "organiser": "Robotics Club of BRAC University",
+    "category": "competition",
+    "date": "2025-04",
+    "order": 3
+  },
+  {
+    "id": "robosoccer-techspectra",
+    "title": "RoboSoccer Competition — TechSpectra",
+    "result": "Second Runner-Up",
+    "organiser": "Robotics Club of BRAC University",
+    "category": "competition",
+    "date": "2024-05",
+    "order": 4
+  },
+  {
+    "id": "hult-prize",
+    "title": "Hult Prize On-Campus Round",
+    "result": "Semi-Finalist",
+    "organiser": "BRAC University",
+    "category": "competition",
+    "date": "2023-02",
+    "order": 5
+  },
+  {
+    "id": "duke-of-edinburgh",
+    "title": "The Duke of Edinburgh’s International Award",
+    "result": "Bronze Level Award",
+    "organiser": "The Duke of Edinburgh’s International Award",
+    "category": "personal-development",
+    "start": "2023-05",
+    "date": "2024-03",
+    "order": 1
+  }
+]
