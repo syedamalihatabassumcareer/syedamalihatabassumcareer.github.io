@@ -55,7 +55,8 @@ export const profile: Profile = {
   headline: 'AI & Technology Graduate · Aspiring Business Leader',
   focus: 'AI and technology, applied with people and leadership',
   intro:
-    'I bring AI and technology together with people to deliver results. From automating power-infrastructure monitoring at Grameenphone to a live digital-health platform and machine-learning models for health data, I apply technology where it solves practical problems.',
+    // The first sentence is the pitch on the home section. About has its own statement — keep them different.
+    'Technologist by training, team player by instinct — from Grameenphone’s power network to a live digital-health platform. I apply technology where it solves practical problems, with the people it serves.',
   description:
     'Syeda Maliha Tabassum — computer science graduate (BRAC University, Highest Distinction, CGPA 3.93) and former Grameenphone NEXTERN, working across AI and technology. Open to Management Trainee programmes.',
   location: 'Dhaka, Bangladesh',
