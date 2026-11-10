@@ -22,7 +22,7 @@ impact:
     - kind: social
       text: "Encrypts sensitive fields with the user's own password."
     - kind: business
-      text: "Generates a CV in a Classic or Modern layout, and stored CVs can be searched by name or e-mail."
+      text: "Two ready-made layouts and quick look-up of saved CVs make it practical to keep using, not just a one-off."
   sdgs: []
 featured: false
 order: 10

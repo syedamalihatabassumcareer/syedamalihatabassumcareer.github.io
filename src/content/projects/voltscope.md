@@ -35,7 +35,7 @@ impact:
   challenge: "Operators need to see at a glance how far a reading has drifted from its target."
   value:
     - kind: business
-      text: "Turns a sensor's deviation into an eight-LED colour scale, from blue for small deviations to red for large ones."
+      text: "Lets an operator read drift at a glance — more lights, larger deviation — with no screen or software."
   sdgs: []
 featured: false
 order: 9

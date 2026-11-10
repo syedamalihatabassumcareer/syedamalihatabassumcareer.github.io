@@ -31,7 +31,7 @@ export const leadership: LeadershipQuality[] = [
     icon: 'users',
     evidence: [
       {
-        text: 'Mentored 250+ students through lab sessions and individual guidance as a Data Structures teaching assistant.',
+        text: 'As a teaching assistant, helped more than 250 students get to grips with Data Structures — in the lab and one to one.',
         href: '#data-structures-ta',
         label: 'Teaching role',
       },
@@ -46,17 +46,17 @@ export const leadership: LeadershipQuality[] = [
     icon: 'agent',
     evidence: [
       {
-        text: 'Coordinated SMU upgrades across Bangladesh with the Umbrella team at Grameenphone.',
+        text: 'Worked hand in hand with Grameenphone’s Umbrella team to coordinate SMU upgrades nationwide.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
       {
-        text: 'Collaborated with the full NEXTERN cohort on a proposal to Grameenphone for feasible feature updates to the MyGP app.',
+        text: 'Joined every NEXTERN in the cohort to shape a proposal on which MyGP app features could realistically be updated.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
       {
-        text: 'Worked with multidisciplinary teams on the Mars rover’s vision, networking and mechanical systems.',
+        text: 'Worked alongside the vision, networking and mechanical sub-teams to bring the Mars rover’s systems together.',
         href: '#mongoltori-mars-rover',
         label: 'Rover team',
       },
@@ -72,17 +72,17 @@ export const leadership: LeadershipQuality[] = [
     icon: 'flask',
     evidence: [
       {
-        text: 'Automated monitoring and weekly reporting for rectifier and Li-ion battery deployment using Huawei NetEco.',
+        text: 'Set up automated tracking of rectifier and Li-ion battery rollout in Huawei NetEco, feeding a weekly report.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
       {
-        text: 'Evaluated five machine-learning models side by side for smoking-behaviour prediction.',
+        text: 'Compared five machine-learning models head to head to find the best predictor of smoking behaviour.',
         href: '#project-smoking-behavior-prediction',
         label: 'Project',
       },
       {
-        text: 'Top 6 Finalist in the EXCELERATE National Excel Competition.',
+        text: 'Placed in the national top six of the EXCELERATE Excel competition.',
         href: '#recognition',
         label: 'Awards',
       },
@@ -97,12 +97,12 @@ export const leadership: LeadershipQuality[] = [
     icon: 'rocket',
     evidence: [
       {
-        text: 'Prepared the requirements for an AI-assisted site power design tool at Grameenphone.',
+        text: 'Defined what an AI-assisted tool for designing site power at Grameenphone would need to do.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
       {
-        text: 'Built WeHeal, a digital-health platform for telemedicine, prescriptions, lab tests and emergency services — live at weheal.live.',
+        text: 'Designed WeHeal and saw it go live at weheal.live, putting everyday healthcare services online in one place.',
         href: '#project-weheal',
         label: 'Project',
       },
@@ -118,12 +118,12 @@ export const leadership: LeadershipQuality[] = [
     icon: 'trophy',
     evidence: [
       {
-        text: 'Core member of BRACU Mongol Tori, ranked 8th of 102 teams at the University Rover Challenge 2025.',
+        text: 'Competed against 102 teams worldwide with BRACU Mongol Tori at URC 2025 — and finished 8th.',
         href: '#recognition',
         label: 'Awards',
       },
       {
-        text: '1st Runner-Up, CSE471 Project Demonstration; Semi-Finalist, RoboSoccer (TRACTION).',
+        text: 'Took 1st Runner-Up at the CSE471 Project Demonstration and reached the RoboSoccer semi-finals at TRACTION.',
         href: '#recognition',
         label: 'Awards',
       },
@@ -139,22 +139,22 @@ export const leadership: LeadershipQuality[] = [
     icon: 'globe',
     evidence: [
       {
-        text: 'Liaised with telecom operators that share rectifiers with Grameenphone — understood their requirements, analysed Grameenphone’s own needs, and proposed technical support to suit both.',
+        text: 'Acted as the go-between for operators sharing Grameenphone’s rectifiers, balancing their needs with Grameenphone’s and recommending support that worked for both.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
       {
-        text: 'Prepared the deck, roadshow visuals and slides with the NEXTERN team for FutureMakers, Grameenphone’s flagship event.',
+        text: 'Helped present FutureMakers, Grameenphone’s flagship event, by designing its presentation and roadshow material with fellow NEXTERNs.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
       {
-        text: 'Prepared technical documentation and presentations for a collaborative research team.',
+        text: 'Documented technical work and prepared presentations while coordinating activities in a research team.',
         href: '#dristee-research-assistant',
         label: 'Research role',
       },
       {
-        text: 'Co-author of a peer-reviewed IEEE conference paper (JCSSE 2026).',
+        text: 'Shared research in writing as co-author of a peer-reviewed IEEE conference paper (JCSSE 2026).',
         href: '#research',
         label: 'Publications',
       },

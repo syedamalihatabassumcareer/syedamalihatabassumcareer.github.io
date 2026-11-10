@@ -203,17 +203,20 @@ const items = await Promise.all(
                             <h5>What I built</h5>
                             <p class="overview">{p.data.summary}</p>
                           </div>
-                          {p.data.impact && (
+                          {p.data.impact && (p.data.impact.value.length > 1 || p.data.impact.sdgs.length > 0) && (
                             <div>
                               <h5>Why it matters</h5>
+                              {/* The first point is already on the card above; list only the rest. */}
+                              {p.data.impact.value.length > 1 && (
                               <ul class="impact-list">
-                                {p.data.impact.value.map((v) => (
+                                {p.data.impact.value.slice(1).map((v) => (
                                   <li class={`impact-item impact-item--${v.kind}`}>
                                     <span class="impact-kind">{v.kind === 'social' ? 'Social impact' : 'Business value'}</span>
                                     <span>{v.text}</span>
                                   </li>
                                 ))}
                               </ul>
+                              )}
                               {p.data.impact.sdgs.length > 0 && (
                                 <ul class="sdgs" aria-label="Related UN Sustainable Development Goals">
                                   {p.data.impact.sdgs.map((n) => (

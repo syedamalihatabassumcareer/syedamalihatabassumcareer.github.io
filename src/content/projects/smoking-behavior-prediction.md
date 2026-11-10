@@ -28,7 +28,7 @@ impact:
     - kind: social
       text: "Explores whether routine biomedical measurements can indicate smoking behaviour — a potential aid to preventive health screening."
     - kind: business
-      text: "Compares five model types — KNN, decision tree, logistic regression, naive Bayes and a neural network — with an emphasis on validation and interpretability."
+      text: "Judges models on validation and interpretability, not accuracy alone — the rigour that decisions based on health data call for."
   sdgs: [3]
 featured: true
 order: 3
