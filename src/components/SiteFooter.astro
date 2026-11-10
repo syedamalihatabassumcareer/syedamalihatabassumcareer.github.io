@@ -7,7 +7,7 @@ import { withBase } from '@/lib/url';
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer brand-band">
+<footer class="site-footer">
   <div class="wrap footer-inner">
     <div class="id">
       <a class="logo" href={withBase('#home')}>
@@ -52,8 +52,8 @@ const year = new Date().getFullYear();
 <style>
   .site-footer {
     margin-top: auto;
-    border-top: 1px solid rgb(255 255 255 / 0.08);
-    background: #051a42; /* the band edge colour, so it continues the Contact band */
+    border-top: 1px solid var(--border);
+    background: var(--bg);
     font-size: var(--step--1);
   }
 

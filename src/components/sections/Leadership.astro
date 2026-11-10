@@ -1,219 +1,808 @@
 ---
-// Leadership in action: six qualities a fast-track leadership / management
-// trainee programme looks for, each with documented evidence linking to the
-// role, project or award on this page (data in src/data/leadership.ts).
+// "Why me — Leadership in action". Built the way assessment centres look at
+// graduates: competencies proven by behaviour (STAR-style evidence), with the
+// headline numbers first. Sits in a rounded deep-blue panel so it stands
+// apart from the white sections around it.
+//
+// Without JS every competency is shown as a card. With JS the list on the
+// left becomes an ARIA tablist and one competency is shown at a time; all
+// panes share one grid cell, so switching never changes the panel height.
+// Data: src/data/leadership.ts (documented facts only).
 import Icon from '@/components/Icon.astro';
 import SectionHeading from '@/components/SectionHeading.astro';
 import { leadership } from '@/data/leadership';
 import { withBase } from '@/lib/url';
+
+const proof = leadership.filter((q) => q.stat);
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<section class="section leadership brand-band" id="leadership" aria-labelledby="leadership-title">
+<section class="section leadership" id="leadership" aria-labelledby="leadership-title">
   <div class="wrap">
-    <SectionHeading
-      id="leadership-title"
-      num="02"
-      kicker="Why me"
-      title="Leadership in action"
-      sub="The qualities a leadership programme looks for — each one backed by something I have actually done."
-    />
+    <div class="panel brand-band">
+      <span class="aurora" aria-hidden="true">
+        <span class="au au--1"></span>
+        <span class="au au--2"></span>
+        <span class="au au--3"></span>
+      </span>
 
-    <ul class="grid glass-scene">
-      {
-        leadership.map((q, i) => (
-          <li
-            class={`quality glass-card float tone-${q.tone}`}
-            id={`lead-${q.id}`}
-            data-reveal
-            data-spotlight
-            style={`--reveal-step:${i % 3};--float-i:${i}`}
-          >
-            <span class="q-bar" aria-hidden="true" />
-            <div class="q-top">
-              <span class="q-icon" aria-hidden="true">
-                <Icon name={q.icon} />
+      <SectionHeading
+        id="leadership-title"
+        num="02"
+        kicker="Why me"
+        title="Leadership in action"
+        sub="No formal title yet — so here is the behaviour instead. Six competencies leadership programmes assess, each proven by something I have actually done."
+      />
+
+      <!-- Proof first: the headline numbers. -->
+      <ul class="proof" data-count-group aria-label="Leadership in numbers">
+        {
+          proof.map((q, i) => (
+            <li class={`proof-item tone-${q.tone}`} data-reveal style={`--reveal-step:${i}`}>
+              <span class="pi-num">
+                <span class="visually-hidden">{q.stat!.value}</span>
+                <span aria-hidden="true" data-count={q.stat!.value}>
+                  {q.stat!.value}
+                </span>
               </span>
-              {q.stat && (
-                <p class="q-stat">
-                  <span class="q-num">{q.stat.value}</span>
-                  <span class="q-unit">{q.stat.label}</span>
-                </p>
-              )}
-            </div>
-            <h3 class="q-title">{q.title}</h3>
-            <p class="q-sum">{q.summary}</p>
-            <ul class="q-evidence">
-              {q.evidence.map((e) => (
-                <li>
-                  <span>{e.text}</span>
-                  <a href={withBase(e.href)}>
-                    {e.label} <Icon name="arrow-right" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))
-      }
-    </ul>
+              <span class="pi-label">{q.stat!.label}</span>
+              <a class="pi-link" href={withBase(`#lead-${q.id}`)}>
+                {q.title} <Icon name="arrow-right" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="explorer" data-lead-tabs>
+        <div class="tabs" role="tablist" aria-label="Leadership competencies" aria-orientation="vertical" hidden>
+          {
+            leadership.map((q, i) => (
+              <button
+                class={`tab tone-${q.tone}`}
+                type="button"
+                role="tab"
+                id={`lead-tab-${q.id}`}
+                aria-controls={`lead-${q.id}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+              >
+                <span class="t-num" aria-hidden="true">{pad(i + 1)}</span>
+                <span class="t-icon" aria-hidden="true">
+                  <Icon name={q.icon} />
+                </span>
+                <span class="t-text">
+                  <span class="t-title">{q.title}</span>
+                  <span class="t-comp">{q.competency}</span>
+                </span>
+              </button>
+            ))
+          }
+        </div>
+
+        <div class="panes">
+          {
+            leadership.map((q, i) => (
+              <article class={`pane tone-${q.tone}`} id={`lead-${q.id}`} aria-labelledby={`lead-h-${q.id}`}>
+                <span class="pane-ghost" aria-hidden="true">
+                  {pad(i + 1)}
+                </span>
+                <div class="pane-head">
+                  <span class="p-icon" aria-hidden="true">
+                    <Icon name={q.icon} />
+                  </span>
+                  <div class="p-titles">
+                    <p class="p-comp">Competency · {q.competency}</p>
+                    <h3 id={`lead-h-${q.id}`}>{q.title}</h3>
+                    <p class="p-sum">{q.summary}</p>
+                  </div>
+                  {q.stat && (
+                    <p class="p-stat">
+                      <span class="ps-num">{q.stat.value}</span>
+                      <span class="ps-label">{q.stat.label}</span>
+                    </p>
+                  )}
+                </div>
+
+                <p class="p-label">In action</p>
+                <ol class="p-evidence">
+                  {q.evidence.map((e) => (
+                    <li>
+                      <span class="e-where">{e.label}</span>
+                      <p>{e.text}</p>
+                      <a href={withBase(e.href)}>
+                        See it on this page <span class="visually-hidden">({e.label})</span>
+                        <Icon name="arrow-right" />
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+
+                <button class="p-next" type="button" data-lead-next hidden>
+                  <span class="pn-label">Next competency</span>
+                  <span class="pn-title">{leadership[(i + 1) % leadership.length].title}</span>
+                  <Icon name="arrow-right" />
+                </button>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
+<script>
+  // Progressive enhancement: turn the stacked competency cards into tabs.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-lead-tabs]')) {
+    const list = root.querySelector<HTMLElement>('[role="tablist"]');
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panes = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls') ?? ''));
+    if (!list || panes.some((p) => !p)) continue;
+
+    panes.forEach((p, i) => {
+      p!.setAttribute('role', 'tabpanel');
+      p!.setAttribute('aria-labelledby', tabs[i].id);
+      p!.tabIndex = 0;
+    });
+
+    const select = (index: number, focus = false) => {
+      tabs.forEach((t, j) => {
+        const on = j === index;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        panes[j]!.toggleAttribute('data-inactive', !on);
+      });
+      if (focus) tabs[index].focus();
+    };
+
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i));
+      t.addEventListener('keydown', (e) => {
+        const keys: Record<string, number> = {
+          ArrowDown: (i + 1) % tabs.length,
+          ArrowRight: (i + 1) % tabs.length,
+          ArrowUp: (i - 1 + tabs.length) % tabs.length,
+          ArrowLeft: (i - 1 + tabs.length) % tabs.length,
+          Home: 0,
+          End: tabs.length - 1,
+        };
+        if (!(e.key in keys)) return;
+        e.preventDefault();
+        select(keys[e.key], true);
+      });
+    });
+
+    // Links to #lead-<id> (from the numbers above, or shared URLs) open that competency.
+    const fromHash = () => {
+      const i = panes.findIndex((p) => `#${p!.id}` === location.hash);
+      if (i >= 0) select(i);
+      return i;
+    };
+    if (fromHash() < 0) select(0);
+    addEventListener('hashchange', fromHash);
+
+    // "Next competency" buttons at the foot of each pane.
+    panes.forEach((p, i) => {
+      const next = p!.querySelector<HTMLButtonElement>('[data-lead-next]');
+      if (!next) return;
+      next.hidden = false;
+      next.addEventListener('click', () => select((i + 1) % tabs.length, true));
+    });
+
+    list.hidden = false;
+    root.classList.add('is-tabs');
+  }
+</script>
+
 <style>
-  /* Sits on a deep-blue band (global .brand-band): cards become dark frosted glass. */
-  .quality {
-    --glass-tint: rgb(9 24 56 / 0.62);
+  /* ── The deep-blue panel (global .brand-band supplies the on-dark tokens) ── */
+  .panel {
+    --band-bg:
+      radial-gradient(50% 60% at 100% 0%, rgb(124 92 255 / 0.4), transparent 70%),
+      radial-gradient(45% 55% at 0% 100%, rgb(26 190 81 / 0.22), transparent 70%),
+      radial-gradient(60% 70% at 25% 20%, rgb(0 120 207 / 0.45), transparent 75%),
+      linear-gradient(150deg, #051a42 0%, #072b66 55%, #0a2456 100%);
+    overflow: clip;
+    padding: clamp(1.5rem, 0.5rem + 4vw, 4rem);
+    border-radius: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    box-shadow:
+      0 2px 4px rgb(4 34 77 / 0.1),
+      0 40px 80px -40px rgb(4 34 77 / 0.7),
+      0 30px 70px -40px rgb(124 92 255 / 0.45),
+      inset 0 1px 0 rgb(255 255 255 / 0.12);
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-    gap: var(--s-3);
-    padding: 0;
-    list-style: none;
+  .aurora {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    pointer-events: none;
   }
 
+  .au {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(50px);
+    opacity: 0.55;
+  }
+
+  .au--1 {
+    width: 34rem;
+    height: 34rem;
+    top: -14rem;
+    right: -8rem;
+    background: radial-gradient(circle, #7c5cff, transparent 65%);
+  }
+
+  .au--2 {
+    width: 30rem;
+    height: 30rem;
+    bottom: -12rem;
+    left: -6rem;
+    background: radial-gradient(circle, #1abe51, transparent 65%);
+    opacity: 0.35;
+  }
+
+  .au--3 {
+    width: 28rem;
+    height: 28rem;
+    top: 30%;
+    left: 35%;
+    background: radial-gradient(circle, #19aaf8, transparent 65%);
+    opacity: 0.3;
+  }
+
+  /* Tones */
   .tone-blue {
-    --tone: var(--accent);
-    --tone-text: var(--accent-text);
-    --tone-soft: var(--accent-soft);
     --tone-a: #19aaf8;
     --tone-b: #0078cf;
+    --tone-text: #7fd0ff;
   }
 
   .tone-purple {
-    --tone: var(--purple);
-    --tone-text: var(--purple);
-    --tone-soft: var(--purple-soft);
-    --tone-a: #a993ff;
+    --tone-a: #b4a1ff;
     --tone-b: #6a3fd1;
+    --tone-text: #c3b5ff;
   }
 
   .tone-green {
-    --tone: var(--green);
-    --tone-text: var(--green);
-    --tone-soft: var(--green-soft);
     --tone-a: #4cd47a;
     --tone-b: #13873b;
+    --tone-text: #7ee2a0;
   }
 
-  .quality {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
-    padding: var(--s-3);
+  /* ── Proof strip ── */
+  .proof {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: 1px;
+    margin-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
+    padding: 0;
+    list-style: none;
+    border-radius: 18px;
     overflow: hidden;
+    background: rgb(255 255 255 / 0.1);
+    border: 1px solid rgb(255 255 255 / 0.12);
   }
 
-  /* Coloured highlight along the top edge. */
-  .q-bar {
+  .proof-item {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.2rem;
+    padding: var(--s-3);
+    background: rgb(5 26 66 / 0.72);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .proof-item::before {
+    content: '';
     position: absolute;
-    inset: 0 0 auto;
-    height: 4px;
-    background: linear-gradient(90deg, var(--tone-a), var(--tone-b));
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--tone-a), var(--tone-b));
   }
 
-  .q-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--s-2);
-    margin-bottom: var(--s-1);
-  }
-
-  .q-icon {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 14px;
-    background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
-    color: #fff;
-    box-shadow: 0 10px 22px -8px var(--tone-b);
-  }
-
-  .q-icon :global(svg) {
-    width: 1.35rem;
-    height: 1.35rem;
-  }
-
-  .q-stat {
-    display: grid;
-    justify-items: end;
-    text-align: right;
-  }
-
-  .q-num {
-    color: var(--tone-text);
-    font-size: var(--step-3);
+  .pi-num {
+    font-size: clamp(2.25rem, 1.6rem + 2.2vw, 3.25rem);
     font-weight: 900;
     line-height: 1;
+    letter-spacing: -0.03em;
+    background: linear-gradient(120deg, #fff 30%, var(--tone-a));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
-  .q-unit {
-    color: var(--muted);
-    font-family: var(--font-mono-stack);
-    font-size: var(--step--2);
-  }
-
-  .q-title {
-    font-size: var(--step-1);
-    font-weight: 800;
-  }
-
-  .q-sum {
+  .pi-label {
     color: var(--text-2);
     font-size: var(--step--1);
   }
 
-  .q-evidence {
-    display: grid;
-    gap: var(--s-1);
-    margin-top: var(--s-1);
-    padding: 0;
-    list-style: none;
-  }
-
-  .q-evidence li {
-    display: grid;
-    gap: 0.25rem;
-    padding: 0.7rem 0.85rem;
-    border-radius: var(--radius);
-    background: var(--tone-soft);
-    border-left: 3px solid var(--tone);
-    font-size: var(--step--1);
-    line-height: 1.5;
-  }
-
-  .q-evidence a {
+  .pi-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.35rem;
     width: fit-content;
-    min-height: 1.75rem;
+    min-height: 2.75rem;
     color: var(--tone-text);
-    font-size: var(--step--2);
+    font-size: var(--step--1);
     font-weight: 700;
     text-decoration: none;
   }
 
-  .q-evidence a:hover {
-    text-decoration: underline;
+  .pi-link:hover {
+    color: #fff;
   }
 
-  .q-evidence a :global(svg) {
+  .pi-link :global(svg) {
     width: 0.85rem;
     height: 0.85rem;
   }
 
+  /* ── Explorer: without JS, every competency is a card in a grid ── */
+  .panes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--s-3);
+  }
+
+  .pane {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(1.25rem, 0.8rem + 1.6vw, 2.25rem);
+    border-radius: 22px;
+    border: 1px solid rgb(255 255 255 / 0.12);
+    background:
+      radial-gradient(70% 60% at 100% 0%, color-mix(in srgb, var(--tone-a) 22%, transparent), transparent 70%),
+      linear-gradient(160deg, rgb(255 255 255 / 0.08), transparent 45%),
+      rgb(6 22 56 / 0.66);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.12),
+      0 30px 60px -30px rgb(0 0 0 / 0.6);
+    scroll-margin-top: calc(var(--header-h) + 2rem);
+  }
+
+  .is-tabs .pane {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .p-next {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.75rem;
+    align-self: flex-start;
+    margin-top: auto;
+    min-height: 2.75rem;
+    padding: 0.6rem 1.1rem;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.06);
+    color: var(--text);
+    font-weight: 700;
+    transition:
+      background-color 250ms ease,
+      border-color 250ms ease;
+  }
+
+  /* Space above the button, wherever the pane content ends. */
+  .is-tabs .p-evidence {
+    margin-bottom: var(--s-3);
+  }
+
+  .p-next:hover {
+    border-color: var(--tone-a);
+    background: color-mix(in srgb, var(--tone-a) 16%, transparent);
+  }
+
+  .p-next:focus-visible {
+    outline-color: #fff;
+  }
+
+  .pn-label {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .p-next :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--tone-text);
+  }
+
+  .pane:focus-visible {
+    outline-color: #fff;
+  }
+
+  .pane-ghost {
+    position: absolute;
+    z-index: -1;
+    right: 1.25rem;
+    bottom: -1.5rem;
+    font-size: clamp(6rem, 4rem + 6vw, 10rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px color-mix(in srgb, var(--tone-a) 35%, transparent);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .pane-head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-2);
+  }
+
+  .p-icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
+    color: #fff;
+    box-shadow:
+      0 14px 30px -10px var(--tone-b),
+      inset 0 1px 0 rgb(255 255 255 / 0.35);
+  }
+
+  .p-icon :global(svg) {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .p-comp {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tone-text);
+  }
+
+  .pane h3 {
+    margin-top: 0.2rem;
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .p-sum {
+    margin-top: 0.4rem;
+    color: var(--text-2);
+  }
+
+  .p-label {
+    margin: var(--s-3) 0 var(--s-1);
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Evidence: one card per documented action, side by side on wide screens. */
+  .p-evidence {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--s-2);
+    padding: 0;
+    list-style: none;
+  }
+
+  .p-evidence li {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    padding: var(--s-2) var(--s-2) 0.5rem;
+    border-radius: 14px;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-top: 3px solid var(--tone-a);
+    background: rgb(255 255 255 / 0.05);
+  }
+
+  .e-where {
+    width: fit-content;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--tone-a) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tone-a) 40%, transparent);
+    color: var(--tone-text);
+    font-size: var(--step--2);
+    font-weight: 700;
+  }
+
+  .p-evidence p {
+    font-size: var(--step-0);
+    line-height: 1.55;
+    max-width: 52ch;
+  }
+
+  .p-evidence a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: fit-content;
+    min-height: 2.25rem;
+    color: var(--tone-text);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .p-evidence a:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
+
+  .p-evidence a :global(svg) {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .p-stat {
+    display: grid;
+    justify-items: end;
+    margin-left: auto;
+    padding-left: var(--s-2);
+    text-align: right;
+  }
+
+  .ps-num {
+    font-size: clamp(2rem, 1.5rem + 1.6vw, 3rem);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--tone-text);
+  }
+
+  .ps-label {
+    max-width: 10rem;
+    color: var(--text-2);
+    font-size: var(--step--2);
+    line-height: 1.35;
+  }
+
+  /* ── Tabs (JS only) ── */
+  .tabs {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+  }
+
+  .tab {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.85rem;
+    width: 100%;
+    min-height: 3.75rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    transition:
+      background-color 250ms ease,
+      border-color 250ms ease;
+  }
+
+  .tab:hover {
+    background: rgb(255 255 255 / 0.06);
+  }
+
+  .tab[aria-selected='true'] {
+    border-color: rgb(255 255 255 / 0.14);
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--tone-a) 22%, transparent), transparent 80%),
+      rgb(255 255 255 / 0.06);
+    box-shadow: 0 16px 36px -22px var(--tone-b);
+  }
+
+  .tab[aria-selected='true']::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 18%;
+    bottom: 18%;
+    width: 3px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--tone-a), var(--tone-b));
+  }
+
+  .tab:focus-visible {
+    outline-color: #fff;
+  }
+
+  .t-num {
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--2);
+    color: var(--muted);
+  }
+
+  .t-icon {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 12px;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    color: var(--tone-text);
+    transition:
+      background-color 250ms ease,
+      color 250ms ease;
+  }
+
+  .tab[aria-selected='true'] .t-icon {
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
+    color: #fff;
+  }
+
+  .t-icon :global(svg) {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .t-text {
+    display: grid;
+    min-width: 0;
+  }
+
+  .t-title {
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .t-comp {
+    color: var(--muted);
+    font-size: var(--step--2);
+  }
+
+  .tab[aria-selected='true'] .t-comp {
+    color: var(--tone-text);
+  }
+
+  /* With JS: list on the left, one pane at a time on the right. All panes
+     share one grid cell, so the panel keeps the height of the tallest. */
+  .explorer.is-tabs {
+    display: grid;
+    grid-template-columns: minmax(16rem, 21rem) minmax(0, 1fr);
+    gap: var(--s-4);
+    align-items: stretch;
+  }
+
+  .is-tabs .panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .is-tabs .pane {
+    grid-area: 1 / 1;
+  }
+
+  .is-tabs .pane[data-inactive] {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  @media (max-width: 59.99rem) {
+    .explorer.is-tabs {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s-2);
+    }
+
+    /* Tabs become a horizontal, swipeable row. */
+    .is-tabs .tabs {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 0.4rem;
+      scrollbar-width: thin;
+    }
+
+    .is-tabs .tab {
+      flex: none;
+      width: auto;
+      grid-template-columns: auto minmax(0, 1fr);
+      scroll-snap-align: start;
+    }
+
+    .is-tabs .t-num,
+    .is-tabs .t-comp {
+      display: none;
+    }
+
+    /* On narrow screens the height may change; no empty space under short panes. */
+    .is-tabs .pane[data-inactive] {
+      display: none;
+    }
+
+    .pane-head {
+      flex-wrap: wrap;
+    }
+
+    .p-stat {
+      order: 3;
+      flex-basis: 100%;
+      justify-items: start;
+      margin-left: 0;
+      padding-left: 0;
+      text-align: left;
+    }
+
+    .tab[aria-selected='true']::before {
+      left: 18%;
+      right: 18%;
+      top: auto;
+      bottom: -1px;
+      width: auto;
+      height: 3px;
+    }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
-    .q-icon {
+    .is-tabs .pane {
+      transition:
+        opacity 350ms var(--ease),
+        transform 450ms var(--ease),
+        visibility 0s linear 0s;
+    }
+
+    .is-tabs .pane[data-inactive] {
+      transform: translateY(10px);
+      transition:
+        opacity 200ms ease,
+        transform 200ms ease,
+        visibility 0s linear 200ms;
+    }
+
+    .au--1 {
+      animation: au-a 16s ease-in-out infinite alternate;
+    }
+
+    .au--2 {
+      animation: au-b 20s ease-in-out infinite alternate;
+    }
+
+    .au--3 {
+      animation: au-a 24s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes au-a {
+      to {
+        transform: translate(-12%, 10%) scale(1.1);
+      }
+    }
+
+    @keyframes au-b {
+      to {
+        transform: translate(14%, -8%) scale(0.92);
+      }
+    }
+
+    .p-icon {
       transition: transform 400ms var(--ease);
     }
 
-    .quality:hover .q-icon {
-      transform: rotate(-6deg) scale(1.08);
+    .pane:hover .p-icon {
+      transform: rotate(-6deg) scale(1.06);
     }
   }
 </style>

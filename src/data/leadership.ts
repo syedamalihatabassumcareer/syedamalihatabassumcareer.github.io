@@ -9,6 +9,8 @@ export interface LeadershipQuality {
   title: string;
   /** One-line description of the quality. */
   summary: string;
+  /** The competency an assessment centre would call this (a label, not a claim). */
+  competency: string;
   /** Optional headline figure, taken from the content files. */
   stat?: { value: string; label: string };
   /** Colour family for the card. */
@@ -23,6 +25,7 @@ export const leadership: LeadershipQuality[] = [
     id: 'developing-people',
     title: 'Developing people',
     summary: 'Helping others learn and grow.',
+    competency: 'Coaching & developing others',
     stat: { value: '250+', label: 'students mentored' },
     tone: 'blue',
     icon: 'users',
@@ -38,6 +41,7 @@ export const leadership: LeadershipQuality[] = [
     id: 'collaboration',
     title: 'Working across teams',
     summary: 'Getting things done with people from other functions.',
+    competency: 'Stakeholder management',
     tone: 'purple',
     icon: 'agent',
     evidence: [
@@ -57,6 +61,8 @@ export const leadership: LeadershipQuality[] = [
     id: 'data-driven',
     title: 'Data-driven decisions',
     summary: 'Letting evidence, not guesswork, drive the call.',
+    competency: 'Analytical thinking',
+    stat: { value: 'Top 6', label: 'national Excel competition' },
     tone: 'green',
     icon: 'flask',
     evidence: [
@@ -81,6 +87,7 @@ export const leadership: LeadershipQuality[] = [
     id: 'digital-change',
     title: 'Driving digital change',
     summary: 'Using AI and technology to modernise how things work.',
+    competency: 'Digital mindset',
     tone: 'blue',
     icon: 'rocket',
     evidence: [
@@ -100,6 +107,7 @@ export const leadership: LeadershipQuality[] = [
     id: 'resilience',
     title: 'Delivering under pressure',
     summary: 'Competing, and delivering, at a high level.',
+    competency: 'Resilience & drive',
     stat: { value: '8th', label: 'of 102 teams worldwide' },
     tone: 'purple',
     icon: 'trophy',
@@ -120,6 +128,7 @@ export const leadership: LeadershipQuality[] = [
     id: 'communication',
     title: 'Communicating clearly',
     summary: 'Explaining complex ideas to any audience.',
+    competency: 'Communication',
     stat: { value: '7.5', label: 'IELTS overall · CEFR C1' },
     tone: 'green',
     icon: 'globe',

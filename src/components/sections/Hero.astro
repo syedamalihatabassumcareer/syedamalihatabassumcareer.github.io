@@ -173,10 +173,13 @@ const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].
 </section>
 
 <style>
-  /* Deep-blue band behind the hero. It starts under the sticky header and
-     stops halfway down the stats bar, so the white bar straddles the edge. */
+  /* Deep-blue rounded panel behind the hero, inset from the page edges so it
+     reads as an object on the page rather than a hard background change. It
+     starts under the sticky header and stops halfway down the stats bar, so
+     the white bar straddles its edge. */
   .hero {
     --hero-tail: calc(var(--s-6) + 3.1rem);
+    --hero-edge: clamp(0.5rem, 1.2vw, 1rem);
     position: relative;
     isolation: isolate;
     overflow: clip;
@@ -187,15 +190,19 @@ const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].
   }
 
   .hero.brand-band::before {
-    bottom: var(--hero-tail);
+    inset: var(--hero-edge) var(--hero-edge) var(--hero-tail);
+    border-radius: clamp(1.5rem, 1rem + 2vw, 2.5rem);
   }
 
   .hero-bg {
     position: absolute;
     z-index: -3;
-    inset: 0 0 var(--hero-tail);
+    inset: var(--hero-edge) var(--hero-edge) var(--hero-tail);
     background: var(--band-bg);
-    border-radius: 0 0 clamp(1.5rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3rem);
+    border-radius: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    box-shadow:
+      0 40px 80px -40px rgb(4 34 77 / 0.6),
+      inset 0 1px 0 rgb(255 255 255 / 0.1);
   }
 
   /* Blue glow behind the portrait, with purple and green light at the edges. */

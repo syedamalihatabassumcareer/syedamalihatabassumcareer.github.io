@@ -7,9 +7,9 @@ import { profile } from '@/data/profile';
 import { withBase } from '@/lib/url';
 ---
 
-<section class="section contact brand-band" id="contact" aria-labelledby="contact-title">
+<section class="section contact" id="contact" aria-labelledby="contact-title">
   <div class="wrap">
-    <div class="frame" data-reveal>
+    <div class="frame brand-band" data-reveal>
       <span class="decor" aria-hidden="true">
         <span class="c-ring"></span>
         <span class="c-ring c-ring--2"></span>
@@ -66,9 +66,14 @@ import { withBase } from '@/lib/url';
     display: grid;
     justify-items: center;
     gap: var(--s-2);
-    max-width: 52rem;
     margin-inline: auto;
-    padding: clamp(2.5rem, 1.5rem + 4vw, 4.5rem) clamp(1.25rem, 0.5rem + 4vw, 4rem);
+    padding: clamp(3rem, 1.5rem + 5vw, 6rem) clamp(1.25rem, 0.5rem + 4vw, 4rem);
+    border-radius: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    box-shadow:
+      0 2px 4px rgb(4 34 77 / 0.1),
+      0 40px 80px -40px rgb(4 34 77 / 0.7),
+      0 30px 70px -40px rgb(124 92 255 / 0.45),
+      inset 0 1px 0 rgb(255 255 255 / 0.12);
     text-align: center;
     overflow: hidden;
   }
