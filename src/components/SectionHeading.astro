@@ -1,20 +1,30 @@
 ---
-// Centred section heading with a grey subtitle (reference style).
+// Editorial section heading: "01 —— Kicker", a large left-aligned title with
+// the subtitle beside it on wide screens.
 interface Props {
   id: string;
   title: string;
-  /** Short line under the title. */
+  /** Short line beside / under the title. */
   sub?: string;
-  /** Small label above the title, e.g. "02 · Research". */
+  /** Small label above the title, e.g. "Track record". */
   kicker?: string;
+  /** Section number, e.g. "03". */
+  num?: string;
 }
-const { id, title, sub, kicker } = Astro.props;
+const { id, title, sub, kicker, num } = Astro.props;
 ---
 
 <header class="section-heading" data-reveal>
-  {kicker && <p class="eyebrow eyebrow--accent">{kicker}</p>}
-  <h2 id={id}>{title}</h2>
-  <span class="rule" aria-hidden="true"></span>
-  {sub && <p>{sub}</p>}
+  {
+    (num || kicker) && (
+      <p class="sh-kicker">
+        {num && <span class="sh-num">{num}</span>}
+        <span class="rule" aria-hidden="true" />
+        {kicker}
+      </p>
+    )
+  }
+  <h2 id={id}>{title}<span class="dot-end" aria-hidden="true">.</span></h2>
+  {sub && <p class="sh-sub">{sub}</p>}
   <slot />
 </header>

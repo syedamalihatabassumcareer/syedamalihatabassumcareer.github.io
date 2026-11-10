@@ -42,7 +42,8 @@ const focusWords = ['Data-driven decisions', 'Digital transformation', 'Telecom 
 const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].filter(Boolean);
 ---
 
-<section class="hero" id="home" aria-labelledby="hero-name" data-parallax>
+<section class="hero brand-band" id="home" aria-labelledby="hero-name" data-parallax>
+  <div class="hero-bg" aria-hidden="true"></div>
   <div class="glow" aria-hidden="true"></div>
   <span class="orb" aria-hidden="true"></span>
   <span class="orb orb--small" aria-hidden="true"></span>
@@ -172,12 +173,29 @@ const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].
 </section>
 
 <style>
+  /* Deep-blue band behind the hero. It starts under the sticky header and
+     stops halfway down the stats bar, so the white bar straddles the edge. */
   .hero {
+    --hero-tail: calc(var(--s-6) + 3.1rem);
     position: relative;
     isolation: isolate;
     overflow: clip;
-    padding-top: var(--s-2);
+    margin-top: calc(-1 * var(--header-h));
+    padding-top: calc(var(--header-h) + var(--s-2));
     padding-bottom: var(--s-6);
+    background: none;
+  }
+
+  .hero.brand-band::before {
+    bottom: var(--hero-tail);
+  }
+
+  .hero-bg {
+    position: absolute;
+    z-index: -3;
+    inset: 0 0 var(--hero-tail);
+    background: var(--band-bg);
+    border-radius: 0 0 clamp(1.5rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3rem);
   }
 
   /* Blue glow behind the portrait, with purple and green light at the edges. */
@@ -401,19 +419,44 @@ const nameLines = [`${first} ${rest[0] ?? ''}`.trim(), rest.slice(1).join(' ')].
     margin-top: clamp(-6rem, -8vw, -3rem);
   }
 
+  /* The stats bar follows the page theme (not the band), so in light mode it
+     is a bright white card straddling the blue edge. */
   .stats {
+    --text: light-dark(#1a1a1a, #f2f6fa);
+    --text-2: light-dark(#454c55, #b8c4d2);
+    color-scheme: light;
     position: relative;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     overflow: hidden;
     border-radius: 18px;
-    border: 1px solid light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.12));
-    background: light-dark(rgb(255 255 255 / 0.42), rgb(24 24 24 / 0.38));
+    border: 1px solid light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.12));
+    background: light-dark(rgb(255 255 255 / 0.94), rgb(20 32 51 / 0.86));
+    color: var(--text);
     backdrop-filter: blur(22px) saturate(1.5);
     -webkit-backdrop-filter: blur(22px) saturate(1.5);
     box-shadow:
-      inset 0 1px 0 light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.1)),
-      0 24px 60px -30px rgb(0 0 0 / 0.6);
+      inset 0 1px 0 light-dark(rgb(255 255 255 / 1), rgb(255 255 255 / 0.1)),
+      0 2px 6px light-dark(rgb(4 34 77 / 0.08), rgb(0 0 0 / 0.3)),
+      0 30px 60px -28px light-dark(rgb(4 34 77 / 0.55), rgb(0 0 0 / 0.8)),
+      0 20px 50px -30px rgb(124 92 255 / 0.45);
+  }
+
+  :global(:root[data-theme='dark']) .stats {
+    color-scheme: dark;
+  }
+
+  /* Brand gradient along the top edge of the bar. */
+  .stats-wrap::before {
+    content: '';
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: calc(var(--gutter) + 18px);
+    right: calc(var(--gutter) + 18px);
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--brand-gradient);
   }
 
   /* Soft sheen across the glass. */

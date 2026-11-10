@@ -48,6 +48,8 @@ const icons: Record<string, IconName> = {
   <div class="wrap">
     <SectionHeading
       id="about-title"
+      num="01"
+      kicker="Who I am"
       title="About me"
       sub="Computer science graduate and former Grameenphone NEXTERN, combining AI and technology with the people skills to lead."
     />
@@ -261,9 +263,10 @@ const icons: Record<string, IconName> = {
     </div>
 
     <!-- Skills -->
-    <div class="skills" id="skills">
+    <div class="skills brand-band" id="skills">
       <div class="skills-head" data-reveal>
-        <h3>Core capabilities</h3>
+        <p class="sk-kicker"><span class="sk-rule" aria-hidden="true"></span>What I work with</p>
+        <h3>Core capabilities<span class="sk-dot" aria-hidden="true">.</span></h3>
         <p>
           Grouped by area. <span class="proven-key"><span class="proven-dot" aria-hidden="true"></span>Highlighted</span> skills
           are backed by a role or project on this page. No self-rated percentages.
@@ -788,11 +791,20 @@ const icons: Record<string, IconName> = {
   }
 
   /* Skills */
+  /* Full-bleed deep-blue band (global .brand-band) at the end of About; it runs
+     straight into the Leadership band below. Glass reads best on colour. */
   .skills {
     position: relative;
     isolation: isolate;
     margin-top: clamp(4rem, 2rem + 5vw, 6rem);
-    scroll-margin-top: calc(var(--header-h) + 1rem);
+    margin-inline: calc(50% - 50vw);
+    margin-bottom: calc(-1 * clamp(4rem, 2.5rem + 4vw, 6rem));
+    padding: clamp(4rem, 2.5rem + 4vw, 6rem) calc(50vw - 50%) var(--s-4);
+    scroll-margin-top: var(--header-h);
+  }
+
+  .skills .glass-backdrop {
+    inset: 10rem calc(50vw - 50%) 0;
   }
 
   /* ── Glass stage: vivid light shapes behind the frosted skill cards ── */
@@ -862,18 +874,43 @@ const icons: Record<string, IconName> = {
 
   .skills-head {
     display: grid;
-    justify-items: center;
-    gap: var(--s-1);
-    text-align: center;
+    justify-items: start;
+    gap: var(--s-2);
     margin-bottom: var(--s-6);
   }
 
-  .skills-head h3 {
-    font-size: var(--step-3);
+  .sk-kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--1);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-text);
   }
 
-  .skills-head p {
-    color: var(--muted);
+  .sk-rule {
+    width: 3.5rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--brand-gradient);
+  }
+
+  .sk-dot {
+    color: var(--accent);
+  }
+
+  .skills-head h3 {
+    font-size: clamp(2.25rem, 1.3rem + 3.6vw, 4rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .skills-head p:not(.sk-kicker) {
+    max-width: 40rem;
+    color: var(--text-2);
   }
 
   /* Expertise cards — adapted from the owner's "services" reference: a pill,

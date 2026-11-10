@@ -8,10 +8,12 @@ import { leadership } from '@/data/leadership';
 import { withBase } from '@/lib/url';
 ---
 
-<section class="section leadership" id="leadership" aria-labelledby="leadership-title">
+<section class="section leadership brand-band" id="leadership" aria-labelledby="leadership-title">
   <div class="wrap">
     <SectionHeading
       id="leadership-title"
+      num="02"
+      kicker="Why me"
       title="Leadership in action"
       sub="The qualities a leadership programme looks for — each one backed by something I have actually done."
     />
@@ -58,11 +60,9 @@ import { withBase } from '@/lib/url';
 </section>
 
 <style>
-  .leadership {
-    background:
-      radial-gradient(45% 55% at 0% 0%, light-dark(rgb(124 92 255 / 0.1), rgb(124 92 255 / 0.08)), transparent 70%),
-      radial-gradient(40% 50% at 100% 100%, light-dark(rgb(26 190 81 / 0.1), rgb(26 190 81 / 0.06)), transparent 70%),
-      var(--bg);
+  /* Sits on a deep-blue band (global .brand-band): cards become dark frosted glass. */
+  .quality {
+    --glass-tint: rgb(9 24 56 / 0.62);
   }
 
   .grid {

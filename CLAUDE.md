@@ -65,7 +65,10 @@ The owner's CV and information she gives directly are the **only** factual sourc
   them.
 - **Visual language:** light-first, Grameenphone blues (`#19AAF8`, `#0078CF`), purple
   (`--purple`) and green (`--green`) accents, layered tinted shadows and coloured card tops, ink `#1A1A1A` on white / pale blue-grey; dark theme only via the
-  toggle. Accent fills carry `--on-accent` text; accent *text* uses `--accent-text`. Lato +
+  toggle. Contrast comes from colour-blocking: full-bleed deep-blue `.brand-band` sections
+  (hero, Core capabilities, Leadership, Contact, footer) between white ones. `.brand-band`
+  sets `color-scheme: dark`, so every `light-dark()` token inside resolves to its on-dark
+  value. Section headings are left-aligned and numbered (`SectionHeading` `num`/`kicker`). Accent fills carry `--on-accent` text; accent *text* uses `--accent-text`. Lato +
   JetBrains Mono. Reuse tokens in `src/styles/global.css` instead of one-off colours, and check
   WCAG AA contrast in both themes.
 - **Content first:** facts belong in `src/content/**` (Markdown) or `src/data/**`

@@ -15,8 +15,9 @@ tracking or API keys.
   Goals — set in the `impact` field of `src/content/projects/<id>.md`. Impact lines describe
   what the work was built to do; never add numbers or outcomes the source doesn't state.
 - **Design:** light-first, in Grameenphone's brand blues (#19AAF8 / #0078CF) with purple
-  (#6A3FD1) and green (#1ABE51) accents, layered card shadows and coloured highlights, and a
-  dark theme on the toggle. Lato type, subtle reveals,
+  (#6A3FD1) and green (#1ABE51) accents. Full-bleed deep-blue bands (hero, capabilities,
+  leadership, contact) alternate with crisp white sections; numbered, left-aligned section
+  headings; frosted-glass cards; and a dark theme on the toggle. Lato type, subtle reveals,
   and no motion for visitors who prefer reduced motion.
 - **Features:** light/dark theme (remembers the choice), project category filters,
   copy email, click-to-load video demos, image gallery with lightbox. The CV download is

@@ -7,7 +7,7 @@ import { profile } from '@/data/profile';
 import { withBase } from '@/lib/url';
 ---
 
-<section class="section contact" id="contact" aria-labelledby="contact-title">
+<section class="section contact brand-band" id="contact" aria-labelledby="contact-title">
   <div class="wrap">
     <div class="frame" data-reveal>
       <span class="decor" aria-hidden="true">
@@ -15,7 +15,7 @@ import { withBase } from '@/lib/url';
         <span class="c-ring c-ring--2"></span>
         <span class="c-orb"></span>
       </span>
-      <p class="eyebrow eyebrow--accent">Contact</p>
+      <p class="c-kicker"><span class="c-num">07</span><span class="c-rule" aria-hidden="true"></span>Contact</p>
       <h2 id="contact-title">Let’s work <span class="accent-grad">together</span>.</h2>
       <p class="lead">
         Recruiting for a Management Trainee programme or a role in AI and technology? Email is the best way to reach me.
@@ -69,17 +69,35 @@ import { withBase } from '@/lib/url';
     max-width: 52rem;
     margin-inline: auto;
     padding: clamp(2.5rem, 1.5rem + 4vw, 4.5rem) clamp(1.25rem, 0.5rem + 4vw, 4rem);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-l);
-    background:
-      radial-gradient(70% 60% at 50% 0%, var(--accent-soft), transparent 70%),
-      var(--surface);
     text-align: center;
     overflow: hidden;
   }
 
+  .c-kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono-stack);
+    font-size: var(--step--1);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .c-num {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .c-rule {
+    width: 3.5rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--brand-gradient);
+  }
+
   h2 {
-    font-size: clamp(2.5rem, 1.5rem + 4.5vw, 5rem);
+    font-size: clamp(2.75rem, 1.5rem + 5.5vw, 6rem);
     font-weight: 900;
     line-height: 1.02;
     letter-spacing: -0.02em;
@@ -120,8 +138,9 @@ import { withBase } from '@/lib/url';
     margin-top: var(--s-2);
     padding: 0.95rem 1.5rem;
     border-radius: var(--radius-s);
-    background: var(--accent);
-    color: var(--on-accent);
+    background: #fff;
+    color: #04224d;
+    box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.6), 0 0 0 6px rgb(255 255 255 / 0.08);
     font-size: clamp(1rem, 0.85rem + 0.8vw, 1.35rem);
     font-weight: 700;
     text-decoration: none;
@@ -135,8 +154,8 @@ import { withBase } from '@/lib/url';
   }
 
   .email:hover {
-    background: var(--accent-hover);
-    color: var(--on-accent);
+    background: #d9f0ff;
+    color: #04224d;
   }
 
   .email:active {
