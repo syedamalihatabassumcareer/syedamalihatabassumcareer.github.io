@@ -46,7 +46,7 @@ export const leadership: LeadershipQuality[] = [
     icon: 'agent',
     evidence: [
       {
-        text: 'Coordinated SMU upgrades with the Umbrella team at Grameenphone.',
+        text: 'Coordinated SMU upgrades across Bangladesh with the Umbrella team at Grameenphone.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
@@ -133,6 +133,11 @@ export const leadership: LeadershipQuality[] = [
     tone: 'green',
     icon: 'globe',
     evidence: [
+      {
+        text: 'Liaised with telecom operators that share rectifiers with Grameenphone — understood their requirements, analysed Grameenphone’s own needs, and proposed technical support to suit both.',
+        href: '#grameenphone-nextern',
+        label: 'Grameenphone',
+      },
       {
         text: 'Prepared technical documentation and presentations for a collaborative research team.',
         href: '#dristee-research-assistant',

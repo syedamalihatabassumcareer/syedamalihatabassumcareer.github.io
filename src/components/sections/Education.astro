@@ -9,12 +9,14 @@ import { getImage, Image } from 'astro:assets';
 import Icon, { type IconName } from '@/components/Icon.astro';
 import SectionHeading from '@/components/SectionHeading.astro';
 import { awardCategories, labelFor } from '@/data/taxonomy';
-import { getAwards, getEducation } from '@/lib/content';
+import { getAwards, getEducation, getExperience } from '@/lib/content';
 import { formatMonth, formatRange } from '@/lib/format';
 import { withBase } from '@/lib/url';
 
 const education = await getEducation();
 const awards = await getAwards();
+// Extracurricular activities (kept in experience.json, shown here rather than under Experience).
+const extracurricular = (await getExperience()).filter((e) => e.data.kind === 'extracurricular');
 const featured = awards.filter((a) => a.data.featured);
 const others = awardCategories.flatMap((c) => awards.filter((a) => !a.data.featured && a.data.category === c.id));
 
@@ -81,8 +83,9 @@ const leaves = Array.from({ length: 7 }, (_, i) => {
     <SectionHeading
       id="education-title"
       num="05"
-      kicker="Foundations"
-      title="Education & Recognition"
+      kicker="Education & awards"
+      title="Foundations that earned recognition"
+      highlight="recognition"
       sub="Qualifications and results, then the scholarships, distinctions and competition results earned along the way."
     />
 
@@ -300,6 +303,34 @@ const leaves = Array.from({ length: 7 }, (_, i) => {
         </ol>
       </div>
     </div>
+
+    {
+      extracurricular.length > 0 && (
+        <div class="extra">
+          <h3 class="part-title" data-reveal>
+            <Icon name="rocket" /> Extracurricular activities
+          </h3>
+          <ul class="extra-list glass-scene">
+            {extracurricular.map((e) => (
+              <li class="extra-item card" id={e.id} data-reveal data-spotlight>
+                <div class="extra-head">
+                  <div>
+                    <h4>{e.data.role}</h4>
+                    <p class="sub">{e.data.organisation}</p>
+                  </div>
+                  <p class="mono muted extra-when">{formatRange(e.data.start, e.data.end)}</p>
+                </div>
+                <ul class="extra-points">
+                  {e.data.highlights.map((h) => (
+                    <li>{h}</li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
   </div>
 
   {
@@ -463,6 +494,54 @@ const leaves = Array.from({ length: 7 }, (_, i) => {
   /* ── Recognition ── */
   .recognition {
     margin-top: clamp(3rem, 2rem + 3vw, 5rem);
+  }
+
+  /* ── Extracurricular activities ── */
+  .extra {
+    margin-top: clamp(3rem, 2rem + 3vw, 5rem);
+  }
+
+  .extra-list {
+    display: grid;
+    gap: var(--s-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .extra-item {
+    display: grid;
+    gap: var(--s-2);
+    padding: var(--s-3) var(--s-4);
+    border-radius: 20px;
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+
+  .extra-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-3);
+  }
+
+  .extra-item h4 {
+    font-size: var(--step-1);
+    line-height: 1.3;
+  }
+
+  .extra-when {
+    font-size: var(--step--1);
+  }
+
+  .extra-points {
+    display: grid;
+    gap: 0.4rem;
+    padding-left: 1.2em;
+    color: var(--text-2);
+  }
+
+  .extra-points li::marker {
+    color: var(--accent);
   }
 
   .rec-grid {

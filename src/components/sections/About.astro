@@ -49,8 +49,9 @@ const icons: Record<string, IconName> = {
     <SectionHeading
       id="about-title"
       num="01"
-      kicker="Who I am"
-      title="About me"
+      kicker="About me"
+      title="Where technology meets people"
+      highlight="technology"
       sub="Computer science graduate and former Grameenphone NEXTERN, combining AI and technology with the people skills to lead."
     />
 
@@ -87,23 +88,27 @@ const icons: Record<string, IconName> = {
           I bring <span class="accent">AI and technology</span> together with people to deliver results.
         </p>
         <p>
-          As a NEXTERN at Grameenphone, in Technology Infrastructure Management, I automated deployment and connectivity
-          monitoring for rectifiers and Li-ion batteries, with weekly reporting through Huawei NetEco. I also coordinated SMU
-          upgrades with the Umbrella team and prepared the requirements for an AI-assisted site power design tool.
+          Grameenphone showed me how much that matters. As a NEXTERN in Technology Infrastructure Management, I automated
+          deployment and connectivity monitoring for rectifiers and Li-ion batteries, with weekly reporting through Huawei
+          NetEco. The technology, though, was only half the job. I coordinated SMU upgrades across Bangladesh with the
+          Umbrella team, and worked with telecom operators that share rectifiers with Grameenphone — understanding their
+          requirements, weighing them against Grameenphone’s own needs, and proposing the technical support that suited
+          both. I also prepared the requirements for an AI-assisted site power design tool.
         </p>
         <p>
-          My projects apply technology to real problems: WeHeal, a digital-health platform that is live today,
-          machine-learning models for health data, a network design linking six healthcare units, and autonomous robots.
+          The same approach — start from the problem, then choose the technology — runs through my projects: WeHeal, a
+          digital-health platform that is live today; machine-learning models for health data; a network design linking six
+          healthcare units; and autonomous robots.
         </p>
         <p>
-          I do my best work with people. I mentored more than 250 students as a Data Structures teaching assistant, was a
-          core member of BRAC University’s Mars rover team, which ranked 8th of 102 teams worldwide at the University Rover
-          Challenge 2025, and was a Top 6 finalist in the EXCELERATE National Excel Competition.
+          And none of it happens alone. As a Data Structures teaching assistant, I mentored more than 250 students. As a
+          core member of BRAC University’s Mars rover team, I was part of the team that finished 8th of 102 worldwide at the
+          University Rover Challenge 2025. I was also a Top 6 finalist in the EXCELERATE National Excel Competition.
         </p>
         <blockquote class="thread">
           <p>
-            What I bring: a strong foundation in AI and technology, a habit of working across teams, and the drive to keep
-            learning — ready for a fast-track leadership programme.
+            What I bring is a strong foundation in AI and technology, the habit of working across teams and organisations,
+            and the drive to keep learning. I am ready for a fast-track leadership programme.
           </p>
         </blockquote>
         <div class="story-actions">
@@ -121,7 +126,7 @@ const icons: Record<string, IconName> = {
     <div class="glance glass-scene">
       <article class="g-card glass-card g-now" data-reveal data-spotlight>
         <p class="g-label"><Icon name="rocket" /> Now</p>
-        {profile.availability && <h3 class="g-title">{profile.availability.label}</h3>}
+        {profile.availability && <h3 class="g-title">{profile.availability.label.split(' — ')[0]}</h3>}
         {
           latestRole && (
             <>
@@ -817,13 +822,43 @@ const icons: Record<string, IconName> = {
     --card-line: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.08));
     --tag-bg: light-dark(rgb(0 0 0 / 0.04), rgb(255 255 255 / 0.05));
     --link: var(--text);
+    /* Green rim, border and glow for the capability cards. */
+    --glass-rim: linear-gradient(
+      145deg,
+      light-dark(rgb(19 135 59 / 0.75), rgb(26 190 81 / 0.7)) 0%,
+      light-dark(rgb(26 190 81 / 0.45), rgb(26 190 81 / 0.35)) 30%,
+      transparent 55%,
+      light-dark(rgb(26 190 81 / 0.35), rgb(26 190 81 / 0.3)) 85%,
+      light-dark(rgb(19 135 59 / 0.6), rgb(76 212 122 / 0.5)) 100%
+    );
+    --float-shadow:
+      inset 0 1px 0 light-dark(rgb(255 255 255 / 1), rgb(255 255 255 / 0.07)),
+      0 1px 2px light-dark(rgb(10 60 30 / 0.08), rgb(0 0 0 / 0.3)),
+      0 10px 24px -14px light-dark(rgb(19 135 59 / 0.28), rgb(0 0 0 / 0.5)),
+      0 28px 56px -30px light-dark(rgb(19 135 59 / 0.4), rgb(26 190 81 / 0.3));
+    --float-shadow-hover:
+      inset 0 1px 0 light-dark(rgb(255 255 255 / 1), rgb(255 255 255 / 0.1)),
+      0 2px 4px light-dark(rgb(10 60 30 / 0.08), rgb(0 0 0 / 0.3)),
+      0 40px 70px -34px light-dark(rgb(19 135 59 / 0.5), rgb(0 0 0 / 0.9)),
+      0 18px 50px -24px light-dark(rgb(26 190 81 / 0.5), rgb(26 190 81 / 0.45)),
+      0 0 0 1px light-dark(rgb(19 135 59 / 0.35), rgb(26 190 81 / 0.45));
     display: flex;
     flex-direction: column;
     gap: var(--s-2);
     padding: var(--s-3);
     border-radius: 22px;
+    border-color: light-dark(rgb(19 135 59 / 0.25), rgb(26 190 81 / 0.25));
     background: var(--card-bg);
     color: var(--card-text);
+  }
+
+  .skill::before {
+    opacity: 1;
+  }
+
+  /* Cursor glow in green. */
+  .skill::after {
+    background: radial-gradient(closest-side, light-dark(rgb(26 190 81 / 0.16), rgb(26 190 81 / 0.2)), transparent);
   }
 
 
@@ -847,8 +882,8 @@ const icons: Record<string, IconName> = {
     width: 2.4rem;
     height: 2.4rem;
     border-radius: 50%;
-    border: 1px solid var(--border);
-    color: var(--accent-text);
+    border: 1px solid light-dark(rgb(19 135 59 / 0.35), rgb(26 190 81 / 0.4));
+    color: var(--green);
   }
 
 

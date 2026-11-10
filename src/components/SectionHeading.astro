@@ -10,8 +10,12 @@ interface Props {
   kicker?: string;
   /** Section number, e.g. "03". */
   num?: string;
+  /** Part of `title` to show in the brand gradient. */
+  highlight?: string;
 }
-const { id, title, sub, kicker, num } = Astro.props;
+const { id, title, sub, kicker, num, highlight } = Astro.props;
+const at = highlight ? title.indexOf(highlight) : -1;
+const parts = at >= 0 ? [title.slice(0, at), highlight!, title.slice(at + highlight!.length)] : [title, '', ''];
 ---
 
 <header class="section-heading" data-reveal>
@@ -24,7 +28,9 @@ const { id, title, sub, kicker, num } = Astro.props;
       </p>
     )
   }
-  <h2 id={id}>{title}<span class="dot-end" aria-hidden="true">.</span></h2>
+  <h2 id={id}>
+    {parts[0]}{parts[1] && <span class="sh-hl">{parts[1]}</span>}{parts[2]}<span class="dot-end" aria-hidden="true">.</span>
+  </h2>
   {sub && <p class="sh-sub">{sub}</p>}
   <slot />
 </header>

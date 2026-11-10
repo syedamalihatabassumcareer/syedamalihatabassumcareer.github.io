@@ -82,7 +82,7 @@ export const experienceKinds = [
   { id: 'industry', label: 'Industry' },
   { id: 'research', label: 'Research' },
   { id: 'teaching', label: 'Teaching' },
-  { id: 'engineering-team', label: 'Engineering team' },
+  { id: 'extracurricular', label: 'Extracurricular' },
 ] as const;
 
 export const awardCategories = [

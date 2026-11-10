@@ -1,7 +1,7 @@
 ---
 // Timeline: dates in a narrow column, a thin rule with orange markers, role
-// and organisation in the main column, contributions underneath. Includes the
-// engineering-team activity (Mars rover).
+// and organisation in the main column, contributions underneath.
+// Extracurricular activities (Mars rover team) are shown under Education.
 import Gallery from '@/components/Gallery.astro';
 import Icon from '@/components/Icon.astro';
 import SectionHeading from '@/components/SectionHeading.astro';
@@ -10,7 +10,7 @@ import { getExperience } from '@/lib/content';
 import { formatMonth } from '@/lib/format';
 import { withBase } from '@/lib/url';
 
-const experience = await getExperience();
+const experience = (await getExperience()).filter((e) => e.data.kind !== 'extracurricular');
 
 // Photos: src/assets/experience/<experience id>/<file>, listed with alt text in experience.json.
 const photoFiles = import.meta.glob<ImageMetadata>('/src/assets/experience/*/*.{jpg,jpeg,png,webp}', {
@@ -30,9 +30,10 @@ const photosFor = (e: (typeof experience)[number]) =>
     <SectionHeading
       id="experience-title"
       num="03"
-      kicker="Track record"
-      title="Experience"
-      sub="Industry experience first, then engineering-team, teaching and research roles."
+      kicker="Experience"
+      title="Where I’ve put it to work"
+      highlight="to work"
+      sub="Industry experience first, then teaching and research roles."
     />
 
     <ol class="timeline">

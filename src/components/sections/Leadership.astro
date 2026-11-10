@@ -5,8 +5,8 @@
 // apart from the white sections around it.
 //
 // Without JS every competency is shown as a card. With JS the list on the
-// left becomes an ARIA tablist and one competency is shown at a time; all
-// panes share one grid cell, so switching never changes the panel height.
+// left becomes an ARIA tablist and one competency is shown at a time; each
+// pane is as tall as its own content.
 // Data: src/data/leadership.ts (documented facts only).
 import Icon from '@/components/Icon.astro';
 import SectionHeading from '@/components/SectionHeading.astro';
@@ -30,8 +30,9 @@ const pad = (n: number) => String(n).padStart(2, '0');
         id="leadership-title"
         num="02"
         kicker="Why me"
-        title="Leadership in action"
-        sub="No formal title yet — so here is the behaviour instead. Six competencies leadership programmes assess, each proven by something I have actually done."
+        title="Leadership, proven in action"
+        highlight="proven"
+        sub="Six competencies that leadership programmes look for — each backed by real work, from Grameenphone to the classroom."
       />
 
       <!-- Proof first: the headline numbers. -->
@@ -82,11 +83,8 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
         <div class="panes">
           {
-            leadership.map((q, i) => (
+            leadership.map((q) => (
               <article class={`pane tone-${q.tone}`} id={`lead-${q.id}`} aria-labelledby={`lead-h-${q.id}`}>
-                <span class="pane-ghost" aria-hidden="true">
-                  {pad(i + 1)}
-                </span>
                 <div class="pane-head">
                   <span class="p-icon" aria-hidden="true">
                     <Icon name={q.icon} />
@@ -117,12 +115,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
                     </li>
                   ))}
                 </ol>
-
-                <button class="p-next" type="button" data-lead-next hidden>
-                  <span class="pn-label">Next competency</span>
-                  <span class="pn-title">{leadership[(i + 1) % leadership.length].title}</span>
-                  <Icon name="arrow-right" />
-                </button>
               </article>
             ))
           }
@@ -181,14 +173,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
     };
     if (fromHash() < 0) select(0);
     addEventListener('hashchange', fromHash);
-
-    // "Next competency" buttons at the foot of each pane.
-    panes.forEach((p, i) => {
-      const next = p!.querySelector<HTMLButtonElement>('[data-lead-next]');
-      if (!next) return;
-      next.hidden = false;
-      next.addEventListener('click', () => select((i + 1) % tabs.length, true));
-    });
 
     list.hidden = false;
     root.classList.add('is-tabs');
@@ -368,76 +352,8 @@ const pad = (n: number) => String(n).padStart(2, '0');
     scroll-margin-top: calc(var(--header-h) + 2rem);
   }
 
-  .is-tabs .pane {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .p-next {
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.3rem 0.75rem;
-    align-self: flex-start;
-    margin-top: auto;
-    min-height: 2.75rem;
-    padding: 0.6rem 1.1rem;
-    border: 1px solid rgb(255 255 255 / 0.18);
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.06);
-    color: var(--text);
-    font-weight: 700;
-    transition:
-      background-color 250ms ease,
-      border-color 250ms ease;
-  }
-
-  /* Space above the button, wherever the pane content ends. */
-  .is-tabs .p-evidence {
-    margin-bottom: var(--s-3);
-  }
-
-  .p-next:hover {
-    border-color: var(--tone-a);
-    background: color-mix(in srgb, var(--tone-a) 16%, transparent);
-  }
-
-  .p-next:focus-visible {
-    outline-color: #fff;
-  }
-
-  .pn-label {
-    font-family: var(--font-mono-stack);
-    font-size: var(--step--2);
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .p-next :global(svg) {
-    width: 1rem;
-    height: 1rem;
-    color: var(--tone-text);
-  }
-
   .pane:focus-visible {
     outline-color: #fff;
-  }
-
-  .pane-ghost {
-    position: absolute;
-    z-index: -1;
-    right: 1.25rem;
-    bottom: -1.5rem;
-    font-size: clamp(6rem, 4rem + 6vw, 10rem);
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -0.05em;
-    color: transparent;
-    -webkit-text-stroke: 1.5px color-mix(in srgb, var(--tone-a) 35%, transparent);
-    pointer-events: none;
-    user-select: none;
   }
 
   .pane-head {
@@ -679,26 +595,21 @@ const pad = (n: number) => String(n).padStart(2, '0');
     color: var(--tone-text);
   }
 
-  /* With JS: list on the left, one pane at a time on the right. All panes
-     share one grid cell, so the panel keeps the height of the tallest. */
+  /* With JS: list on the left, one pane at a time on the right; the pane is
+     only as tall as its content. */
   .explorer.is-tabs {
     display: grid;
     grid-template-columns: minmax(16rem, 21rem) minmax(0, 1fr);
     gap: var(--s-4);
-    align-items: stretch;
+    align-items: start;
   }
 
   .is-tabs .panes {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .is-tabs .pane {
-    grid-area: 1 / 1;
-  }
-
   .is-tabs .pane[data-inactive] {
-    visibility: hidden;
-    opacity: 0;
+    display: none;
   }
 
   @media (max-width: 59.99rem) {
@@ -729,11 +640,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
       display: none;
     }
 
-    /* On narrow screens the height may change; no empty space under short panes. */
-    .is-tabs .pane[data-inactive] {
-      display: none;
-    }
-
     .pane-head {
       flex-wrap: wrap;
     }
@@ -758,19 +664,15 @@ const pad = (n: number) => String(n).padStart(2, '0');
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .is-tabs .pane {
-      transition:
-        opacity 350ms var(--ease),
-        transform 450ms var(--ease),
-        visibility 0s linear 0s;
+    .is-tabs .pane:not([data-inactive]) {
+      animation: pane-in 400ms var(--ease) both;
     }
 
-    .is-tabs .pane[data-inactive] {
-      transform: translateY(10px);
-      transition:
-        opacity 200ms ease,
-        transform 200ms ease,
-        visibility 0s linear 200ms;
+    @keyframes pane-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
     }
 
     .au--1 {

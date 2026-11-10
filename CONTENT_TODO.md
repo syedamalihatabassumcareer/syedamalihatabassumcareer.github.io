@@ -83,9 +83,15 @@ If you have real figures, they make the strongest case for recruiters:
 - [ ] **IELTS:** optional link to verify the Test Report Form.
 
 ## Decisions made for this site
-- **Section order for recruiters:** About → Experience → Projects → Education & Awards →
-  Publications → Contact. Experience lists the industry role first, then the engineering team,
-  teaching and research roles.
+- **Section order for recruiters:** About → Leadership → Experience → Projects → Education &
+  Awards → Publications → Contact. Experience lists the industry role first, then teaching and
+  research roles. The Mars rover team is shown under Education as an extracurricular activity
+  (`kind: "extracurricular"` in `src/data/experience.json`).
+- **Teaching assistant dates** changed to Oct 2025 – May 2026 at the owner's request; the CV
+  will be updated by the owner.
+- **Grameenphone (owner-supplied):** SMU upgrades were coordinated across Bangladesh; she
+  liaised with telecom operators sharing rectifiers with Grameenphone, analysed Grameenphone's
+  needs and proposed technical support accordingly.
 - **Publications kept, but compact** (no filters), near the end: evidence of analytical skill
   and technical writing.
 - **Colours:** Grameenphone's brand blues and green, light theme by default. No Grameenphone
