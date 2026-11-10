@@ -56,6 +56,11 @@ export const leadership: LeadershipQuality[] = [
         label: 'Grameenphone',
       },
       {
+        text: 'Worked in a special ten-person NEXTERN team to create the presentation and roadshow material for FutureMakers, Grameenphone’s flagship event.',
+        href: '#grameenphone-nextern',
+        label: 'Grameenphone',
+      },
+      {
         text: 'Worked alongside the vision, networking and mechanical sub-teams to bring the Mars rover’s systems together.',
         href: '#mongoltori-mars-rover',
         label: 'Rover team',
@@ -140,11 +145,6 @@ export const leadership: LeadershipQuality[] = [
     evidence: [
       {
         text: 'Acted as the go-between for operators sharing Grameenphone’s rectifiers, balancing their needs with Grameenphone’s and recommending support that worked for both.',
-        href: '#grameenphone-nextern',
-        label: 'Grameenphone',
-      },
-      {
-        text: 'Helped present FutureMakers, Grameenphone’s flagship event, by designing its presentation and roadshow material with fellow NEXTERNs.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
