@@ -91,7 +91,12 @@ If you have real figures, they make the strongest case for recruiters:
   will be updated by the owner.
 - **Grameenphone (owner-supplied):** SMU upgrades were coordinated across Bangladesh; she
   liaised with telecom operators sharing rectifiers with Grameenphone, analysed Grameenphone's
-  needs and proposed technical support accordingly.
+  needs and proposed technical support accordingly. She also worked with the full NEXTERN cohort on a
+  proposal for feasible MyGP app feature updates, and with the NEXTERN team prepared the deck,
+  roadshow visuals and slides for FutureMakers, Grameenphone's flagship event.
+- **Leadership competency names** made formal at the owner's request (People Development,
+  Cross-Functional Collaboration, Data-Driven Decision-Making, Digital Transformation,
+  Performance Under Pressure, Effective Communication).
 - **Publications kept, but compact** (no filters), near the end: evidence of analytical skill
   and technical writing.
 - **Colours:** Grameenphone's brand blues and green, light theme by default. No Grameenphone

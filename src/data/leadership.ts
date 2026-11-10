@@ -23,9 +23,9 @@ export interface LeadershipQuality {
 export const leadership: LeadershipQuality[] = [
   {
     id: 'developing-people',
-    title: 'Developing people',
+    title: 'People Development',
     summary: 'Helping others learn and grow.',
-    competency: 'Coaching & developing others',
+    competency: 'Coaching & mentoring',
     stat: { value: '250+', label: 'students mentored' },
     tone: 'blue',
     icon: 'users',
@@ -39,7 +39,7 @@ export const leadership: LeadershipQuality[] = [
   },
   {
     id: 'collaboration',
-    title: 'Working across teams',
+    title: 'Cross-Functional Collaboration',
     summary: 'Getting things done with people from other functions.',
     competency: 'Stakeholder management',
     tone: 'purple',
@@ -47,6 +47,11 @@ export const leadership: LeadershipQuality[] = [
     evidence: [
       {
         text: 'Coordinated SMU upgrades across Bangladesh with the Umbrella team at Grameenphone.',
+        href: '#grameenphone-nextern',
+        label: 'Grameenphone',
+      },
+      {
+        text: 'Collaborated with the full NEXTERN cohort on a proposal to Grameenphone for feasible feature updates to the MyGP app.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
@@ -59,7 +64,7 @@ export const leadership: LeadershipQuality[] = [
   },
   {
     id: 'data-driven',
-    title: 'Data-driven decisions',
+    title: 'Data-Driven Decision-Making',
     summary: 'Letting evidence, not guesswork, drive the call.',
     competency: 'Analytical thinking',
     stat: { value: 'Top 6', label: 'national Excel competition' },
@@ -85,7 +90,7 @@ export const leadership: LeadershipQuality[] = [
   },
   {
     id: 'digital-change',
-    title: 'Driving digital change',
+    title: 'Digital Transformation',
     summary: 'Using AI and technology to modernise how things work.',
     competency: 'Digital mindset',
     tone: 'blue',
@@ -105,7 +110,7 @@ export const leadership: LeadershipQuality[] = [
   },
   {
     id: 'resilience',
-    title: 'Delivering under pressure',
+    title: 'Performance Under Pressure',
     summary: 'Competing, and delivering, at a high level.',
     competency: 'Resilience & drive',
     stat: { value: '8th', label: 'of 102 teams worldwide' },
@@ -126,15 +131,20 @@ export const leadership: LeadershipQuality[] = [
   },
   {
     id: 'communication',
-    title: 'Communicating clearly',
+    title: 'Effective Communication',
     summary: 'Explaining complex ideas to any audience.',
-    competency: 'Communication',
+    competency: 'Written & verbal communication',
     stat: { value: '7.5', label: 'IELTS overall · CEFR C1' },
     tone: 'green',
     icon: 'globe',
     evidence: [
       {
         text: 'Liaised with telecom operators that share rectifiers with Grameenphone — understood their requirements, analysed Grameenphone’s own needs, and proposed technical support to suit both.',
+        href: '#grameenphone-nextern',
+        label: 'Grameenphone',
+      },
+      {
+        text: 'Prepared the deck, roadshow visuals and slides with the NEXTERN team for FutureMakers, Grameenphone’s flagship event.',
         href: '#grameenphone-nextern',
         label: 'Grameenphone',
       },
